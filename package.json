@@ -1,0 +1,20 @@
+{
+  "name": "react-roster",
+  "version": "1.0.0",
+  "description": "ExpressJS-ReactJS Roster for 7cav.us",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "7cav"
+  ],
+  "author": "Josh Edson",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "react": "^17.0.2"
+  }
+}

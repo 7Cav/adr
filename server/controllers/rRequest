@@ -1,0 +1,21 @@
+const express = require("express");
+const axios = require("axios");
+const Token = require("../credentials/token")
+
+//controller function getCombatRoster
+let getReserveRoster = async () => {
+let response = await axios('https://api.7cav.us/api/v1/roster/2', {
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + Token
+    },
+})
+return response.data
+}
+//controller function getReserveRoster
+
+module.exports = async (req, res) => {
+let responseReserves = await getReserveRoster();
+res.send(responseReserves);
+};
