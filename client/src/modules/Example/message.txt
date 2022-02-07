@@ -1,0 +1,1135 @@
+/584/edit">JAG Specialist</a></td>
+
+/14/edit">----------REG HQ----------</a></td>
+
+/1/edit">Regimental Commanding Officer</a></td>
+
+/2/edit">Regimental Executive Officer</a></td>
+
+/3/edit">Regimental Chief of Staff</a></td>
+
+/4/edit">Regimental Recruiting Oversight Officer</a></td>
+
+/5/edit">Regimental Information Management Officer</a></td>
+
+/61/edit">Regimental Security Operations Officer</a></td>
+
+/6/edit">Regimental Command Sergeant Major</a></td>
+
+/9/edit">Aide to the IMO</a></td>
+
+/10/edit">Aide to the CoS</a></td>
+
+/60/edit">Aide to the ROO</a></td>
+
+/62/edit">Aide to the SecOps</a></td>
+
+/13/edit">Officer Pool</a></td>
+
+/15/edit">----------SUPPORT----------</a></td>
+
+/16/edit">----------S1 DEPARTMENT----------</a></td>
+
+/8/edit">S1 1IC</a></td>
+
+/17/edit">S1 2IC</a></td>
+
+/18/edit">S1 Milpacs Lead</a></td>
+
+/19/edit">S1 Milpacs Senior</a></td>
+
+/20/edit">S1 Milpacs Clerk</a></td>
+
+/21/edit">S1 Milpacs IT</a></td>
+
+/22/edit">S1 Uniforms Lead</a></td>
+
+/23/edit">S1 Uniforms Senior</a></td>
+
+/24/edit">S1 Uniforms Clerk</a></td>
+
+/25/edit">S1 Uniforms IT</a></td>
+
+/26/edit">S1 Operations Lead</a></td>
+
+/27/edit">S1 Operations Senior</a></td>
+
+/28/edit">S1 Operations Clerk</a></td>
+
+/29/edit">S1 Operations IT</a></td>
+
+/30/edit">S1 Citations Lead</a></td>
+
+/31/edit">S1 Citations Senior</a></td>
+
+/32/edit">S1 Citations Clerk</a></td>
+
+/33/edit">S1 Citations IT</a></td>
+
+/34/edit">S1 Tracker Lead</a></td>
+
+/35/edit">S1 Tracker Senior</a></td>
+
+/36/edit">S1 Tracker Clerk</a></td>
+
+/37/edit">S1 Tracker IT</a></td>
+
+/7/edit">S1 Test Account</a></td>
+
+/38/edit">----------WAG DEPARTMENT----------</a></td>
+
+/39/edit">WAG 1IC</a></td>
+
+/40/edit">WAG 2IC</a></td>
+
+/41/edit">WAG Admin Lead</a></td>
+
+/42/edit">WAG Admin Senior</a></td>
+
+/43/edit">WAG Admin Clerk</a></td>
+
+/44/edit">WAG Admin IT</a></td>
+
+/45/edit">WAG Drafting Lead</a></td>
+
+/46/edit">WAG Drafting Senior</a></td>
+
+/47/edit">WAG Drafting Staff</a></td>
+
+/48/edit">WAG Drafting IT</a></td>
+
+/49/edit">----------S6 DEPARTMENT----------</a></td>
+
+/50/edit">S6 1IC</a></td>
+
+/51/edit">S6 2IC</a></td>
+
+/52/edit">S6 Lead Developer</a></td>
+
+/53/edit">S6 Senior Developer</a></td>
+
+/54/edit">S6 Developer</a></td>
+
+/55/edit">S6 Developer IT</a></td>
+
+/56/edit">S6 Lead</a></td>
+
+/57/edit">S6 Senior Game Staff</a></td>
+
+/58/edit">S6 Game Staff</a></td>
+
+/59/edit">S6 Game Staff IT</a></td>
+
+/63/edit">----------RRD DEPARTMENT----------</a></td>
+
+/64/edit">RRD 1IC</a></td>
+
+/65/edit">RRD 2IC</a></td>
+
+/577/edit">RRD Senior Recruiter</a></td>
+
+/578/edit">RRD Recruiter</a></td>
+
+/579/edit">RRD Lead Processing Clerk</a></td>
+
+/580/edit">RRD Processing Clerk</a></td>
+
+/82/edit">----------S5 DEPARTMENT----------</a></td>
+
+/83/edit">S5 1IC</a></td>
+
+/84/edit">S5 2IC</a></td>
+
+/85/edit">S5 Public Relations Lead</a></td>
+
+/86/edit">S5 Public Relations Senior</a></td>
+
+/87/edit">S5 Public Relations</a></td>
+
+/88/edit">S5 Public Relations IT</a></td>
+
+/89/edit">S5 Graphics Lead</a></td>
+
+/90/edit">S5 Graphics Senior</a></td>
+
+/91/edit">S5 Graphics</a></td>
+
+/92/edit">S5 Graphics IT</a></td>
+
+/93/edit">S5 Lead Filmmaker</a></td>
+
+/94/edit">S5 Senior Filmmaker</a></td>
+
+/95/edit">S5 Filmmaker</a></td>
+
+/96/edit">S5 Filmmaker IT</a></td>
+
+/97/edit">----------RTC DEPARTMENT----------</a></td>
+
+/98/edit">RTC 1IC</a></td>
+
+/99/edit">RTC 2IC</a></td>
+
+/100/edit">RTC Lead Drill Instructor</a></td>
+
+/101/edit">RTC Senior Drill Instructor</a></td>
+
+/102/edit">RTC Drill Instructor</a></td>
+
+/103/edit">RTC Drill Instructor IT</a></td>
+
+/104/edit">----------S7 DEPARTMENT----------</a></td>
+
+/105/edit">S7 1IC</a></td>
+
+/106/edit">S7 2IC</a></td>
+
+/107/edit">S7 1BN Lead Instructor</a></td>
+
+/108/edit">S7 ARMA ACE Senior Instructor</a></td>
+
+/531/edit">S7 ARMA ACE Lead Instructor</a></td>
+
+/109/edit">S7 ARMA ACE Instructor</a></td>
+
+/110/edit">S7 ARMA ACE Instructor IT</a></td>
+
+/532/edit">S7 Arma IS Lead Instructor</a></td>
+
+/111/edit">S7 ARMA IS Senior Instructor</a></td>
+
+/112/edit">S7 ARMA IS Instructor</a></td>
+
+/113/edit">S7 ARMA IS Instructor IT</a></td>
+
+/114/edit">S7 ARMA TAS Senior Instructor</a></td>
+
+/533/edit">S7 Arma TAS Lead Instructor</a></td>
+
+/115/edit">S7 ARMA TAS Instructor</a></td>
+
+/116/edit">S7 ARMA TAS Instructor IT</a></td>
+
+/117/edit">S7 ARMA TCS Senior Instructor</a></td>
+
+/534/edit">S7 Arma TCS Lead Instructor</a></td>
+
+/118/edit">S7 ARMA TCS Instructor</a></td>
+
+/119/edit">S7 ARMA TCS Instructor IT</a></td>
+
+/120/edit">S7 2BN Lead Instructor</a></td>
+
+/121/edit">S7 Squad CAS Senior Instructor</a></td>
+
+/535/edit">S7 Squad CAS Lead Instructor</a></td>
+
+/122/edit">S7 Squad CAS Instructor</a></td>
+
+/123/edit">S7 Squad CAS Instructor IT</a></td>
+
+/124/edit">S7 HLL SOI Senior Instructor</a></td>
+
+/536/edit">S7 HLL SOI Lead Instructor</a></td>
+
+/125/edit">S7 HLL SOI Instructor</a></td>
+
+/126/edit">S7 HLL SOI Instructor IT</a></td>
+
+/127/edit">S7 ODS Lead Instructor</a></td>
+
+/128/edit">S7 ODS Instructor</a></td>
+
+/129/edit">S7 ODS Instructor IT</a></td>
+
+/130/edit">S7 NCOA Lead Instructor</a></td>
+
+/539/edit">S7 NCOA Senior Instructor</a></td>
+
+/131/edit">S7 NCOA Instructor</a></td>
+
+/132/edit">S7 NCOA Instructor IT</a></td>
+
+/544/edit">S7 HLL THQ Lead Instructor</a></td>
+
+/545/edit">S7 HLL THQ Senior Instructor</a></td>
+
+/546/edit">S7 HLL THQ Instructor</a></td>
+
+/547/edit">S7 HLL THQ Instructor IT</a></td>
+
+/548/edit">S7 HLL SOA Lead Instructor</a></td>
+
+/549/edit">S7 HLL SOA Senior Instructor</a></td>
+
+/550/edit">S7 HLL SOA Instructor</a></td>
+
+/551/edit">S7 HLL SOA Instructor IT</a></td>
+
+/133/edit">----------S3 DEPARTMENT----------</a></td>
+
+/134/edit">S3 1IC</a></td>
+
+/135/edit">S3 2IC</a></td>
+
+/136/edit">S3 Arma Operations Lead</a></td>
+
+/137/edit">S3 Arma Operations Senior</a></td>
+
+/138/edit">S3 Arma Operations Staff</a></td>
+
+/139/edit">S3 Arma Operations Staff IT</a></td>
+
+/140/edit">S3 HLL Operations Lead</a></td>
+
+/141/edit">S3 HLL Operations Senior</a></td>
+
+/142/edit">S3 HLL Operations Staff</a></td>
+
+/143/edit">S3 HLL Operations Staff IT</a></td>
+
+/540/edit">S3 HLL Lead Public Staff</a></td>
+
+/541/edit">S3 HLL Senior Public Staff</a></td>
+
+/542/edit">S3 HLL Public Staff</a></td>
+
+/543/edit">S3 HLL Public Staff IT</a></td>
+
+/144/edit">S3 Squad Operations Lead</a></td>
+
+/145/edit">S3 Squad Operations Senior</a></td>
+
+/146/edit">S3 Squad Operations Staff</a></td>
+
+/147/edit">S3 Squad Operations Staff IT</a></td>
+
+/148/edit">S3 Arma Lead Public Staff</a></td>
+
+/149/edit">S3 Arma Senior Public Staff</a></td>
+
+/150/edit">S3 Arma Public Staff</a></td>
+
+/151/edit">S3 Arma Public Staff IT</a></td>
+
+/152/edit">S3 Arma Lead Mission Designer</a></td>
+
+/153/edit">S3 Arma Senior Mission Designer</a></td>
+
+/154/edit">S3 Arma Mission Designer</a></td>
+
+/155/edit">S3 Arma Mission Designer IT</a></td>
+
+/156/edit">S3 Arma Scripting Lead</a></td>
+
+/157/edit">S3 Arma Scripting Senior</a></td>
+
+/158/edit">S3 Arma Scripting</a></td>
+
+/159/edit">S3 Arma Scripting IT</a></td>
+
+/174/edit">----------SPD DEPARTMENT----------</a></td>
+
+/175/edit">SPD Lead</a></td>
+
+/176/edit">SPD Clerk</a></td>
+
+/160/edit">----------S2 DEPARTMENT----------</a></td>
+
+/161/edit">S2 1IC</a></td>
+
+/162/edit">S2 2IC</a></td>
+
+/163/edit">S2 Lead Investigator</a></td>
+
+/164/edit">S2 Senior Investigator</a></td>
+
+/165/edit">S2 Investigator</a></td>
+
+/166/edit">S2 Investigator IT</a></td>
+
+/167/edit">----------MP DEPARTMENT----------</a></td>
+
+/168/edit">MP 1IC</a></td>
+
+/169/edit">MP 2IC</a></td>
+
+/170/edit">MP Lead Administrator</a></td>
+
+/171/edit">MP Senior Administrator</a></td>
+
+/172/edit">MP Administrator</a></td>
+
+/173/edit">MP Administrator IT</a></td>
+
+/177/edit">----------1-7 HQ----------</a></td>
+
+/178/edit">1-7 Commanding Officer</a></td>
+
+/179/edit">1-7 Executive Officer</a></td>
+
+/180/edit">1-7 Sergeant Major</a></td>
+
+/530/edit">1-7 Support Staff</a></td>
+
+/185/edit">----------A/1-7----------</a></td>
+
+/196/edit">Commander A/1-7</a></td>
+
+/197/edit">Executive Officer A/1-7</a></td>
+
+/198/edit">First Sergeant A/1-7</a></td>
+
+/199/edit">Platoon Leader 1/A/1-7</a></td>
+
+/200/edit">Platoon Sergeant 1/A/1-7</a></td>
+
+/201/edit">Section Leader 1/1/A/1-7</a></td>
+
+/202/edit">Assistant Section Leader 1/1/A/1-7</a></td>
+
+/203/edit">Trooper 1/1/A/1-7</a></td>
+
+/204/edit">Section Leader 2/1/A/1-7</a></td>
+
+/205/edit">Assistant Section Leader 2/1/A/1-7</a></td>
+
+/206/edit">Trooper 2/1/A/1-7</a></td>
+
+/207/edit">Section Leader 3/1/A/1-7</a></td>
+
+/208/edit">Assistant Section Leader 3/1/A/1-7</a></td>
+
+/209/edit">Trooper 3/1/A/1-7</a></td>
+
+/210/edit">Section Leader 4/1/A/1-7</a></td>
+
+/211/edit">Assistant Section Leader 4/1/A/1-7</a></td>
+
+/212/edit">Trooper 4/1/A/1-7</a></td>
+
+/213/edit">Platoon Leader 2/A/1-7</a></td>
+
+/214/edit">Platoon Sergeant 2/A/1-7</a></td>
+
+/215/edit">Section Leader 1/2/A/1-7</a></td>
+
+/216/edit">Assistant Section Leader 1/2/A/1-7</a></td>
+
+/217/edit">Trooper 1/2/A/1-7</a></td>
+
+/218/edit">Section Leader 2/2/A/1-7</a></td>
+
+/219/edit">Assistant Section Leader 2/2/A/1-7</a></td>
+
+/220/edit">Trooper 2/2/A/1-7</a></td>
+
+/221/edit">Section Leader 3/2/A/1-7</a></td>
+
+/222/edit">Assistant Section Leader 3/2/A/1-7</a></td>
+
+/223/edit">Trooper 3/2/A/1-7</a></td>
+
+/224/edit">Section Leader 4/2/A/1-7</a></td>
+
+/225/edit">Assistant Section Leader 4/2/A/1-7</a></td>
+
+/226/edit">Trooper 4/2/A/1-7</a></td>
+
+/186/edit">----------B/1-7----------</a></td>
+
+/227/edit">Commander B/1-7</a></td>
+
+/228/edit">Executive Officer B/1-7</a></td>
+
+/229/edit">First Sergeant B/1-7</a></td>
+
+/230/edit">Platoon Leader 1/B/1-7</a></td>
+
+/231/edit">Platoon Sergeant 1/B/1-7</a></td>
+
+/232/edit">Section Leader 1/1/B/1-7</a></td>
+
+/233/edit">Assistant Section Leader 1/1/B/1-7</a></td>
+
+/234/edit">Trooper 1/1/B/1-7</a></td>
+
+/235/edit">Section Leader 2/1/B/1-7</a></td>
+
+/236/edit">Assistant Section Leader 2/1/B/1-7</a></td>
+
+/237/edit">Trooper 2/1/B/1-7</a></td>
+
+/238/edit">Section Leader 3/1/B/1-7</a></td>
+
+/239/edit">Assistant Section Leader 3/1/B/1-7</a></td>
+
+/240/edit">Trooper 3/1/B/1-7</a></td>
+
+/241/edit">Section Leader 4/1/B/1-7</a></td>
+
+/242/edit">Assistant Section Leader 4/1/B/1-7</a></td>
+
+/243/edit">Trooper 4/1/B/1-7</a></td>
+
+/244/edit">Platoon Leader 2/B/1-7</a></td>
+
+/245/edit">Platoon Sergeant 2/B/1-7</a></td>
+
+/246/edit">Section Leader 1/2/B/1-7</a></td>
+
+/247/edit">Assistant Section Leader 1/2/B/1-7</a></td>
+
+/248/edit">Trooper 1/2/B/1-7</a></td>
+
+/249/edit">Section Leader 2/2/B/1-7</a></td>
+
+/250/edit">Assistant Section Leader 2/2/B/1-7</a></td>
+
+/251/edit">Trooper 2/2/B/1-7</a></td>
+
+/252/edit">Section Leader 3/2/B/1-7</a></td>
+
+/253/edit">Assistant Section Leader 3/2/B/1-7</a></td>
+
+/254/edit">Trooper 3/2/B/1-7</a></td>
+
+/255/edit">Section Leader 4/2/B/1-7</a></td>
+
+/256/edit">Assistant Section Leader 4/2/B/1-7</a></td>
+
+/257/edit">Trooper 4/2/B/1-7</a></td>
+
+/258/edit">Platoon Leader 3/B/1-7</a></td>
+
+/259/edit">Platoon Sergeant 3/B/1-7</a></td>
+
+/260/edit">Section Leader 1/3/B/1-7</a></td>
+
+/261/edit">Assistant Section Leader 1/3/B/1-7</a></td>
+
+/262/edit">Trooper 1/3/B/1-7</a></td>
+
+/263/edit">Section Leader 2/3/B/1-7</a></td>
+
+/264/edit">Assistant Section Leader 2/3/B/1-7</a></td>
+
+/265/edit">Trooper 2/3/B/1-7</a></td>
+
+/266/edit">Section Leader 3/3/B/1-7</a></td>
+
+/267/edit">Assistant Section Leader 3/3/B/1-7</a></td>
+
+/268/edit">Trooper 3/3/B/1-7</a></td>
+
+/269/edit">Section Leader 4/3/B/1-7</a></td>
+
+/270/edit">Assistant Section Leader 4/3/B/1-7</a></td>
+
+/271/edit">Trooper 4/3/B/1-7</a></td>
+
+/272/edit">Platoon Leader 4/B/1-7</a></td>
+
+/273/edit">Platoon Sergeant 4/B/1-7</a></td>
+
+/274/edit">Section Leader 1/4/B/1-7</a></td>
+
+/275/edit">Assistant Section Leader 1/4/B/1-7</a></td>
+
+/276/edit">Trooper 1/4/B/1-7</a></td>
+
+/277/edit">Section Leader 2/4/B/1-7</a></td>
+
+/278/edit">Assistant Section Leader 2/4/B/1-7</a></td>
+
+/279/edit">Trooper 2/4/B/1-7</a></td>
+
+/280/edit">Section Leader 3/4/B/1-7</a></td>
+
+/281/edit">Assistant Section Leader 3/4/B/1-7</a></td>
+
+/282/edit">Trooper 3/4/B/1-7</a></td>
+
+/283/edit">Section Leader 4/4/B/1-7</a></td>
+
+/284/edit">Assistant Section Leader 4/4/B/1-7</a></td>
+
+/285/edit">Trooper 4/4/B/1-7</a></td>
+
+/187/edit">----------C/1-7----------</a></td>
+
+/286/edit">Commander C/1-7</a></td>
+
+/287/edit">Executive Officer C/1-7</a></td>
+
+/288/edit">First Sergeant C/1-7</a></td>
+
+/289/edit">Platoon Leader 1/C/1-7</a></td>
+
+/290/edit">Platoon Sergeant 1/C/1-7</a></td>
+
+/291/edit">Section Leader 1/1/C/1-7</a></td>
+
+/292/edit">Assistant Section Leader 1/1/C/1-7</a></td>
+
+/293/edit">Trooper 1/1/C/1-7</a></td>
+
+/294/edit">Section Leader 2/1/C/1-7</a></td>
+
+/295/edit">Assistant Section Leader 2/1/C/1-7</a></td>
+
+/296/edit">Trooper 2/1/C/1-7</a></td>
+
+/297/edit">Section Leader 3/1/C/1-7</a></td>
+
+/298/edit">Assistant Section Leader 3/1/C/1-7</a></td>
+
+/299/edit">Trooper 3/1/C/1-7</a></td>
+
+/300/edit">Section Leader 4/1/C/1-7</a></td>
+
+/301/edit">Assistant Section Leader 4/1/C/1-7</a></td>
+
+/302/edit">Trooper 4/1/C/1-7</a></td>
+
+/303/edit">Platoon Leader 2/C/1-7</a></td>
+
+/304/edit">Platoon Sergeant 2/C/1-7</a></td>
+
+/305/edit">Section Leader 1/2/C/1-7</a></td>
+
+/306/edit">Assistant Section Leader 1/2/C/1-7</a></td>
+
+/307/edit">Trooper 1/2/C/1-7</a></td>
+
+/308/edit">Section Leader 2/2/C/1-7</a></td>
+
+/309/edit">Assistant Section Leader 2/2/C/1-7</a></td>
+
+/310/edit">Trooper 2/2/C/1-7</a></td>
+
+/311/edit">Section Leader 3/2/C/1-7</a></td>
+
+/312/edit">Assistant Section Leader 3/2/C/1-7</a></td>
+
+/313/edit">Trooper 3/2/C/1-7</a></td>
+
+/314/edit">Section Leader 4/2/C/1-7</a></td>
+
+/315/edit">Assistant Section Leader 4/2/C/1-7</a></td>
+
+/316/edit">Trooper 4/2/C/1-7</a></td>
+
+/317/edit">Platoon Leader 3/C/1-7</a></td>
+
+/318/edit">Platoon Sergeant 3/C/1-7</a></td>
+
+/319/edit">Section Leader 1/3/C/1-7</a></td>
+
+/320/edit">Assistant Section Leader 1/3/C/1-7</a></td>
+
+/321/edit">Trooper 1/3/C/1-7</a></td>
+
+/322/edit">Section Leader 2/3/C/1-7</a></td>
+
+/323/edit">Assistant Section Leader 2/3/C/1-7</a></td>
+
+/324/edit">Trooper 2/3/C/1-7</a></td>
+
+/325/edit">Section Leader 3/3/C/1-7</a></td>
+
+/326/edit">Assistant Section Leader 3/3/C/1-7</a></td>
+
+/327/edit">Trooper 3/3/C/1-7</a></td>
+
+/328/edit">Section Leader 4/3/C/1-7</a></td>
+
+/329/edit">Assistant Section Leader 4/3/C/1-7</a></td>
+
+/330/edit">Trooper 4/3/C/1-7</a></td>
+
+/331/edit">Platoon Leader 4/C/1-7</a></td>
+
+/332/edit">Platoon Sergeant 4/C/1-7</a></td>
+
+/333/edit">Section Leader 1/4/C/1-7</a></td>
+
+/334/edit">Assistant Section Leader 1/4/C/1-7</a></td>
+
+/335/edit">Trooper 1/4/C/1-7</a></td>
+
+/336/edit">Section Leader 2/4/C/1-7</a></td>
+
+/337/edit">Assistant Section Leader 2/4/C/1-7</a></td>
+
+/338/edit">Trooper 2/4/C/1-7</a></td>
+
+/339/edit">Section Leader 3/4/C/1-7</a></td>
+
+/340/edit">Assistant Section Leader 3/4/C/1-7</a></td>
+
+/341/edit">Trooper 3/4/C/1-7</a></td>
+
+/342/edit">Section Leader 4/4/C/1-7</a></td>
+
+/343/edit">Assistant Section Leader 4/4/C/1-7</a></td>
+
+/344/edit">Trooper 4/4/C/1-7</a></td>
+
+/181/edit">----------2-7 HQ----------</a></td>
+
+/182/edit">2-7 Commanding Officer</a></td>
+
+/183/edit">2-7 Executive Officer</a></td>
+
+/184/edit">2-7 Sergeant Major</a></td>
+
+/188/edit">----------A/2-7----------</a></td>
+
+/345/edit">Commander A/2-7</a></td>
+
+/346/edit">Executive Officer A/2-7</a></td>
+
+/347/edit">First Sergeant A/2-7</a></td>
+
+/348/edit">Platoon Leader 1/A/2-7</a></td>
+
+/349/edit">Platoon Sergeant 1/A/2-7</a></td>
+
+/350/edit">Section Leader 1/1/A/2-7</a></td>
+
+/351/edit">Assistant Section Leader 1/1/A/2-7</a></td>
+
+/352/edit">Trooper 1/1/A/2-7</a></td>
+
+/353/edit">Section Leader 2/1/A/2-7</a></td>
+
+/354/edit">Assistant Section Leader 2/1/A/2-7</a></td>
+
+/355/edit">Trooper 2/1/A/2-7</a></td>
+
+/356/edit">Section Leader 3/1/A/2-7</a></td>
+
+/357/edit">Assistant Section Leader 3/1/A/2-7</a></td>
+
+/358/edit">Trooper 3/1/A/2-7</a></td>
+
+/359/edit">Section Leader 4/1/A/2-7</a></td>
+
+/360/edit">Assistant Section Leader 4/1/A/2-7</a></td>
+
+/361/edit">Trooper 4/1/A/2-7</a></td>
+
+/362/edit">Platoon Leader 2/A/2-7</a></td>
+
+/363/edit">Platoon Sergeant 2/A/2-7</a></td>
+
+/364/edit">Section Leader 1/2/A/2-7</a></td>
+
+/365/edit">Assistant Section Leader 1/2/A/2-7</a></td>
+
+/366/edit">Trooper 1/2/A/2-7</a></td>
+
+/367/edit">Section Leader 2/2/A/2-7</a></td>
+
+/368/edit">Assistant Section Leader 2/2/A/2-7</a></td>
+
+/369/edit">Trooper 2/2/A/2-7</a></td>
+
+/370/edit">Section Leader 3/2/A/2-7</a></td>
+
+/371/edit">Assistant Section Leader 3/2/A/2-7</a></td>
+
+/372/edit">Trooper 3/2/A/2-7</a></td>
+
+/373/edit">Section Leader 4/2/A/2-7</a></td>
+
+/374/edit">Assistant Section Leader 4/2/A/2-7</a></td>
+
+/375/edit">Trooper 4/2/A/2-7</a></td>
+
+/376/edit">Platoon Leader 3/A/2-7</a></td>
+
+/377/edit">Platoon Sergeant 3/A/2-7</a></td>
+
+/378/edit">Section Leader 1/3/A/2-7</a></td>
+
+/379/edit">Assistant Section Leader 1/3/A/2-7</a></td>
+
+/380/edit">Trooper 1/3/A/2-7</a></td>
+
+/381/edit">Section Leader 2/3/A/2-7</a></td>
+
+/382/edit">Assistant Section Leader 2/3/A/2-7</a></td>
+
+/383/edit">Trooper 2/3/A/2-7</a></td>
+
+/384/edit">Section Leader 3/3/A/2-7</a></td>
+
+/385/edit">Assistant Section Leader 3/3/A/2-7</a></td>
+
+/386/edit">Trooper 3/3/A/2-7</a></td>
+
+/387/edit">Section Leader 4/3/A/2-7</a></td>
+
+/388/edit">Assistant Section Leader 4/3/A/2-7</a></td>
+
+/389/edit">Trooper 4/3/A/2-7</a></td>
+
+/189/edit">----------B/2-7----------</a></td>
+
+/390/edit">Commander B/2-7</a></td>
+
+/391/edit">Executive Officer B/2-7</a></td>
+
+/392/edit">First Sergeant B/2-7</a></td>
+
+/393/edit">Platoon Leader 1/B/2-7</a></td>
+
+/394/edit">Platoon Sergeant 1/B/2-7</a></td>
+
+/395/edit">Section Leader 1/1/B/2-7</a></td>
+
+/396/edit">Assistant Section Leader 1/1/B/2-7</a></td>
+
+/397/edit">Trooper 1/1/B/2-7</a></td>
+
+/398/edit">Section Leader 2/1/B/2-7</a></td>
+
+/399/edit">Assistant Section Leader 2/1/B/2-7</a></td>
+
+/400/edit">Trooper 2/1/B/2-7</a></td>
+
+/401/edit">Section Leader 3/1/B/2-7</a></td>
+
+/402/edit">Assistant Section Leader 3/1/B/2-7</a></td>
+
+/403/edit">Trooper 3/1/B/2-7</a></td>
+
+/404/edit">Section Leader 4/1/B/2-7</a></td>
+
+/405/edit">Assistant Section Leader 4/1/B/2-7</a></td>
+
+/406/edit">Trooper 4/1/B/2-7</a></td>
+
+/407/edit">Platoon Leader 2/B/2-7</a></td>
+
+/408/edit">Platoon Sergeant 2/B/2-7</a></td>
+
+/409/edit">Section Leader 1/2/B/2-7</a></td>
+
+/410/edit">Assistant Section Leader 1/2/B/2-7</a></td>
+
+/411/edit">Trooper 1/2/B/2-7</a></td>
+
+/412/edit">Section Leader 2/2/B/2-7</a></td>
+
+/413/edit">Assistant Section Leader 2/2/B/2-7</a></td>
+
+/414/edit">Trooper 2/2/B/2-7</a></td>
+
+/415/edit">Section Leader 3/2/B/2-7</a></td>
+
+/416/edit">Assistant Section Leader 3/2/B/2-7</a></td>
+
+/417/edit">Trooper 3/2/B/2-7</a></td>
+
+/418/edit">Section Leader 4/2/B/2-7</a></td>
+
+/419/edit">Assistant Section Leader 4/2/B/2-7</a></td>
+
+/420/edit">Trooper 4/2/B/2-7</a></td>
+
+/421/edit">Platoon Leader 3/B/2-7</a></td>
+
+/422/edit">Platoon Sergeant 3/B/2-7</a></td>
+
+/423/edit">Section Leader 1/3/B/2-7</a></td>
+
+/424/edit">Assistant Section Leader 1/3/B/2-7</a></td>
+
+/425/edit">Trooper 1/3/B/2-7</a></td>
+
+/426/edit">Section Leader 2/3/B/2-7</a></td>
+
+/427/edit">Assistant Section Leader 2/3/B/2-7</a></td>
+
+/428/edit">Trooper 2/3/B/2-7</a></td>
+
+/429/edit">Section Leader 3/3/B/2-7</a></td>
+
+/430/edit">Assistant Section Leader 3/3/B/2-7</a></td>
+
+/431/edit">Trooper 3/3/B/2-7</a></td>
+
+/432/edit">Section Leader 4/3/B/2-7</a></td>
+
+/433/edit">Assistant Section Leader 4/3/B/2-7</a></td>
+
+/434/edit">Trooper 4/3/B/2-7</a></td>
+
+/191/edit">----------C/2-7----------</a></td>
+
+/435/edit">Commander C/2-7</a></td>
+
+/436/edit">Executive Officer C/2-7</a></td>
+
+/437/edit">First Sergeant C/2-7</a></td>
+
+/438/edit">Platoon Leader 1/C/2-7</a></td>
+
+/439/edit">Platoon Sergeant 1/C/2-7</a></td>
+
+/440/edit">Section Leader 1/1/C/2-7</a></td>
+
+/441/edit">Assistant Section Leader 1/1/C/2-7</a></td>
+
+/442/edit">Trooper 1/1/C/2-7</a></td>
+
+/443/edit">Section Leader 2/1/C/2-7</a></td>
+
+/444/edit">Assistant Section Leader 2/1/C/2-7</a></td>
+
+/445/edit">Trooper 2/1/C/2-7</a></td>
+
+/446/edit">Section Leader 3/1/C/2-7</a></td>
+
+/447/edit">Assistant Section Leader 3/1/C/2-7</a></td>
+
+/448/edit">Trooper 3/1/C/2-7</a></td>
+
+/449/edit">Section Leader 4/1/C/2-7</a></td>
+
+/450/edit">Assistant Section Leader 4/1/C/2-7</a></td>
+
+/451/edit">Trooper 4/1/C/2-7</a></td>
+
+/452/edit">Platoon Leader 2/C/2-7</a></td>
+
+/453/edit">Platoon Sergeant 2/C/2-7</a></td>
+
+/454/edit">Section Leader 1/2/C/2-7</a></td>
+
+/455/edit">Assistant Section Leader 1/2/C/2-7</a></td>
+
+/456/edit">Trooper 1/2/C/2-7</a></td>
+
+/457/edit">Section Leader 2/2/C/2-7</a></td>
+
+/458/edit">Assistant Section Leader 2/2/C/2-7</a></td>
+
+/459/edit">Trooper 2/2/C/2-7</a></td>
+
+/460/edit">Section Leader 3/2/C/2-7</a></td>
+
+/461/edit">Assistant Section Leader 3/2/C/2-7</a></td>
+
+/462/edit">Trooper 3/2/C/2-7</a></td>
+
+/463/edit">Section Leader 4/2/C/2-7</a></td>
+
+/464/edit">Assistant Section Leader 4/2/C/2-7</a></td>
+
+/465/edit">Trooper 4/2/C/2-7</a></td>
+
+/466/edit">Platoon Leader 3/C/2-7</a></td>
+
+/467/edit">Platoon Sergeant 3/C/2-7</a></td>
+
+/468/edit">Section Leader 1/3/C/2-7</a></td>
+
+/469/edit">Assistant Section Leader 1/3/C/2-7</a></td>
+
+/470/edit">Trooper 1/3/C/2-7</a></td>
+
+/471/edit">Section Leader 2/3/C/2-7</a></td>
+
+/472/edit">Assistant Section Leader 2/3/C/2-7</a></td>
+
+/473/edit">Trooper 2/3/C/2-7</a></td>
+
+/474/edit">Section Leader 3/3/C/2-7</a></td>
+
+/475/edit">Assistant Section Leader 3/3/C/2-7</a></td>
+
+/476/edit">Trooper 3/3/C/2-7</a></td>
+
+/477/edit">Section Leader 4/3/C/2-7</a></td>
+
+/478/edit">Assistant Section Leader 4/3/C/2-7</a></td>
+
+/479/edit">Trooper 4/3/C/2-7</a></td>
+
+/192/edit">----------E/2-7----------</a></td>
+
+/480/edit">Commander E/2-7</a></td>
+
+/481/edit">Executive Officer E/2-7</a></td>
+
+/482/edit">First Sergeant E/2-7</a></td>
+
+/483/edit">Platoon Leader 1/E/2-7</a></td>
+
+/484/edit">Platoon Sergeant 1/E/2-7</a></td>
+
+/485/edit">Section Leader 1/1/E/2-7</a></td>
+
+/486/edit">Assistant Section Leader 1/1/E/2-7</a></td>
+
+/487/edit">Trooper 1/1/E/2-7</a></td>
+
+/488/edit">Section Leader 2/1/E/2-7</a></td>
+
+/489/edit">Assistant Section Leader 2/1/E/2-7</a></td>
+
+/490/edit">Trooper 2/1/E/2-7</a></td>
+
+/491/edit">Section Leader 3/1/E/2-7</a></td>
+
+/492/edit">Assistant Section Leader 3/1/E/2-7</a></td>
+
+/493/edit">Trooper 3/1/E/2-7</a></td>
+
+/494/edit">Section Leader 4/1/E/2-7</a></td>
+
+/495/edit">Assistant Section Leader 4/1/E/2-7</a></td>
+
+/496/edit">Trooper 4/1/E/2-7</a></td>
+
+/497/edit">Platoon Leader 2/E/2-7</a></td>
+
+/498/edit">Platoon Sergeant 2/E/2-7</a></td>
+
+/499/edit">Section Leader 1/2/E/2-7</a></td>
+
+/500/edit">Assistant Section Leader 1/2/E/2-7</a></td>
+
+/501/edit">Trooper 1/2/E/2-7</a></td>
+
+/502/edit">Section Leader 2/2/E/2-7</a></td>
+
+/503/edit">Assistant Section Leader 2/2/E/2-7</a></td>
+
+/504/edit">Trooper 2/2/E/2-7</a></td>
+
+/505/edit">Section Leader 3/2/E/2-7</a></td>
+
+/506/edit">Assistant Section Leader 3/2/E/2-7</a></td>
+
+/507/edit">Trooper 3/2/E/2-7</a></td>
+
+/508/edit">Section Leader 4/2/E/2-7</a></td>
+
+/509/edit">Assistant Section Leader 4/2/E/2-7</a></td>
+
+/510/edit">Trooper 4/2/E/2-7</a></td>
+
+/511/edit">Platoon Leader 3/E/2-7</a></td>
+
+/512/edit">Platoon Sergeant 3/E/2-7</a></td>
+
+/513/edit">Section Leader 1/3/E/2-7</a></td>
+
+/514/edit">Assistant Section Leader 1/3/E/2-7</a></td>
+
+/515/edit">Trooper 1/3/E/2-7</a></td>
+
+/516/edit">Section Leader 2/3/E/2-7</a></td>
+
+/517/edit">Assistant Section Leader 2/3/E/2-7</a></td>
+
+/518/edit">Trooper 2/3/E/2-7</a></td>
+
+/519/edit">Section Leader 3/3/E/2-7</a></td>
+
+/520/edit">Assistant Section Leader 3/3/E/2-7</a></td>
+
+/521/edit">Trooper 3/3/E/2-7</a></td>
+
+/522/edit">Section Leader 4/3/E/2-7</a></td>
+
+/523/edit">Assistant Section Leader 4/3/E/2-7</a></td>
+
+/524/edit">Trooper 4/3/E/2-7</a></td>
+
+/552/edit">Auxiliary Commander</a></td>
+
+/11/edit">Reserve Commander</a></td>
+
+/12/edit">Reserve Executive Officer</a></td>
+
+/554/edit">----------A/ACD HQ----------</a></td>
+
+/555/edit">Commander A/ACD</a></td>
+
+/556/edit">Executive Officer A/ACD</a></td>
+
+/557/edit">First Sergeant A/ACD</a></td>
+
+/558/edit">Platoon Leader 1/A/ACD</a></td>
+
+/559/edit">Platoon Sergeant 1/A/ACD</a></td>
+
+/560/edit">Section Leader 1/1/A/ACD</a></td>
+
+/562/edit">Assistant Section Leader 1/1/A/ACD</a></td>
+
+/561/edit">Trooper 1/1/A/ACD</a></td>
+
+/563/edit">Section Leader 2/1/A/ACD</a></td>
+
+/564/edit">Assistant Section Leader 2/1/A/ACD</a></td>
+
+/565/edit">Trooper 2/1/A/ACD</a></td>
+
+/566/edit">Section Leader 3/1/A/ACD</a></td>
+
+/567/edit">Assistant Section Leader 3/1/A/ACD</a></td>
+
+/568/edit">Trooper 3/1/A/ACD</a></td>
+
+/569/edit">Section Leader 4/1/A/ACD</a></td>
+
+/570/edit">Assistant Section Leader 4/1/A/ACD</a></td>
+
+/571/edit">Trooper 4/1/A/ACD</a></td>
+
+/572/edit">Section Leader 5/1/A/ACD</a></td>
+
+/573/edit">Assistant Section Leader 5/1/A/ACD</a></td>
+
+/574/edit">Trooper 5/1/A/ACD</a></td>
+
+/537/edit">Squad Start-Up HQ</a></td>
+
+/538/edit">Squad Start-Up Member</a></td>
+
+/582/edit">Section Leader HLL Console Start-Up</a></td>
+
+/583/edit">Assistant Section Leader HLL Console Start-Up</a></td>
+
+/575/edit">Trooper HLL Console Start-Up</a></td>
+
+/585/edit">Section Leader BF 2042 Start-Up</a></td>
+
+/586/edit">Assistant Section Leader BF 2042 Start-Up</a></td>
+
+/576/edit">Trooper BF 2042 Start-Up</a></td>
+
+/587/edit">Section Leader Foxhole Start-Up</a></td>
+
+/588/edit">Assistant Section Leader HLL Console Start-Up</a></td>
+
+/581/edit">Trooper Foxhole Start-Up</a></td>
+
+/193/edit">New Recruit</a></td>
+
+/194/edit">ELOA</a></td>
+
+/195/edit">Reservist</a></td>
+
+/525/edit">Retired</a></td>
+
+/528/edit">Discharged</a></td>
+
+/529/edit">Dishonorably Discharged</a></td>
