@@ -89,7 +89,6 @@ function RTCList (listArray) {
                     <tr>
                         <th>Name</th>
                         <th>Billet</th>
-                        <th>sortKey</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,7 +97,6 @@ function RTCList (listArray) {
                             <tr key={index}>
                                 <td>{obj.fullName}</td>
                                 <td>{obj.position.positionTitle}</td>
-                                <td>{obj.sortKey}</td>
                             </tr>
                         )
                     })}

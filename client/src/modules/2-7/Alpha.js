@@ -35,7 +35,6 @@ function Alpha2List (listArray) {
                     <tr>
                         <th>Name</th>
                         <th>Billet</th>
-                        <th>sortKey</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +43,6 @@ function Alpha2List (listArray) {
                             <tr>
                                 <td>{obj.fullName}</td>
                                 <td>{obj.position.positionTitle}</td>
-                                <td>{obj.sortKey}</td>
                             </tr>
                         )
                     })}

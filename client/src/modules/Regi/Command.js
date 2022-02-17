@@ -3,7 +3,7 @@ import React from 'react';
 function RCommandList (listArray) {
     var {listArray} = listArray
     var array = [];
-    var commandPositions = ['1','2','3','4','5','6','9','10','62'];
+    var commandPositions = ['1','2','3','4','5','6','9','10','60','62'];
 
     for (var milpacIdCombat in listArray[0].combat.profiles) {
 
@@ -35,7 +35,6 @@ function RCommandList (listArray) {
                     <tr>
                         <th>Name</th>
                         <th>Billet</th>
-                        <th>sortKey</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +43,6 @@ function RCommandList (listArray) {
                             <tr>
                                 <td>{obj.fullName}</td>
                                 <td>{obj.position.positionTitle}</td>
-                                <td>{obj.sortKey}</td>
                             </tr>
                         )
                     })}
