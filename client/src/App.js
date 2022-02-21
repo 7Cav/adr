@@ -14,6 +14,7 @@
 
 import React, {useEffect, useState} from 'react';
 import './App.css';
+import Collapsible from 'react-collapsible';
 
 //Command Billets
 import RCommandList from './modules/Regi/Command';
@@ -70,7 +71,7 @@ function MilpacRequest () {
   useEffect(() => {
       async function fetchMilpacList() {
           try {
-              const requestUrl = 'http://localhost:4000/roster/combat'
+              const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
               const response = await fetch (requestUrl);
               const responseJSON = await response.json();
               setMilpacList(responseJSON);
@@ -84,7 +85,7 @@ function MilpacRequest () {
   useEffect(() => {
     async function fetchReserveList() {
         try {
-            const requestUrl = 'http://localhost:4000/roster/reserves'
+            const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
             const response = await fetch (requestUrl);
             const responseJSON = await response.json();
             setReserveList(responseJSON);
@@ -120,12 +121,14 @@ function MilpacRequest () {
     </div>
     <div classname='ListContainer'>
       <div className='RegiContainer'>
-        <div className='RegiTitle'>
+        {/* <div className='RegiTitle'>
           Regimental Command
-        </div>
+        </div> */}
+        <Collapsible trigger="Regimental Command" triggerClassName="RegiTitle" triggerOpenedClassName="RegiTitle">
         <div className='RegiList'>
           <RCommandList listArray = {listArray}/>
         </div>
+        </Collapsible>
       </div>
       <div className='OneSevenContainer'>
         <div className='OneSevenTitle'>
