@@ -412,4 +412,19 @@
     padding-bottom: 7px;
     padding-left: 10px;
     width: 50%;
-} 
+}
+
+/*
+Extra changes for Links 
+- Sweetwater
+*/
+a {
+    color: #ebc729;
+    text-decoration: none;
+
+  }
+
+a:hover {
+    color: #e2cd6e;
+    text-decoration: underline;
+  } 
