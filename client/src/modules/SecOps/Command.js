@@ -20,7 +20,7 @@ function SecOpsList (listArray) {
                 "position": primary,
                 "isPrimary": 'true',
                 "sortKey": primarySortKey,
-                "itemKey": name
+                "itemKey": milpacIdCombat
                 
             })
         }
@@ -38,7 +38,7 @@ function SecOpsList (listArray) {
                 "position": secondary,
                 "isPrimary": 'false',
                 "sortKey": secondarySortKey,
-                "itemKey": name
+                "itemKey": milpacIdCombat
             })
         }
     }; 
@@ -58,7 +58,7 @@ function SecOpsList (listArray) {
                 "position": rPrimary,
                 "isPrimary": 'true',
                 "sortKey": rPrimarySortKey,
-                "itemKey": rName
+                "itemKey": milpacIdReserve
             })
         }
 
@@ -75,7 +75,8 @@ function SecOpsList (listArray) {
                 "position": rSecondary,
                 "isPrimary": 'false',
                 "sortKey": rSecondarySortKey,
-                "itemKey": rName
+                "itemKey": milpacIdReserve
+                
             })
         }
     }; 
@@ -94,8 +95,8 @@ function SecOpsList (listArray) {
                 <tbody>
                     {array.map( obj => {
                         return(
-                            <tr key={index}>
-                                <td>{obj.fullName}</td>
+                            <tr>
+                                <td><a href={"https://7cav.us/rosters/profile/" + obj.itemKey}>{obj.fullName}</a></td>
                                 <td>{obj.position.positionTitle}</td>
                             </tr>
                         )

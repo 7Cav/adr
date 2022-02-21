@@ -58,7 +58,7 @@ function IMOStaffList (listArray) {
                 "position": rPrimary,
                 "isPrimary": 'true',
                 "sortKey": rPrimarySortKey,
-                "itemKey": rName
+                "itemKey": milpacIdCombat
             })
         }
 
@@ -75,7 +75,8 @@ function IMOStaffList (listArray) {
                 "position": rSecondary,
                 "isPrimary": 'false',
                 "sortKey": rSecondarySortKey,
-                "itemKey": rName
+                "itemKey": milpacIdReserve
+                
             })
         }
     }; 
@@ -94,8 +95,8 @@ function IMOStaffList (listArray) {
                 <tbody>
                     {array.map( obj => {
                         return(
-                            <tr key={index}>
-                                <td>{obj.fullName}</td>
+                            <tr>
+                                <td><a href={"https://7cav.us/rosters/profile/" + obj.itemKey}>{obj.fullName}</a></td>
                                 <td>{obj.position.positionTitle}</td>
                             </tr>
                         )
