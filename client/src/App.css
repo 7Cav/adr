@@ -62,15 +62,27 @@
     height:37.7167px;
 }
 
-.RegiTitle {
+.Title {
     color:#f1f1f1;
     font-size: x-large;
     font-weight: bold;
-    border-bottom: solid 1px #ebc729;
+    border-width: 1px;
+    border-style: solid;
+    border-image: 
+      linear-gradient(
+        to right, 
+        #ebc729, 
+        transparent
+      ) 1 0%;
+    border-top: transparent;
+}
+
+.Title:hover {
+    text-decoration: none;
 }
 
 .RegiList {
-    padding-top: 30px;
+    padding-top: 10px;
 }
 
 .OneSevenContainer {
@@ -412,4 +424,47 @@
     padding-bottom: 7px;
     padding-left: 10px;
     width: 50%;
+}
+
+/*
+Extra changes for Links 
+- Sweetwater
+*/
+a {
+    color: #a1a1a1;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #a1a1a1;
+    font-weight: bold;
+    text-decoration: none;
 } 
+
+.Collapsible__trigger {
+    display: block;
+    position: relative;
+}
+
+.Collapsible__trigger:after {
+    content: url('./style/themes/Chevron.png');
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    display: block;
+    transition: transform 300ms;
+    transform: rotateZ(180deg);
+
+    /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
+    transform-origin: 67% 67%;
+}
+
+.Collapsible__trigger.is-open::after {
+    transform: rotateZ(0deg);
+    position: absolute;
+    right: 0px;
+    top: 0px;
+
+    /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
+    transform-origin: 67% 67%;
+}

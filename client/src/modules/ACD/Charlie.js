@@ -20,7 +20,7 @@ function Charlie3List (listArray) {
                 "position": primary,
                 "isPrimary": 'true',
                 "sortKey": primarySortKey,
-                "itemKey": name
+                "itemKey": milpacIdCombat
                 
             })
         }
@@ -41,7 +41,7 @@ function Charlie3List (listArray) {
                     {array.map( obj => {
                         return(
                             <tr>
-                                <td>{obj.fullName}</td>
+                                <td><a href={"https://7cav.us/rosters/profile/" + obj.itemKey}>{obj.fullName}</a></td>
                                 <td>{obj.position.positionTitle}</td>
                             </tr>
                         )

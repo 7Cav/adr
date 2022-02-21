@@ -14,6 +14,7 @@
 
 import React, {useEffect, useState} from 'react';
 import './App.css';
+import Collapsible from 'react-collapsible';
 
 //Command Billets
 import RCommandList from './modules/Regi/Command';
@@ -70,7 +71,7 @@ function MilpacRequest () {
   useEffect(() => {
       async function fetchMilpacList() {
           try {
-              const requestUrl = 'http://localhost:4000/roster/combat'
+              const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
               const response = await fetch (requestUrl);
               const responseJSON = await response.json();
               setMilpacList(responseJSON);
@@ -84,7 +85,7 @@ function MilpacRequest () {
   useEffect(() => {
     async function fetchReserveList() {
         try {
-            const requestUrl = 'http://localhost:4000/roster/reserves'
+            const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
             const response = await fetch (requestUrl);
             const responseJSON = await response.json();
             setReserveList(responseJSON);
@@ -120,279 +121,271 @@ function MilpacRequest () {
     </div>
     <div classname='ListContainer'>
       <div className='RegiContainer'>
-        <div className='RegiTitle'>
-          Regimental Command
-        </div>
+        <Collapsible trigger="Regimental Command" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
         <div className='RegiList'>
           <RCommandList listArray = {listArray}/>
         </div>
+        </Collapsible>
       </div>
       <div className='OneSevenContainer'>
-        <div className='OneSevenTitle'>
-          First Battalion
-        </div>
-        <div className='OneSevenCommand'>
-          <div className='OneSevenCommandTitle'>
-           1-7 Command
-         </div>
-         <div className='OneSevenCommandList'>
-           <Command1List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Alpha1'>
-          <div className='Alpha1Title'>
-           Alpha Company 1-7
-         </div>
-         <div className='Alpha1List'>
-           <Alpha1List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Bravo1'>
-          <div className='Bravo1Title'>
-           Bravo Company 1-7
-         </div>
-         <div className='Bravo1List'>
-           <Bravo1List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Charlie1'>
-          <div className='Charlie1Title'>
-           Charlie Company 1-7
-         </div>
-         <div className='Charlie1List'>
-           <Charlie1List listArray={listArray}/>
-         </div>
-        </div>
+        <Collapsible trigger="First Battalion" triggerClassName="Title" triggerOpenedClassName="Title" open={true}> 
+          <div className='OneSevenCommand'>
+            <div className='OneSevenCommandTitle'>
+            1-7 Command
+          </div>
+          <div className='OneSevenCommandList'>
+            <Command1List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Alpha1'>
+            <div className='Alpha1Title'>
+            Alpha Company 1-7
+          </div>
+          <div className='Alpha1List'>
+            <Alpha1List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Bravo1'>
+            <div className='Bravo1Title'>
+            Bravo Company 1-7
+          </div>
+          <div className='Bravo1List'>
+            <Bravo1List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Charlie1'>
+            <div className='Charlie1Title'>
+            Charlie Company 1-7
+          </div>
+          <div className='Charlie1List'>
+            <Charlie1List listArray={listArray}/>
+          </div>
+          </div>
+        </Collapsible>
       </div>
       <div className='TwoSevenContainer'>
-        <div className='TwoSevenTitle'>
-          Second Battalion
-        </div>
-        <div className='TwoSevenCommand'>
-          <div className='TwoSevenCommandTitle'>
-           2-7 Command
-         </div>
-         <div className='TwoSevenCommandList'>
-           <Command2List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Alpha2'>
-          <div className='Alpha2Title'>
-           Alpha Company 2-7
-         </div>
-         <div className='Alpha2List'>
-           <Alpha2List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Bravo2'>
-          <div className='Bravo2Title'>
-           Bravo Company 2-7
-         </div>
-         <div className='Bravo2List'>
-           <Bravo2List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Charlie2'>
-          <div className='Charlie2Title'>
-           Charlie Company 2-7
-         </div>
-         <div className='Charlie2List'>
-           <Charlie2List listArray={listArray}/>
-         </div>
-        </div>
+        <Collapsible trigger="Second Battalion" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='TwoSevenCommand'>
+            <div className='TwoSevenCommandTitle'>
+            2-7 Command
+          </div>
+          <div className='TwoSevenCommandList'>
+            <Command2List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Alpha2'>
+            <div className='Alpha2Title'>
+            Alpha Company 2-7
+          </div>
+          <div className='Alpha2List'>
+            <Alpha2List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Bravo2'>
+            <div className='Bravo2Title'>
+            Bravo Company 2-7
+          </div>
+          <div className='Bravo2List'>
+            <Bravo2List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Charlie2'>
+            <div className='Charlie2Title'>
+            Charlie Company 2-7
+          </div>
+          <div className='Charlie2List'>
+            <Charlie2List listArray={listArray}/>
+          </div>
+          </div>
+        </Collapsible>
       </div>
       <div className='ACDContainer'>
-        <div className='ACDTitle'>
-          Auxillary Combat Division
-        </div>
-        <div className='ACDCommand'>
-          <div className='ACDCommandTitle'>
-           ACD Command
-         </div>
-         <div className='ACDCommandList'>
-           <Command3List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Alpha3'>
-          <div className='Alpha3Title'>
-           Alpha Division
-         </div>
-         <div className='Alpha3List'>
-           <Alpha3List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Bravo3'>
-          <div className='Bravo3Title'>
-           Bravo Division
-         </div>
-         <div className='Bravo3List'>
-           <Bravo3List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Charlie3'>
-          <div className='Charlie3Title'>
-           Charlie Division
-         </div>
-         <div className='Charlie3List'>
-           <Charlie3List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Delta3'>
-          <div className='Delta3Title'>
-           Delta Division
-         </div>
-         <div className='Delta3List'>
-           <Delta3List listArray={listArray}/>
-         </div>
-        </div>
-        <div className='Echo3'>
-          <div className='Echo3Title'>
-           Echo Division
-         </div>
-         <div className='Echo3List'>
-           <Echo3List listArray={listArray}/>
-         </div>
-        </div>
+        <Collapsible trigger="Auxillary Combat Division" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='ACDCommand'>
+            <div className='ACDCommandTitle'>
+            ACD Command
+          </div>
+          <div className='ACDCommandList'>
+            <Command3List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Alpha3'>
+            <div className='Alpha3Title'>
+            Alpha Division
+          </div>
+          <div className='Alpha3List'>
+            <Alpha3List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Bravo3'>
+            <div className='Bravo3Title'>
+            Bravo Division
+          </div>
+          <div className='Bravo3List'>
+            <Bravo3List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Charlie3'>
+            <div className='Charlie3Title'>
+            Charlie Division
+          </div>
+          <div className='Charlie3List'>
+            <Charlie3List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Delta3'>
+            <div className='Delta3Title'>
+            Delta Division
+          </div>
+          <div className='Delta3List'>
+            <Delta3List listArray={listArray}/>
+          </div>
+          </div>
+          <div className='Echo3'>
+            <div className='Echo3Title'>
+            Echo Division
+          </div>
+          <div className='Echo3List'>
+            <Echo3List listArray={listArray}/>
+          </div>
+          </div>
+        </Collapsible>
       </div>
       <div className='IMOContainer'>
-        <div className='IMOTitle'>
-          Information Managment Office
-        </div>
-        <div className='IMOStaff'>
-          <div className='IMOStaffTitle'>
-           Information Management Office Command
+        <Collapsible trigger="Information Management Office" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='IMOStaff'>
+            <div className='IMOStaffTitle'>
+            Information Management Office Command
+            </div>
+            <div className='IMOStaffList'>
+              <IMOStaffList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='IMOStaffList'>
-            <IMOStaffList listArray = {listArray}/>
+          <div className='S1'>
+            <div className='S1Title'>
+              S1 - Administration
+            </div>
+            <div className='S1List'>
+              <S1List listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='S1'>
-          <div className='S1Title'>
-            S1 - Administration
+          <div className='S6'>
+            <div className='S6Title'>
+              S6 - Information Management
+            </div>
+            <div className='S6List'>
+              <S6List listArray = {listArray}/>
+            </div>
           </div>
-          <div className='S1List'>
-            <S1List listArray = {listArray}/>
+          <div className='WAG'>
+            <div className='WAGTitle'>
+              Wiki Administration Group
+            </div>
+            <div className='WAGList'>
+              <WAGList listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='S6'>
-          <div className='S6Title'>
-            S6 - Information Management
-          </div>
-          <div className='S6List'>
-            <S6List listArray = {listArray}/>
-          </div>
-        </div>
-        <div className='WAG'>
-          <div className='WAGTitle'>
-            Wiki Administration Group
-          </div>
-          <div className='WAGList'>
-            <WAGList listArray = {listArray}/>
-          </div>
-        </div>
+        </Collapsible>
       </div>
       <div className='SecOpsContainer'>
-        <div className='SecOpsTitle'>
-          Security Operations Department
-        </div>
-        <div className='SecOpsStaff'>
-          <div className='SecOpsStaffTitle'>
-            Security Operations Command
+        <Collapsible trigger="Security Operations Department" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='SecOpsStaff'>
+            <div className='SecOpsStaffTitle'>
+              Security Operations Command
+            </div>
+            <div className='SecOpsStaffList'>
+              <SecOpsList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='SecOpsStaffList'>
-            <SecOpsList listArray = {listArray}/>
+          <div className='JAG'>
+            <div className='JAGTitle'>
+              Judge Advocate General Corps
+            </div>
+            <div className='JAGList'>
+              <JAGList listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='JAG'>
-          <div className='JAGTitle'>
-            Judge Advocate General Corps
+          <div className='MP'>
+            <div className='MPTitle'>
+              Military Police
+            </div>
+            <div className='MPList'>
+              <MPList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='JAGList'>
-            <JAGList listArray = {listArray}/>
+          <div className='S2'>
+            <div className='S2Title'>
+              S2 - Intelligence and Security
+            </div>
+            <div className='WAGList'>
+              <S2List listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='MP'>
-          <div className='MPTitle'>
-            Military Police
-          </div>
-          <div className='MPList'>
-            <MPList listArray = {listArray}/>
-          </div>
-        </div>
-        <div className='S2'>
-          <div className='S2Title'>
-            S2 - Intelligence and Security
-          </div>
-          <div className='WAGList'>
-            <S2List listArray = {listArray}/>
-          </div>
-        </div>
+        </Collapsible>
       </div>
       <div className='ROOContainer'>
-      <div className='ROOTitle'>
-          Recruitment Oversight Office
-        </div>
-        <div className='ROOStaff'>
-          <div className='ROOStaffTitle'>
-            Recruitment Oversight Command
+        <Collapsible trigger="Recruitment Oversight Office" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='ROOStaff'>
+            <div className='ROOStaffTitle'>
+              Recruitment Oversight Command
+            </div>
+            <div className='ROOStaffList'>
+              <ROOStaffList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='ROOStaffList'>
-            <ROOStaffList listArray = {listArray}/>
+          <div className='RRD'>
+            <div className='RRDTitle'>
+              Regimental Recruiting Department
+            </div>
+            <div className='RRDList'>
+              <RRDList listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='RRD'>
-          <div className='RRDTitle'>
-            Regimental Recruiting Department
+          <div className='RTC'>
+            <div className='RTCTitle'>
+              Recruit Training Command
+            </div>
+            <div className='RTCList'>
+              <RTCList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='RRDList'>
-            <RRDList listArray = {listArray}/>
+          <div className='S5'>
+            <div className='S5Title'>
+              S5 - Public Relations
+            </div>
+            <div className='S5List'>
+              <S5List listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='RTC'>
-          <div className='RTCTitle'>
-            Recruit Training Command
-          </div>
-          <div className='RTCList'>
-            <RTCList listArray = {listArray}/>
-          </div>
-        </div>
-        <div className='S5'>
-          <div className='S5Title'>
-            S5 - Public Relations
-          </div>
-          <div className='S5List'>
-            <S5List listArray = {listArray}/>
-          </div>
-        </div>
+        </Collapsible>
       </div>
       <div className='SupportContainer'>
-       <div className='SupportTitle'>
-          Support Departments
-        </div>
-        <div className='SPD'>
-          <div className='SPDTitle'>
-            Special Projects Division
+        <Collapsible trigger="Support Departments" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+          <div className='SPD'>
+            <div className='SPDTitle'>
+              Special Projects Division
+            </div>
+            <div className='SPDList'>
+              <SPDList listArray = {listArray}/>
+            </div>
           </div>
-          <div className='SPDList'>
-            <SPDList listArray = {listArray}/>
+          <div className='S3'>
+            <div className='S3Title'>
+              S3 - Operations
+            </div>
+            <div className='S3List'>
+              <S3List listArray = {listArray}/>
+            </div>
           </div>
-        </div>
-        <div className='S3'>
-          <div className='S3Title'>
-            S3 - Operations
+          <div className='S7'>
+            <div className='S7Title'>
+              S7 - Training
+            </div>
+            <div className='S7List'>
+              <S7List listArray = {listArray}/>
+            </div>
           </div>
-          <div className='S3List'>
-            <S3List listArray = {listArray}/>
-          </div>
-        </div>
-        <div className='S7'>
-          <div className='S7Title'>
-            S7 - Training
-          </div>
-          <div className='S7List'>
-            <S7List listArray = {listArray}/>
-          </div>
-        </div>
+        </Collapsible>
       </div>
     </div>
   </div> 
