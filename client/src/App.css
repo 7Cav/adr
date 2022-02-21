@@ -7,13 +7,8 @@
     position: sticky;
     top:0;
     z-index: 400;
-}
-
-.p-nav-primary {
-    position: sticky;
-    top:0;
-    z-index: 400;
     background-color: #2e2e2e;
+    margin-bottom: 1.2em;
 }
   
 .p-nav{
@@ -79,6 +74,7 @@
 
 .Title:hover {
     text-decoration: none;
+    cursor: pointer;
 }
 
 .RegiList {
@@ -431,14 +427,13 @@ Extra changes for Links
 - Sweetwater
 */
 a {
-    color: #a1a1a1;
+    color: #ebc729;
     text-decoration: none;
 }
 
 a:hover {
-    color: #a1a1a1;
-    font-weight: bold;
-    text-decoration: none;
+    color: #ebc729;
+    text-decoration: underline;
 } 
 
 .Collapsible__trigger {
@@ -453,14 +448,14 @@ a:hover {
     top: 0px;
     display: block;
     transition: transform 300ms;
-    transform: rotateZ(180deg);
+    transform: rotateZ(90deg);
 
     /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
     transform-origin: 67% 67%;
 }
 
 .Collapsible__trigger.is-open::after {
-    transform: rotateZ(0deg);
+    transform: rotateZ(180deg);
     position: absolute;
     right: 0px;
     top: 0px;
