@@ -1,67 +1,9 @@
-/* TODO:
-
-- Reorganize this terribleness into something more streamlined
-- Wait for jarvis to update the API so that sort order is properly displayed
-- Look into sorting by rank after sorting by billet (Subsorting? QuickSort maybe?)
-- Styling
-- Search Bar/Collapsable Divs
-- Maybe a loading screen?
-- General Code Cleanup
-- Fix these fucking errors that throw up over list keys
-
-*/
-
-
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import Collapsible from 'react-collapsible';
-
-//Command Billets
-import RCommandList from './modules/Regi/Command';
-
-//1-7 Billets
-import Command1List from './modules/1-7/Command';
-import Alpha1List from './modules/1-7/Alpha';
-import Bravo1List from './modules/1-7/Bravo';
-import Charlie1List from './modules/1-7/Charlie';
-
-//2-7 Billets
-import Command2List from './modules/2-7/Command';
-import Alpha2List from './modules/2-7/Alpha';
-import Bravo2List from './modules/2-7/Bravo';
-import Charlie2List from './modules/2-7/Charlie';
-
-//ACD Billets
-import Command3List from './modules/ACD/Command';
-import Alpha3List from './modules/ACD/Alpha';
-import Bravo3List from './modules/ACD/Bravo';
-import Charlie3List from './modules/ACD/Charlie';
-import Delta3List from './modules/ACD/Delta';
-import Echo3List from './modules/ACD/Echo';
-
-//IMO Billets
-import WAGList from './modules/IMO/WAG.js';
-import S1List from './modules/IMO/S1.js';
-import S6List from './modules/IMO/S6.js';
-import IMOStaffList from './modules/IMO/Command.js';
-
-//SecOps Billets
-import JAGList from './modules/SecOps/JAG.js';
-import MPList from './modules/SecOps/MP.js';
-import S2List from './modules/SecOps/S2.js';
-import SecOpsList from './modules/SecOps/Command.js';
-
-//ROO Billets
-import ROOStaffList from './modules/ROO/Command.js';
-import RRDList from './modules/ROO/RRD.js';
-import RTCList from './modules/ROO/RTC.js';
-import S5List from './modules/ROO/S5.js';
-
-//Support Billets
-import S3List from './modules/Support/S3.js';
-import S7List from './modules/Support/S7.js';
-import SPDList from './modules/Support/SPD.js';
-
+import * as lists from './modules/Generic/BilletBank';
+import MilpacParse from './modules/Generic/MilpacParse';
+import MilpacParsePrimaryOnly from './modules/Generic/MilpacParsePrimaryOnly';
 
 function MilpacRequest () {
 
@@ -96,11 +38,15 @@ function MilpacRequest () {
     fetchReserveList();
   },[]);
 
-  var listArray = []
-  listArray.push({
+  var milpacArray = []
+  milpacArray.push({
     "combat": milpacList,
-    "reserve": reserveList
+    "reserve": reserveList,
   })
+
+ /*(return(
+   <h1><MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s1}/></h1>
+ )*/
 
   return(
   <div className='MasterContainer'>
@@ -123,7 +69,7 @@ function MilpacRequest () {
       <div className='RegiContainer'>
         <Collapsible trigger="Regimental Command" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
         <div className='RegiList'>
-          <RCommandList listArray = {listArray}/>
+          <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.regiCommand}/>
         </div>
         </Collapsible>
       </div>
@@ -134,7 +80,7 @@ function MilpacRequest () {
             1-7 Command
           </div>
           <div className='OneSevenCommandList'>
-            <Command1List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.oneSevenCommand}/>
           </div>
           </div>
           <div className='Alpha1'>
@@ -142,7 +88,7 @@ function MilpacRequest () {
             Alpha Company 1-7
           </div>
           <div className='Alpha1List'>
-            <Alpha1List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha1}/>
           </div>
           </div>
           <div className='Bravo1'>
@@ -150,7 +96,7 @@ function MilpacRequest () {
             Bravo Company 1-7
           </div>
           <div className='Bravo1List'>
-            <Bravo1List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo1}/>
           </div>
           </div>
           <div className='Charlie1'>
@@ -158,7 +104,7 @@ function MilpacRequest () {
             Charlie Company 1-7
           </div>
           <div className='Charlie1List'>
-            <Charlie1List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie1}/>
           </div>
           </div>
         </Collapsible>
@@ -170,7 +116,7 @@ function MilpacRequest () {
             2-7 Command
           </div>
           <div className='TwoSevenCommandList'>
-            <Command2List listArray={listArray}/>
+           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.twoSevenCommand}/>
           </div>
           </div>
           <div className='Alpha2'>
@@ -178,7 +124,7 @@ function MilpacRequest () {
             Alpha Company 2-7
           </div>
           <div className='Alpha2List'>
-            <Alpha2List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha2}/>
           </div>
           </div>
           <div className='Bravo2'>
@@ -186,7 +132,7 @@ function MilpacRequest () {
             Bravo Company 2-7
           </div>
           <div className='Bravo2List'>
-            <Bravo2List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo2}/>
           </div>
           </div>
           <div className='Charlie2'>
@@ -194,7 +140,7 @@ function MilpacRequest () {
             Charlie Company 2-7
           </div>
           <div className='Charlie2List'>
-            <Charlie2List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie2}/>
           </div>
           </div>
         </Collapsible>
@@ -206,7 +152,7 @@ function MilpacRequest () {
             ACD Command
           </div>
           <div className='ACDCommandList'>
-            <Command3List listArray={listArray}/>
+           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.acdCommand}/>
           </div>
           </div>
           <div className='Alpha3'>
@@ -214,7 +160,7 @@ function MilpacRequest () {
             Alpha Division
           </div>
           <div className='Alpha3List'>
-            <Alpha3List listArray={listArray}/>
+           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha3}/>
           </div>
           </div>
           <div className='Bravo3'>
@@ -222,7 +168,7 @@ function MilpacRequest () {
             Bravo Division
           </div>
           <div className='Bravo3List'>
-            <Bravo3List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo3}/>
           </div>
           </div>
           <div className='Charlie3'>
@@ -230,7 +176,7 @@ function MilpacRequest () {
             Charlie Division
           </div>
           <div className='Charlie3List'>
-            <Charlie3List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie3}/>
           </div>
           </div>
           <div className='Delta3'>
@@ -238,7 +184,7 @@ function MilpacRequest () {
             Delta Division
           </div>
           <div className='Delta3List'>
-            <Delta3List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.delta3}/>
           </div>
           </div>
           <div className='Echo3'>
@@ -246,7 +192,7 @@ function MilpacRequest () {
             Echo Division
           </div>
           <div className='Echo3List'>
-            <Echo3List listArray={listArray}/>
+            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.echo3}/>
           </div>
           </div>
         </Collapsible>
@@ -258,7 +204,7 @@ function MilpacRequest () {
             Information Management Office Command
             </div>
             <div className='IMOStaffList'>
-              <IMOStaffList listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.imoCommand}/>
             </div>
           </div>
           <div className='S1'>
@@ -266,7 +212,7 @@ function MilpacRequest () {
               S1 - Administration
             </div>
             <div className='S1List'>
-              <S1List listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s1}/>
             </div>
           </div>
           <div className='S6'>
@@ -274,7 +220,7 @@ function MilpacRequest () {
               S6 - Information Management
             </div>
             <div className='S6List'>
-              <S6List listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s6}/>
             </div>
           </div>
           <div className='WAG'>
@@ -282,7 +228,7 @@ function MilpacRequest () {
               Wiki Administration Group
             </div>
             <div className='WAGList'>
-              <WAGList listArray = {listArray}/>
+            <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.wag}/>
             </div>
           </div>
         </Collapsible>
@@ -294,7 +240,7 @@ function MilpacRequest () {
               Security Operations Command
             </div>
             <div className='SecOpsStaffList'>
-              <SecOpsList listArray = {listArray}/>
+             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.secOpsCommand}/>
             </div>
           </div>
           <div className='JAG'>
@@ -302,7 +248,7 @@ function MilpacRequest () {
               Judge Advocate General Corps
             </div>
             <div className='JAGList'>
-              <JAGList listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.jag}/>
             </div>
           </div>
           <div className='MP'>
@@ -310,15 +256,15 @@ function MilpacRequest () {
               Military Police
             </div>
             <div className='MPList'>
-              <MPList listArray = {listArray}/>
+             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.mp}/>
             </div>
           </div>
           <div className='S2'>
             <div className='S2Title'>
               S2 - Intelligence and Security
             </div>
-            <div className='WAGList'>
-              <S2List listArray = {listArray}/>
+            <div className='S2List'>
+             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s2}/>
             </div>
           </div>
         </Collapsible>
@@ -330,7 +276,7 @@ function MilpacRequest () {
               Recruitment Oversight Command
             </div>
             <div className='ROOStaffList'>
-              <ROOStaffList listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.rooCommand}/>
             </div>
           </div>
           <div className='RRD'>
@@ -338,7 +284,7 @@ function MilpacRequest () {
               Regimental Recruiting Department
             </div>
             <div className='RRDList'>
-              <RRDList listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.rrd}/>
             </div>
           </div>
           <div className='RTC'>
@@ -346,7 +292,7 @@ function MilpacRequest () {
               Recruit Training Command
             </div>
             <div className='RTCList'>
-              <RTCList listArray = {listArray}/>
+             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.rtc}/>
             </div>
           </div>
           <div className='S5'>
@@ -354,7 +300,7 @@ function MilpacRequest () {
               S5 - Public Relations
             </div>
             <div className='S5List'>
-              <S5List listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s5}/>
             </div>
           </div>
         </Collapsible>
@@ -366,7 +312,7 @@ function MilpacRequest () {
               Special Projects Division
             </div>
             <div className='SPDList'>
-              <SPDList listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.spd}/>
             </div>
           </div>
           <div className='S3'>
@@ -374,7 +320,7 @@ function MilpacRequest () {
               S3 - Operations
             </div>
             <div className='S3List'>
-              <S3List listArray = {listArray}/>
+             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s3}/>
             </div>
           </div>
           <div className='S7'>
@@ -382,7 +328,7 @@ function MilpacRequest () {
               S7 - Training
             </div>
             <div className='S7List'>
-              <S7List listArray = {listArray}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s7}/>
             </div>
           </div>
         </Collapsible>
@@ -390,5 +336,5 @@ function MilpacRequest () {
     </div>
   </div> 
   )
-}
-export default MilpacRequest; 
+} 
+export default MilpacRequest
