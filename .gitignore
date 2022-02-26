@@ -1,4 +1,3 @@
 node_modules/
 credentials/token.js
 server/credentials/token.js
-package-lock.json
