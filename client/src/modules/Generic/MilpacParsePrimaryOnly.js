@@ -1,27 +1,27 @@
 import React from 'react';
 
-function RCommandList (listArray) {
-    var {listArray} = listArray
+function MilpacParsePrimaryOnly (props) {
     var array = [];
-    var commandPositions = ['1','2','3','4','5','6','9','10','60','62'];
+    var milpacArray = props.milpacArray
+    var billetIDs = props.billetIDs
 
-    for (var milpacIdCombat in listArray[0].combat.profiles) {
+    for (var milpacIdCombat in milpacArray[0].combat.profiles) {
 
-        var name = listArray[0].combat.profiles[milpacIdCombat].realName;
-        var rank = listArray[0].combat.profiles[milpacIdCombat].rank.rankFull 
-        var primary = listArray[0].combat.profiles[milpacIdCombat].primary;
+        var name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
+        var rank = milpacArray[0].combat.profiles[milpacIdCombat].rank.rankFull 
+        var primary = milpacArray[0].combat.profiles[milpacIdCombat].primary;
         var fullName = rank + ' ' + name;
-        var primarySortKey = listArray[0].combat.profiles[milpacIdCombat].primary.positionId;
+        var primarySortKey = milpacArray[0].combat.profiles[milpacIdCombat].primary.positionId;
 
-        if (commandPositions.includes(primary.positionId)) {
+        if (billetIDs.includes(primary.positionId)) {
 
             array.push({
                 "fullName": fullName,
                 "position": primary,
                 "isPrimary": 'true',
                 "sortKey": primarySortKey,
-                "itemKey": milpacIdCombat
-                
+                "itemKey": milpacIdCombat,
+                "listKey": primarySortKey + milpacIdCombat
             })
         }
     }; 
@@ -40,7 +40,7 @@ function RCommandList (listArray) {
                 <tbody>
                     {array.map( obj => {
                         return(
-                            <tr>
+                            <tr key={obj.listKey}>
                                 <td><a href={"https://7cav.us/rosters/profile/" + obj.itemKey}>{obj.fullName}</a></td>
                                 <td>{obj.position.positionTitle}</td>
                             </tr>
@@ -52,4 +52,4 @@ function RCommandList (listArray) {
     )
 }
 
-export default RCommandList
+export default MilpacParsePrimaryOnly
