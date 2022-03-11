@@ -1100,6 +1100,61 @@
 
 /574/edit">Trooper 5/1/A/ACD</a></td>
 
+----------B/ACD HQ----------    N/A
+
+
+590 Commander B/ACD             B/ACD,B/ACD HQ,ACD HQ
+591 Executive Officer B/ACD     B/ACD,B/ACD HQ,ACD HQ
+592 First Sergeant B/ACD        B/ACD,B/ACD HQ,ACD HQ
+593 Platoon Leader 1/B/ACD      B/ACD,B/ACD HQ
+594 Platoon Leader 2/B/ACD      B/ACD,B/ACD HQ
+595 Platoon Sergeant 1/B/ACD    B/ACD,B/ACD HQ
+596 Platoon Sergeant 2/B/ACD    B/ACD,B/ACD HQ
+
+
+
+597 Section Leader 1/1/B/ACD    B/ACD
+598 Assistant Section Leader 1/1/B/ACD  B/ACD
+599 Trooper 1/1/B/ACD   B/ACD
+
+600 Section Leader 2/1/B/ACD    B/ACD
+601 Assistant Section Leader 2/1/B/ACD  B/ACD
+602 Trooper 2/1/B/ACD   B/ACD
+
+603 Section Leader 3/1/B/ACD    B/ACD
+604 Assistant Section Leader 3/1/B/ACD  B/ACD
+605 Trooper 3/1/B/ACD   B/ACD
+
+606 Section Leader 4/1/B/ACD    B/ACD
+607 Assistant Section Leader 4/1/B/ACD  B/ACD
+608 Trooper 4/1/B/ACD   B/ACD
+
+609 Section Leader 5/1/B/ACD    B/ACD
+610 Assistant Section Leader 5/1/B/ACD  B/ACD
+611 Trooper 5/1/B/ACD   B/ACD
+
+ --- 2nd Platoon --
+
+612 Section Leader 1/2/B/ACD    B/ACD
+613 Assistant Section Leader 1/2/B/ACD  B/ACD
+614 Trooper 1/2/B/ACD   B/ACD
+
+615 Section Leader 2/2/B/ACD    B/ACD
+616 Assistant Section Leader 2/2/B/ACD  B/ACD
+617 Trooper 2/2/B/ACD   B/ACD
+
+618 Section Leader 3/2/B/ACD    B/ACD
+619 Assistant Section Leader 3/2/B/ACD  B/ACD
+620 Trooper 3/2/B/ACD   B/ACD
+
+621 Section Leader 4/2/B/ACD    B/ACD
+622 Assistant Section Leader 4/2/B/ACD  B/ACD
+623 Trooper 4/2/B/ACD   B/ACD
+
+624 Section Leader 5/2/B/ACD    B/ACD
+625 Assistant Section Leader 5/2/B/ACD  B/ACD
+626 Trooper 5/2/B/ACD   B/ACD
+
 /537/edit">Squad Start-Up HQ</a></td>
 
 /538/edit">Squad Start-Up Member</a></td>
