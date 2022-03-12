@@ -1,8 +1,8 @@
-//This is included to aid in development for large ammounts of billets. This is otherwise unused in the final product
+//This is included to generate arrays for large ammounts of billets. This is otherwise unused in the final product
 
 let countString = '';
-let i = 227;
-let stopper = 285
+let i = 590;
+let stopper = 626
  
 do {
   countString = `${countString},'${i}'`;
