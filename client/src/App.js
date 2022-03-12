@@ -3,7 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import * as lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
-import MilpacParsePrimaryOnly from './modules/Generic/MilpacParsePrimaryOnly';
+import ReactDOM from 'react-dom'
 
 function MilpacRequest () {
 
@@ -14,6 +14,7 @@ function MilpacRequest () {
       async function fetchMilpacList() {
           try {
               const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
+              //const requestUrl = 'http://localhost:4000/roster/combat'
               const response = await fetch (requestUrl);
               const responseJSON = await response.json();
               setMilpacList(responseJSON);
@@ -28,6 +29,7 @@ function MilpacRequest () {
     async function fetchReserveList() {
         try {
             const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
+            //const requestUrl = 'http://localhost:4000/roster/reserves'
             const response = await fetch (requestUrl);
             const responseJSON = await response.json();
             setReserveList(responseJSON);
@@ -69,7 +71,7 @@ function MilpacRequest () {
       <div className='RegiContainer'>
         <Collapsible trigger="Regimental Command" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
         <div className='RegiList'>
-          <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.regiCommand}/>
+          <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.regiCommand}/>
         </div>
         </Collapsible>
       </div>
@@ -80,7 +82,7 @@ function MilpacRequest () {
             1-7 Command
           </div>
           <div className='OneSevenCommandList'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.oneSevenCommand}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.oneSevenCommand}/>
           </div>
           </div>
           <div className='Alpha1'>
@@ -88,7 +90,7 @@ function MilpacRequest () {
             Alpha Company 1-7
           </div>
           <div className='Alpha1List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha1}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.alpha1}/>
           </div>
           </div>
           <div className='Bravo1'>
@@ -96,7 +98,7 @@ function MilpacRequest () {
             Bravo Company 1-7
           </div>
           <div className='Bravo1List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo1}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.bravo1}/>
           </div>
           </div>
           <div className='Charlie1'>
@@ -104,7 +106,7 @@ function MilpacRequest () {
             Charlie Company 1-7
           </div>
           <div className='Charlie1List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie1}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.charlie1}/>
           </div>
           </div>
         </Collapsible>
@@ -116,7 +118,7 @@ function MilpacRequest () {
             2-7 Command
           </div>
           <div className='TwoSevenCommandList'>
-           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.twoSevenCommand}/>
+           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.twoSevenCommand}/>
           </div>
           </div>
           <div className='Alpha2'>
@@ -124,7 +126,7 @@ function MilpacRequest () {
             Alpha Company 2-7
           </div>
           <div className='Alpha2List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha2}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.alpha2}/>
           </div>
           </div>
           <div className='Bravo2'>
@@ -132,7 +134,7 @@ function MilpacRequest () {
             Bravo Company 2-7
           </div>
           <div className='Bravo2List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo2}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.bravo2}/>
           </div>
           </div>
           <div className='Charlie2'>
@@ -140,7 +142,7 @@ function MilpacRequest () {
             Charlie Company 2-7
           </div>
           <div className='Charlie2List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie2}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.charlie2}/>
           </div>
           </div>
         </Collapsible>
@@ -152,7 +154,7 @@ function MilpacRequest () {
             ACD Command
           </div>
           <div className='ACDCommandList'>
-           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.acdCommand}/>
+           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.acdCommand}/>
           </div>
           </div>
           <div className='Alpha3'>
@@ -160,7 +162,7 @@ function MilpacRequest () {
             Alpha Division
           </div>
           <div className='Alpha3List'>
-           <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.alpha3}/>
+           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.alpha3}/>
           </div>
           </div>
           <div className='Bravo3'>
@@ -168,7 +170,7 @@ function MilpacRequest () {
             Bravo Division
           </div>
           <div className='Bravo3List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.bravo3}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.bravo3}/>
           </div>
           </div>
           <div className='Charlie3'>
@@ -176,7 +178,7 @@ function MilpacRequest () {
             Charlie Division
           </div>
           <div className='Charlie3List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.charlie3}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.charlie3}/>
           </div>
           </div>
           <div className='Delta3'>
@@ -184,7 +186,7 @@ function MilpacRequest () {
             Delta Division
           </div>
           <div className='Delta3List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.delta3}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.delta3}/>
           </div>
           </div>
           <div className='Echo3'>
@@ -192,7 +194,7 @@ function MilpacRequest () {
             Echo Division
           </div>
           <div className='Echo3List'>
-            <MilpacParsePrimaryOnly milpacArray = {milpacArray} billetIDs = {lists.default.echo3}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.echo3}/>
           </div>
           </div>
         </Collapsible>
@@ -228,7 +230,7 @@ function MilpacRequest () {
               Wiki Administration Group
             </div>
             <div className='WAGList'>
-            <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.wag}/>
+              <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.wag}/>
             </div>
           </div>
         </Collapsible>
