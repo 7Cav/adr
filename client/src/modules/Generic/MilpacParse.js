@@ -5,6 +5,7 @@ function MilpacParse (props) {
     var milpacArray = props.milpacArray
     var billetIDs = props.billetIDs
     var usePrimaryOnly = props.usePrimaryOnly
+    var subtitle = props.subtitle
 
     console.log (usePrimaryOnly)
 
@@ -91,10 +92,15 @@ function MilpacParse (props) {
         array.sort((a,b) => a.sortKey - b.sortKey)
         return(
             <div className='ResponseContainer'>
-                <div className='Counter'>
-                    {array.length}
-                </div> 
-                <div className='WAGList'>
+                <div className='HeaderContainer'>
+                    <div className='Subtitle'>
+                        {subtitle}
+                    </div> 
+                    <div className='Counter'>
+                        Unit Strength: {array.length}
+                    </div>
+                </div>
+                <div className='ItemList'>
                     <table>
                         <thead>
                             <tr>
@@ -143,10 +149,15 @@ function MilpacParse (props) {
         
         return(
             <div className='ResponseContainer'>
-                <div className='Counter'>
-                    {array.length}
+                <div className='HeaderContainer'>
+                    <div className='Subtitle'>
+                        {subtitle}
+                    </div> 
+                    <div className='Counter'>
+                        Unit Strength: {array.length}
+                    </div>
                 </div>
-                <div className='WAGList'>
+                <div className='ItemList'>
                     <table>
                         <thead>
                             <tr>

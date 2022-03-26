@@ -1,4 +1,8 @@
-.RegiContainer {
+/*
+ALOT of stuff in this file has been made redundant throughout the various updates. This needs to be properly cleaned up, but it works as is for now ¯\_(ツ)_/¯
+*/
+
+.DepartmentContainer {
     margin: auto;
     width: 30%;
 }
@@ -68,6 +72,14 @@
         transparent
       ) 1 0%;
     border-top: transparent;
+}
+
+.Subtitle {
+    color: #f1f1f1;
+    font-size: larger;
+    font-weight: bold;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 .Title:hover {
@@ -404,17 +416,28 @@
     padding-bottom: 15px;
 }
 
-.WAGList table {
+.HeaderContainer {
+    display: flex;
+}
+
+.Counter{
+    font-size: smaller;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    margin-left: auto;
+}
+
+.ItemList table {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
 
-.WAGList thead {
+.ItemList thead {
     display: none;
 }
 
-.WAGList td {
+.ItemList td {
     padding-bottom: 7px;
     padding-left: 10px;
     width: 50%;
