@@ -15,8 +15,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
+  # deployment
+  deployment:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -27,7 +27,6 @@ jobs:
 
       - name: change directory to /docker-adr/src
         run: cd /opt/compose/docker-adr/src
-        
 
       - name: run git pull on src
-        run: git pull
+        run: git pull 
