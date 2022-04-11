@@ -1,10 +1,12 @@
-/*
-ALOT of stuff in this file has been made redundant throughout the various updates. This needs to be properly cleaned up, but it works as is for now ¯\_(ツ)_/¯
-*/
 
 .DepartmentContainer {
     margin: auto;
-    width: 30%;
+    min-width: 30%; max-width: 30%;
+}
+
+@media only screen and (max-width: 1000px) {
+     .DepartmentContainer { min-width: 50%; max-width: 95%;
+    } 
 }
 
 .p-nav-primary {
@@ -30,7 +32,7 @@ ALOT of stuff in this file has been made redundant throughout the various update
 }
   
 .p-nav-inner {
-    margin-left: 25em;
+    margin-left: 25%;
 }
   
 .p-nav-scroller{
@@ -74,6 +76,16 @@ ALOT of stuff in this file has been made redundant throughout the various update
     border-top: transparent;
 }
 
+@media only screen and (max-width: 1000px) {
+    .Title {
+        border-image: none;
+        border-color: #ebc729;
+        border-left: transparent;
+        border-right: transparent;
+    }
+}
+/* This is a very hack-y way to make the borders look proper on mobile browsers. This is because the border image property does not appear to be properly supported with IOS' Safari */
+
 .Subtitle {
     color: #f1f1f1;
     font-size: larger;
@@ -87,334 +99,6 @@ ALOT of stuff in this file has been made redundant throughout the various update
     cursor: pointer;
 }
 
-.RegiList {
-    padding-top: 10px;
-}
-
-.OneSevenContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.OneSevenTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.OneSevenCommandTitle {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Alpha1Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Bravo1Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Charlie1Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.TwoSevenContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.TwoSevenTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.TwoSevenCommandTitle {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Alpha2Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Bravo2Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Charlie2Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.ACDContainer {
-    margin: auto;
-    width: 30%;
-} 
-
-.ACDTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.ACDCommandTitle {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Alpha3Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Bravo3Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Charlie3Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Delta3Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.Echo3Title {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.ROOContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.ROOTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.ROOStaffTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.RRDTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-
-}
-
-.RTCTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-
-}
-
-.S5Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.SecOpsContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.SecOpsTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.SecOpsStaffTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.JAGTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.MPTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.S2Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.IMOContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.IMOTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.IMOStaffTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.S1Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.S6Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.WAGTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.SupportContainer {
-    margin: auto;
-    width: 30%;
-}
-
-.SupportTitle {
-    color:#f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-bottom: solid 1px #ebc729;
-    padding-top: 15px;
-}
-
-.SPDTitle{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.S3Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.S7Title{
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
 
 .HeaderContainer {
     display: flex;
@@ -443,10 +127,6 @@ ALOT of stuff in this file has been made redundant throughout the various update
     width: 50%;
 }
 
-/*
-Extra changes for Links 
-- Sweetwater
-*/
 a {
     color: #ebc729;
     text-decoration: none;
