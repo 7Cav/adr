@@ -1,8 +1,8 @@
 //This is included to generate arrays for large ammounts of billets. This is otherwise unused in the final product
 
 let countString = '';
-let i = 590;
-let stopper = 626
+let i = 629;
+let stopper = 644;
  
 do {
   countString = `${countString},'${i}'`;

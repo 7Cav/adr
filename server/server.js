@@ -9,7 +9,7 @@ app.use(cors({
 }));
 app.use("/roster", middleware);
 app.get("/", (req, res) => {
-res.send("returned");
+res.send("Ayy Lmao! Successful response! Any issues? Submit a ticket to S6!");
 });
 
 app.listen(port, () => {

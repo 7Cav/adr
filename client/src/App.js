@@ -13,7 +13,7 @@ function MilpacRequest () {
       async function fetchMilpacList() {
           try {
               const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
-              //const requestUrl = 'http://localhost:4000/roster/combat'
+              //const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
               const response = await fetch (requestUrl);
               const responseJSON = await response.json();
               setMilpacList(responseJSON);
@@ -28,7 +28,7 @@ function MilpacRequest () {
     async function fetchReserveList() {
         try {
             const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
-            //const requestUrl = 'http://localhost:4000/roster/reserves'
+            //const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
             const response = await fetch (requestUrl);
             const responseJSON = await response.json();
             setReserveList(responseJSON);
@@ -180,6 +180,9 @@ function MilpacRequest () {
           </div>
           <div className='S7'>
             <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.s7} subtitle = {'S7 - Training'}/>
+          </div>
+          <div className='LD'>
+            <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.default.ld} subtitle = {'Leadership Development'}/>
           </div>
         </Collapsible>
       </div>

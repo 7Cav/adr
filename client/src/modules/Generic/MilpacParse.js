@@ -6,9 +6,7 @@ function MilpacParse (props) {
     var billetIDs = props.billetIDs
     var usePrimaryOnly = props.usePrimaryOnly
     var subtitle = props.subtitle
-
-    console.log (usePrimaryOnly)
-
+    
     if (usePrimaryOnly !== true) {
 
         for (var milpacIdCombat in milpacArray[0].combat.profiles) {
