@@ -75,7 +75,7 @@ function MilpacRequest () {
         </nav>
       </div>
     </div>
-    <div classname='ListContainer'>
+    <div className='ListContainer'>
       <div className='DepartmentContainer'>
         <Collapsible trigger="Regimental Command" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.default.regiCommand} subtitle = {'Command Staff'}/>
