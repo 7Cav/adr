@@ -3,7 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import * as lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
-import Helmet from "react-helmet";
+import {Helmet} from "react-helmet";
 
 function MilpacRequest () {
 
