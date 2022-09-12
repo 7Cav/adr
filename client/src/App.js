@@ -9,6 +9,13 @@ function MilpacRequest () {
 
   const [milpacList, setMilpacList] = useState ([]);
   const [reserveList, setReserveList] = useState ([]);
+  const clscript = `<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "dig85agbqz");
+</script>`
   
   useEffect(() => {
       async function fetchMilpacList() {
@@ -48,21 +55,9 @@ function MilpacRequest () {
 
   return(
   <div className='MasterContainer'>
-    <script
-   dangerouslySetInnerHTML={
-                 {
-     __html: `
-         (function(c,l,a,r,i,t,y){
-             c[a] = c[a] || function () { (c[a].q = c[a].q || 
-             []).push(arguments) };
-             t=l.createElement(r);
-             t.async=1;
-             t.src="https://www.clarity.ms/tag/"+i;
-             y=l.getElementsByTagName(r)[0];
-             y.parentNode.insertBefore(t,y);
-         })(window, document, "clarity", "script", "dig85agbqz");`,
-   }}
- />;
+   <div
+      dangerouslySetInnerHTML={{__html: clscript}}
+    />
     <div className = "p-nav-primary">
       <div className = "p-nav-wrapper">
         <nav className = "p-nav">
