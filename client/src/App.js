@@ -3,6 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import * as lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
+import {Helmet} from "react-helmet";
 
 function MilpacRequest () {
 
@@ -47,19 +48,23 @@ function MilpacRequest () {
 
   return(
   <div className='MasterContainer'>
-        <script
-    dangerouslySetInnerHTML={{
-      __html: `
-          (function(c,l,a,r,i,t,y){
-              c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-              t=l.createElement(r);
-              t.async=1;
-              t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];
-              y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "dig85agbqz");`,
-    }}
-  />
+    <Helmet>
+    <script
+   dangerouslySetInnerHTML={
+                 {
+     __html: `
+         (function(c,l,a,r,i,t,y){
+             c[a] = c[a] || function () { (c[a].q = c[a].q || 
+             []).push(arguments) };
+             t=l.createElement(r);
+             t.async=1;
+             t.src="https://www.clarity.ms/tag/"+i;
+             y=l.getElementsByTagName(r)[0];
+             y.parentNode.insertBefore(t,y);
+         })(window, document, "clarity", "script", "dig85agbqz");`,
+   }}
+ />;
+    </Helmet>
     <div className = "p-nav-primary">
       <div className = "p-nav-wrapper">
         <nav className = "p-nav">
