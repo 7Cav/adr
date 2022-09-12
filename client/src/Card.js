@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from 'react';
  
 class CardSSR extends React.Component {
   render () {
@@ -23,3 +23,5 @@ class CardSSR extends React.Component {
     );
   }
 };
+
+export default CardSSR;
