@@ -24,8 +24,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - name: change directory to /docker-adr/src
-      - run: git -C /opt/compose/docker-adr/src pull
-      - run: npm run build --if-present
-      - run: npm test
+      - name: Build ReactApp
+        uses: actions/setup-node@v3
+      - name: Pull from Repo
+        run: git -C /opt/compose/docker-adr/src pull && cd /opt/compose/docker-adr/src
+      - name: Build to Prod
+        run: npm run build --if-present
+      - name: run tests
+        run: npm test
+      - name: change directory
+        run: cd /opt/compose/docker-adr
+      - name: restart container
+        run: docker-compose restart
