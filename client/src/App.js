@@ -46,8 +46,8 @@ function MilpacRequest () {
   })
 
   return(
-    <>
-    <script
+  <div className='MasterContainer'>
+        <script
     dangerouslySetInnerHTML={{
       __html: `
           (function(c,l,a,r,i,t,y){
@@ -60,7 +60,6 @@ function MilpacRequest () {
           })(window, document, "clarity", "script", "dig85agbqz");`,
     }}
   />
-  <div className='MasterContainer'>
     <div className = "p-nav-primary">
       <div className = "p-nav-wrapper">
         <nav className = "p-nav">
@@ -201,7 +200,7 @@ function MilpacRequest () {
         </Collapsible>
       </div>
     </div>
-  </div></> 
+  </div>
   )
 } 
 export default MilpacRequest
