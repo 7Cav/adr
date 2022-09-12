@@ -3,7 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import * as lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
-import {Helmet} from 'react-helmet';
+// import {Helmet} from 'react-helmet';
 
 function MilpacRequest () {
 
@@ -48,7 +48,6 @@ function MilpacRequest () {
 
   return(
   <div className='MasterContainer'>
-    <Helmet>
     <script
    dangerouslySetInnerHTML={
                  {
@@ -64,7 +63,6 @@ function MilpacRequest () {
          })(window, document, "clarity", "script", "dig85agbqz");`,
    }}
  />;
-    </Helmet>
     <div className = "p-nav-primary">
       <div className = "p-nav-wrapper">
         <nav className = "p-nav">
