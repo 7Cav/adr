@@ -30,8 +30,6 @@ jobs:
         run: git -C /opt/compose/docker-adr/src pull && cd /opt/compose/docker-adr/src
       - name: Build to Prod
         run: npm run build --if-present
-      - name: run tests
-        run: npm test
       - name: change directory
         run: cd /opt/compose/docker-adr
       - name: restart container
