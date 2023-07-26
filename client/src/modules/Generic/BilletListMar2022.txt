@@ -1155,6 +1155,21 @@
 625 Assistant Section Leader 5/2/B/ACD  B/ACD
 626 Trooper 5/2/B/ACD   B/ACD
 
+----------D/ACD HQ----------    N/A
+
+675 Platoon Leader 1/D/ACD      D/ACD,D/ACD HQ
+676 Platoon Sergeant 1/D/ACD    D/ACD,D/ACD HQ
+
+ --- 1st Platoon --
+
+677 Section Leader 1/1/D/ACD    D/ACD
+678 Assistant Section Leader 1/1/D/ACD  D/ACD
+679 Trooper 1/1/D/ACD   D/ACD
+
+680 Section Leader 2/1/D/ACD    D/ACD
+681 Assistant Section Leader 2/1/D/ACD  D/ACD
+682 Trooper 2/1/D/ACD   D/ACD
+
 /537/edit">Squad Start-Up HQ</a></td>
 
 /538/edit">Squad Start-Up Member</a></td>
