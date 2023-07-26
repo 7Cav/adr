@@ -1,3 +1,7 @@
+/*This file is used as a reference to tell MilpacParse what billet id's to look for when called on the App.js file. 
+Despite all of the magic of my limited JS coding, this file must be updated whenever billets change. 
+As such i will provide a method to get updated BilletID's at the end of this document.*/
+
 
 //Regimental Staff
 
@@ -20,10 +24,10 @@ var charlie2 = ['435','436','437','438','439','440','441','442','443','444','445
 //ACD
 
 var acdCommand = ['552','627','645'];
-var alpha3 = [,'555','556','557','558','559','560','561','562','563','564','565','566','567','568','569','570','571','572','573','574'];
+var alpha3 = ['555','556','557','558','559','560','561','562','563','564','565','566','567','568','569','570','571','572','573','574'];
 var bravo3 = ['590','591','592','593','594','595','596','597','598','599','600','601','602','603','604','605','606','607','608','609','610','611','612','613','614','615','616','617','618','619','620','621','622','623','624','625','626'];
 var charlie3 = ['656','657','658','659','660','661','662','663','664','665','666','667','668','669','670','671','672'];
-var delta3 = ['538'];
+var delta3 = ['537','538','575','576'];
 var echo3= [];
 
 //IMO
@@ -51,7 +55,7 @@ var s2 = ['161','162','163','164','165','166'];
 
 var s3 = ['134','135','136','137','138','139','140','141','142','143','144','145','146','147','148','149','150','151','152','153','154','155','156','157','158','159','540','541','542','543'];
 var s7 = ['105','106','107','108','109','110','111','112','113','114','115','116','117','118','119','120','121','122','123','124','125','531','532','533','534','535','536','537','539','544','545','546','547','548','549','550','551','629','630','631','632','633','634','635','636','637','638','639','640','641','642','643','644'];
-var ld =['126','127','128','129','130','131','132']; //I think...
+var ld =['126','127','128','129','130','131','132'];
 var spd = ['175','176'];
 
 export default {
@@ -87,3 +91,18 @@ export default {
     spd,
     ld,
 };
+
+/* Need updated billetID's? here is what you can do:
+
+The number 1 thing you can do is ask the S6 1IC to provide you with a list of any BilletID's that have been recently changed.
+If the 1IC is busy or a dick, you can do it manually:
+
+Open a milpacs tab of a member that has the billet you need. for example: https://7cav.us/rosters/profile/1900/ i want his primary billet ID
+Open another tab to the following link https://api.7cav.us/                                                 ^---------------------------┐
+On the API tab, click authorize and provide it your API key, to get your API key, see line 107                                          |
+Click the 'Get given user milpac profile' dropdown, then click 'Try it out'                                                             |
+You will be prompted for a userID. The userID is the number in the link of the persons milpac. For my example case, the user id is   (1900)
+Upon sucessful response you will get a small json of the user, if you look through it you should find the position title and the position ID you are looking for.
+
+You can get the API key by going to https://7cav.us/account/connected-accounts/ then viewing your account in Auth.7cav
+*/
