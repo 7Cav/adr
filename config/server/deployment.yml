@@ -18,10 +18,6 @@ spec:
           image: <IMAGE>
           ports:
             - containerPort: 4000
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "128Mi"
           volumeMounts:
             - name: token
               mountPath: /app/server/credentials
