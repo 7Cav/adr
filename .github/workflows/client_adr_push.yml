@@ -33,6 +33,9 @@ jobs:
         run: npm ci
         working-directory: client
 
+      - name: Update Browserlist
+        run: npx browserslist@latest --update-db
+
       - name: Build Client to Prod
         run: npm run build
         working-directory: client

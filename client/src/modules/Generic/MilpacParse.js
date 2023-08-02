@@ -120,15 +120,15 @@ function MilpacParse (props) {
                 </div> 
             </div>
         )
-    } else if (usePrimaryOnly == true) {  
+    } else if (usePrimaryOnly === true) {  
 
-        for (var milpacIdCombat in milpacArray[0].combat.profiles) {
+        for (milpacIdCombat in milpacArray[0].combat.profiles) {
 
-            var name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
-            var rank = milpacArray[0].combat.profiles[milpacIdCombat].rank.rankFull 
-            var primary = milpacArray[0].combat.profiles[milpacIdCombat].primary;
-            var fullName = rank + ' ' + name;
-            var primarySortKey = milpacArray[0].combat.profiles[milpacIdCombat].primary.positionId;
+            name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
+            rank = milpacArray[0].combat.profiles[milpacIdCombat].rank.rankFull 
+            primary = milpacArray[0].combat.profiles[milpacIdCombat].primary;
+            fullName = rank + ' ' + name;
+            primarySortKey = milpacArray[0].combat.profiles[milpacIdCombat].primary.positionId;
     
             if (billetIDs.includes(primary.positionId)) {
     
