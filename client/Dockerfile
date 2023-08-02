@@ -7,13 +7,6 @@ WORKDIR /app/client
 
 RUN npm install
 
-# Install a simple HTTP server to serve the built files
-RUN npm install -g http-server
-
-RUN npx browserslist@latest --update-db
-
-RUN npm  run build
-
 # Expose the port that the HTTP server will use
 EXPOSE 8080
 
