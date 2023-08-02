@@ -6,7 +6,7 @@ WORKDIR /app
 
 ADD . /app
 # Install the dependencies
-RUN npm ci
+RUN npm install
 
 # Expose the port that the HTTP server will use
 EXPOSE 4000
