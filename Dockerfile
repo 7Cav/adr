@@ -6,6 +6,8 @@ WORKDIR /app
 
 ADD . /app
 
+WORKDIR /app/client
+
 # Install the dependencies
 RUN npm ci
 
