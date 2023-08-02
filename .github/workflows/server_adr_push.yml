@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Server Image
-        run: docker build --file ./Dockerfile --tag registry.digitalocean.com/s6container/adr-server:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build --file ./Dockerfile --tag registry.digitalocean.com/s6containers/adr-server:$(echo $GITHUB_SHA | head -c7) .
 
       # - name: Instal doctl
       #   uses: digitalocean/action-doctl@v2
