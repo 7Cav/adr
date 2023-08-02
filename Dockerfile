@@ -5,8 +5,10 @@ FROM node:lts-alpine
 WORKDIR /app
 
 ADD . /app
+
+RUN rm -f ./client
 # Install the dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Expose the port that the HTTP server will use
 EXPOSE 4000
