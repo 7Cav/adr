@@ -26,21 +26,6 @@ jobs:
       - name: Checkout the Repo
         uses: actions/checkout@v3
 
-      - name: Setup node.js
-        uses: actions/setup-node@v3
-
-      - name: Install Dependancies
-        run: npm i
-        working-directory: client
-
-      - name: Update Browserlist
-        run: npx browserslist@latest --update-db
-        working-directory: client
-
-      - name: Build Client to Prod
-        run: npm run build
-        working-directory: client
-
       - name: Build client Image
         run: docker build --file ./client/Dockerfile --tag registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7) .
 
