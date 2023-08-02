@@ -5,13 +5,6 @@ FROM node:lts-alpine
 WORKDIR /app
 
 ADD . /app
-
-WORKDIR /app/client
-
-RUN ls
-
-RUN ls /app/client
-
 # Install the dependencies
 RUN npm ci
 
