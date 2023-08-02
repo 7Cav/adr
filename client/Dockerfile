@@ -10,9 +10,6 @@ WORKDIR /app/client
 # Install the dependencies
 RUN npm install
 
-# Build the application
-RUN npm run build
-
 # Install a simple HTTP server to serve the built files
 RUN npm install -g http-server
 
