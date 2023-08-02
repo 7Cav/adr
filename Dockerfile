@@ -4,6 +4,8 @@ FROM node:lts-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
+ADD . /app
+
 # Install the dependencies
 RUN npm ci
 
