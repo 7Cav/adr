@@ -4,6 +4,9 @@ FROM node:lts-alpine
 # Change working directory to the client folder
 WORKDIR /app
 
+ADD . /app
+
+WORKDIR /app/client
 # Install the dependencies
 RUN npm install
 
