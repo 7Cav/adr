@@ -1,5 +1,5 @@
 # 7th Cavalry ADR
-[![ADR Deployment](https://github.com/7Cav/adr/actions/workflows/main.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/main.yml)
+[![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml) [![Client ADR Deployment](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml)
 
 A react app intended to display roster data from the 7th Cavalry API.
 
