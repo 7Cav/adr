@@ -37,6 +37,12 @@ jobs:
         run: npx browserslist@latest --update-db
         working-directory: client
 
+      - name: List files in the client directory
+        run: ls -al ./client
+
+      - name: Print the content of package.json
+        run: cat ./client/package.json
+
       - name: Build Client to Prod
         run: npm run build
         working-directory: client
