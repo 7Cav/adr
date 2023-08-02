@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
 import Collapsible from 'react-collapsible';
-import * as lists from './modules/Generic/BilletBank';
+import * as BilletBank from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
 // import {Helmet} from 'react-helmet';
+
+const lists = BilletBank.default;
 
 function MilpacRequest () {
 
