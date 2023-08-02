@@ -2,13 +2,16 @@
 FROM node:lts-alpine
 
 # Set the working directory inside the container
+
+COPY . /app
+
 WORKDIR /app
 
-ADD . /app
+RUN rm -rf ./client
 
-RUN rm -f ./client
+RUN npm install -g npm
 # Install the dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Expose the port that the HTTP server will use
 EXPOSE 4000
