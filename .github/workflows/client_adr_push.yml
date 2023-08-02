@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: Install Dependancies
-        run: npm ci
+        run: npm i
         working-directory: client
 
       - name: Update Browserlist
