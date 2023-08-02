@@ -8,7 +8,7 @@ ADD . /app
 
 WORKDIR /app/client
 # Install the dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Install a simple HTTP server to serve the built files
 RUN npm install -g http-server
