@@ -4,13 +4,13 @@ name: CLIENT_ADR_PUSH
 
 # Controls when the workflow will run
 on:
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - ".github/workflows/client_adr_push.yml"
-  #     - "client/**"
-  #     - "config/client/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/client_adr_push.yml"
+      - "client/**"
+      - "config/client/**"
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

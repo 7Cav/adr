@@ -4,15 +4,15 @@ name: SERVER_ADR_PUSH
 
 # Controls when the workflow will run
 on:
-  #   push:
-  #     branches:
-  #       - main
-  #     paths:
-  #       - ".github/workflows/server_adr_push.yml"
-  #       - "server/**"
-  #       - "Dockerfile"
-  #       - "package.json"
-  #       - "config/server/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/server_adr_push.yml"
+      - "server/**"
+      - "Dockerfile"
+      - "package.json"
+      - "config/server/**"
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
