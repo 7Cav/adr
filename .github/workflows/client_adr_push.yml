@@ -43,7 +43,6 @@ jobs:
 
       - name: Build client Image
         run: docker build --file ./client/Dockerfile --tag registry.digitalocean.com/s6container/adr_client:$(echo $GITHUB_SHA | head -c7) .
-        working-directory: client
 
       # - name: Instal doctl
       #   uses: digitalocean/action-doctl@v2
