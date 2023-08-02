@@ -1,4 +1,3 @@
-require('dotenv').config();
 const middleware = require("./routes");
 const express = require("express");
 const app = express()
