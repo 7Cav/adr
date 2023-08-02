@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: adr-server
-          image: registry.digitalocean.com/s6containers/adr_server:3
+          image: <IMAGE>
           ports:
             - containerPort: 4000
           resources:
