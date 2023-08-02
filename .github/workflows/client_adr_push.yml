@@ -44,25 +44,25 @@ jobs:
       - name: Build client Image
         run: docker build --file ./client/Dockerfile --tag registry.digitalocean.com/s6container/adr_client:$(echo $GITHUB_SHA | head -c7) .
 
-      # - name: Instal doctl
-      #   uses: digitalocean/action-doctl@v2
-      #   with:
-      #     token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Instal doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      # - name: Log in to DO Container Registry
-      #   run: doctl registry login --expiry-seconds 600
+      - name: Log in to DO Container Registry
+        run: doctl registry login --expiry-seconds 600
 
-      # - name: Push image to DO Container Registry
-      #   run: docker push registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7)
+      - name: Push image to DO Container Registry
+        run: docker push registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7)
 
-      # - name: Update Deployment File
-      #   run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/s6containers/adr_client:'${TAG}'|' $GITHUB_WORKSPACE/config/client/deployment.yml
+      - name: Update Deployment File
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/s6containers/adr_client:'${TAG}'|' $GITHUB_WORKSPACE/config/client/deployment.yml
 
-      # - name: Save DO Kubeconfig with short-lived credentials
-      #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cav-kube
+      - name: Save DO Kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 cav-kube
 
-      # - name: Deploy to DO Cluster
-      #   run: kubectl apply -f $GITHUB_WORKSPACE/config/client/deployment.yml
+      - name: Deploy to DO Cluster
+        run: kubectl apply -f $GITHUB_WORKSPACE/config/client/deployment.yml
 
-      # - name: Verify Deployment
-      #   run: kubectl rollout status deployment/adr-client -n 7cav
+      - name: Verify Deployment
+        run: kubectl rollout status deployment/adr-client -n 7cav
