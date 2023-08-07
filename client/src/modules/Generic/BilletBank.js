@@ -72,6 +72,7 @@ const billetBank = {
     charlie3,
     delta3,
     echo3,
+	starterPlatoon,
     imoCommand,
     s1,
     s6,
