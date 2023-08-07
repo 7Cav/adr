@@ -131,8 +131,11 @@ function MilpacRequest () {
           <div className='Echo3'>
             <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.echo3} subtitle = {'Echo Company'}/>
           </div>
-		  <div className='starterPlatoon'>
+          <div className='starterPlatoon'>
             <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.starterPlatoon} subtitle = {'Starter Platoon'}/>
+          </div>
+	  <div className='futureC'>
+            <MilpacParse milpacArray = {milpacArray} billetIDs = {lists.futureC} subtitle = {'Futures and Concepts Center'}/>
           </div>
         </Collapsible>
       </div>
