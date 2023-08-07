@@ -117,19 +117,22 @@ function MilpacRequest () {
            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.acdCommand} subtitle = {'ACD Command'}/>
           </div>
           <div className='Alpha3'>
-           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.alpha3} subtitle = {'Alpha Division'}/>
+           <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.alpha3} subtitle = {'Alpha Company'}/>
           </div>
           <div className='Bravo3'>
-            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.bravo3} subtitle = {'Bravo Division'}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.bravo3} subtitle = {'Bravo Company'}/>
           </div>
           <div className='Charlie3'>
-            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.charlie3} subtitle = {'Charlie Division'}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.charlie3} subtitle = {'Charlie Company'}/>
           </div>
           <div className='Delta3'>
-            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.delta3} subtitle = {'Delta Division'}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.delta3} subtitle = {'Delta Company'}/>
           </div>
           <div className='Echo3'>
-            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.echo3} subtitle = {'Echo Division'}/>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.echo3} subtitle = {'Echo Company'}/>
+          </div>
+		  <div className='starterPlatoon'>
+            <MilpacParse usePrimaryOnly = {true} milpacArray = {milpacArray} billetIDs = {lists.starterPlatoon} subtitle = {'Starter Platoon'}/>
           </div>
         </Collapsible>
       </div>

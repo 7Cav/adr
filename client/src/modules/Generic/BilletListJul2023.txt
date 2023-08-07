@@ -29,6 +29,8 @@ Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCI
 
 /10/edit">Aide to the CoS</a></td>
 
+676/edit">Aide to the CSM</a>
+
 /60/edit">Aide to the ROO</a></td>
 
 /62/edit">Aide to the SecOps</a></td>
@@ -143,6 +145,14 @@ Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCI
 
 /580/edit">RRD Processing Clerk</a></td>
 
+/751/edit">RRD Processing Clerk IT
+
+734/edit">RRD Recruiter - Arma 3
+
+736/edit">RRD Recruiter - Hell Let Loose
+
+738/edit">RRD Recruiter - ACD
+
 /82/edit">----------S5 DEPARTMENT----------</a></td>
 
 /83/edit">S5 1IC</a></td>
@@ -174,7 +184,9 @@ Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCI
 /96/edit">S5 Filmmaker IT</a></td>
 
 739/edit">S5 Social Media Lead</a>
+
 740/edit">S5 Social Media Senior</a>
+
 741/edit">S5 Social Media Clerk</a>
 
 /97/edit">----------RTC DEPARTMENT----------</a></td>
@@ -1286,6 +1298,10 @@ Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCI
 /588/edit">Assistant Section Leader HLL Console Start-Up</a></td>
 
 /581/edit">Trooper Foxhole Start-Up</a></td>
+
+759/edit">Star Citizen Start-Up
+
+
 
 /193/edit">New Recruit</a></td>
 
