@@ -87,7 +87,13 @@ function MilpacParse (props) {
             }
         }; 
     
-        array.sort((a,b) => a.sortKey - b.sortKey)
+        // Sorting the array based on the order of positionIds in the billetIDs array
+        array.sort((a, b) => {
+            const aIndex = billetIDs.indexOf(a.sortKey);
+            const bIndex = billetIDs.indexOf(b.sortKey);
+            return aIndex - bIndex;
+        });
+  
         return(
             <div className='ResponseContainer'>
                 <div className='HeaderContainer'>
@@ -143,7 +149,13 @@ function MilpacParse (props) {
             }
         }; 
     
-        array.sort((a,b) => a.sortKey - b.sortKey)
+        // Sorting the array based on the order of positionIds in the billetIDs array
+        array.sort((a, b) => {
+            const aIndex = billetIDs.indexOf(a.sortKey);
+            const bIndex = billetIDs.indexOf(b.sortKey);
+            return aIndex - bIndex;
+        });
+  
         
         return(
             <div className='ResponseContainer'>
