@@ -3,6 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
+import CLIENT_TOKEN from './credentials/token';
 // import {Helmet} from 'react-helmet';
 
 function MilpacRequest() {
@@ -22,7 +23,11 @@ function MilpacRequest() {
       try {
         const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
         //const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
-        const response = await fetch(requestUrl);
+        const response = await fetch(requestUrl, {
+          headers: {
+            'Authorization': CLIENT_TOKEN
+          }
+        });
 
         if (!response.ok) {
           throw new Error('HTTP Error! status: ' + response.status);
@@ -42,7 +47,11 @@ function MilpacRequest() {
       try {
         const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
         //const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
-        const response = await fetch(requestUrl);
+        const response = await fetch(requestUrl, {
+          headers: {
+            'Authorization': CLIENT_TOKEN
+          }
+        });
 
         if (!response.ok) {
           throw new Error('HTTP Error! status: ' + response.status);

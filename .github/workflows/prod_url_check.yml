@@ -3,6 +3,8 @@ name: PROD_URL_CHECK
 on:
     pull_request:
       branches: [ main ]
+      paths:
+        - 'client/src/App.js'
 
 jobs:
     check-url:
