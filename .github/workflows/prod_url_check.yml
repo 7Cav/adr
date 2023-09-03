@@ -10,14 +10,9 @@ jobs:
       steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      - name: List directory for debugging
-        run: ls -l client/src/
-      - name: List files for debugging
-        run: ls
       - name: Check API URL
         run: |
-          if ! grep -E '^[^/]*https://bff.adr.7cav.us/roster/combat' /client/src/App.js; then
+          if ! grep -E '^[^/]*https://bff.adr.7cav.us/roster/combat' client/src/App.js; then
             echo "ERROR: Production API URL is either absent or commented out."
             exit 1
           else
