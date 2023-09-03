@@ -25,7 +25,7 @@ spec:
       volumes:
         - name: token
           secret:
-            secretName: adr-token
+            secretName: adr-server-token
 ---
 apiVersion: v1
 kind: Service
@@ -55,17 +55,17 @@ metadata:
 spec:
   tls:
     - hosts:
-      - "bff.adr.7cav.us"
+        - "bff.adr.7cav.us"
       secretName: letsencrypt-adr-server
   ingressClassName: nginx
   rules:
-  - host: bff.adr.7cav.us
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: adr-server
-            port:
-              name: http
+    - host: bff.adr.7cav.us
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adr-server
+                port:
+                  name: http
