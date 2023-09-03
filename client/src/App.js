@@ -20,8 +20,8 @@ function MilpacRequest() {
   useEffect(() => {
     async function fetchMilpacList() {
       try {
-        //const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
-        const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
+        const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
+        //const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
         const response = await fetch(requestUrl);
         const responseJSON = await response.json();
         setMilpacList(responseJSON);
@@ -35,8 +35,8 @@ function MilpacRequest() {
   useEffect(() => {
     async function fetchReserveList() {
       try {
-        //const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
-        const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
+        const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
+        //const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
         const response = await fetch(requestUrl);
         const responseJSON = await response.json();
         setReserveList(responseJSON);
