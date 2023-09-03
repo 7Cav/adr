@@ -3,7 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
-import CLIENT_TOKEN from './credentials/token';
+const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 // import {Helmet} from 'react-helmet';
 
 function MilpacRequest() {
