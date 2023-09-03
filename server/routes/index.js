@@ -5,7 +5,7 @@ const cRequest = require("../controllers/cRequest");
 const rRequest = require("../controllers/rRequest");
 const app = express();
 
-app.use (cors({
+app.use(cors({
     origin: '*',
 }));
 
