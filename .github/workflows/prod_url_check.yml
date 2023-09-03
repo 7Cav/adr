@@ -13,7 +13,7 @@ jobs:
   
       - name: Check API URL
         run: |
-          if ! grep -E '^[^/]*https://bff.adr.7cav.us/roster/combat' ../client/src/App.js; then
+          if ! grep -E '^[^/]*https://bff.adr.7cav.us/roster/combat' /client/src/App.js; then
             echo "ERROR: Production API URL is either absent or commented out."
             exit 1
           else
