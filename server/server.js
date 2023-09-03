@@ -9,11 +9,9 @@ app.use(cors({
 }));
 app.use("/roster", middleware);
 app.get("/", (req, res) => {
-res.send("Ayy Lmao! Successful response! Any issues? Submit a ticket to S6!");
+  res.send("Ayy Lmao! Successful response! Any issues? Submit a ticket to S6!");
 });
 
 app.listen(port, () => {
-    console.log(`Roster Server listening on ${port}`)
+  console.log(`Roster Server listening on ${port}`)
 })
-
-  
