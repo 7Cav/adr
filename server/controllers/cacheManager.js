@@ -23,7 +23,6 @@ const updateCombatRosterCache = async () => {
 
 const updateReserveRosterCache = async () => {
     try {
-        // Replace this with your actual API call for rRequest
         const response = await axios('https://api.7cav.us/api/v1/roster/2', {
             headers: {
                 Accept: 'application/json',
