@@ -18,14 +18,6 @@ spec:
           image: <IMAGE>
           ports:
             - containerPort: 8080
-          volumeMounts:
-            - name: token
-              mountPath: /app/client/src/credentials
-              readOnly: true
-      volumes:
-        - name: token
-          secret:
-            secretName: adr-client-token
 ---
 apiVersion: v1
 kind: Service
