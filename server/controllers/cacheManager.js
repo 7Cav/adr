@@ -1,5 +1,5 @@
 const axios = require("axios");
-const Token = require("../credentials/token");
+const { API_TOKEN } = require("../credentials/token");
 
 let cachedCombatRoster;
 let cachedReserveRoster;
@@ -11,7 +11,7 @@ const updateCombatRosterCache = async () => {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + Token
+                Authorization: 'Bearer ' + API_TOKEN
             },
         });
         cachedCombatRoster = response.data;
@@ -27,7 +27,7 @@ const updateReserveRosterCache = async () => {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + Token
+                Authorization: 'Bearer ' + API_TOKEN
             },
         });
         cachedReserveRoster = response.data;

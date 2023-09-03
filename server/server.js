@@ -3,13 +3,36 @@ const express = require("express");
 const app = express()
 const cors = require("cors");
 const port = 4000;
+const { CLIENT_TOKEN } = require("./credentials/token");
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowlist = ["http://localhost:3000", "http://adr.7cav.us", "https://adr.7cav.us", "https://adr.7cav.us/"];
+    if (allowlist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+}
+
+// Token Checking Middleware
+const checkToken = (req, res, next) => {
+  const authToken = req.headers['authorization'];
+  if (authToken === CLIENT_TOKEN) {
+    next();  // proceed to the next middleware or route handler
+  } else {
+    res.status(403).send('Forbidden');
+  }
+};
 
 app.use(cors({
-  origin: '*',
+  origin: corsOptions.origin,
 }));
-app.use("/roster", middleware);
+// Apply token checking middleware only to these routes
+app.use("/roster", checkToken, middleware);
 app.get("/", (req, res) => {
-  res.send("Ayy Lmao! Successful response! Any issues? Submit a ticket to S6!");
+  res.send("Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://adr.7cav.us/");
 });
 
 app.listen(port, () => {
