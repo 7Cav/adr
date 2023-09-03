@@ -43,7 +43,7 @@ const scheduleCacheUpdate = (updateFunction, key) => {
 
     setTimeout(() => {
         updateFunction();
-        setInterval(updateFunction, 3600 * 1000); // Update every 3600 seconds (1 hour)
+        setInterval(updateFunction, 3660 * 1000); // Update every 3660 seconds (1 hour and 1 minute)
     }, delay);
 };
 
