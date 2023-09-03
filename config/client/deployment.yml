@@ -18,7 +18,14 @@ spec:
           image: <IMAGE>
           ports:
             - containerPort: 8080
-
+          volumeMounts:
+            - name: token
+              mountPath: /app/client/src/credentials
+              readOnly: true
+      volumes:
+        - name: token
+          secret:
+            secretName: adr-client-token
 ---
 apiVersion: v1
 kind: Service
@@ -48,17 +55,17 @@ metadata:
 spec:
   tls:
     - hosts:
-      - "adr.7cav.us"
+        - "adr.7cav.us"
       secretName: letsencrypt-adr-client
   ingressClassName: nginx
   rules:
-  - host: adr.7cav.us
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: adr-client
-            port:
-              name: http
+    - host: adr.7cav.us
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adr-client
+                port:
+                  name: http
