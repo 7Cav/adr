@@ -23,10 +23,15 @@ function MilpacRequest() {
         const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
         //const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
         const response = await fetch(requestUrl);
+
+        if (!response.ok) {
+          throw new Error('HTTP Error! status: ' + response.status);
+        }
+
         const responseJSON = await response.json();
         setMilpacList(responseJSON);
-      } catch {
-
+      } catch (error) {
+        console.error("Error fetching combat roster data: ", error);
       }
     }
     fetchMilpacList();
@@ -38,10 +43,15 @@ function MilpacRequest() {
         const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
         //const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
         const response = await fetch(requestUrl);
+
+        if (!response.ok) {
+          throw new Error('HTTP Error! status: ' + response.status);
+        }
+
         const responseJSON = await response.json();
         setReserveList(responseJSON);
-      } catch {
-
+      } catch (error) {
+        console.error("Error fetching reserve roster data: ", error);
       }
     }
     fetchReserveList();
