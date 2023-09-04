@@ -1,192 +1,189 @@
 .DepartmentContainer {
-    margin: auto;
-    min-width: 30%;
-    max-width: 30%;
+  margin: auto;
+  min-width: 30%;
+  max-width: 30%;
 }
 
 @media only screen and (max-width: 1000px) {
-    .DepartmentContainer {
-        min-width: 50%;
-        max-width: 95%;
-    }
+  .DepartmentContainer {
+    min-width: 50%;
+    max-width: 95%;
+  }
 }
 
 .p-nav-primary {
-    position: sticky;
-    top: 0;
-    z-index: 400;
-    background-color: #2e2e2e;
-    margin-bottom: 1.2em;
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  background-color: #2e2e2e;
+  margin-bottom: 1.2em;
 }
 
 .p-nav {
-    display: block;
-    overflow-wrap: break-word;
+  display: block;
+  overflow-wrap: break-word;
 }
 
 .p-nav-logo {
-    align-self: center;
-    box-sizing: border-box;
-    display: block;
-    max-width: 220px;
-    line-height: 21px;
-    padding: 3px
+  align-self: center;
+  box-sizing: border-box;
+  display: block;
+  max-width: 220px;
+  line-height: 21px;
+  padding: 3px;
 }
 
+/* commented out because it was causing the logo to be off center
 .p-nav-inner {
-    margin-left: 25%;
-}
+  margin-left: 25%;
+} */
 
 .p-nav-scroller {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .p-nav-png {
-    max-width: 220px;
-    max-height: 37.7167px;
-    flex: 1 1 auto;
+  max-width: 220px;
+  max-height: 37.7167px;
+  flex: 1 1 auto;
 }
 
 .p-nav-opposite {
-    text-align: right;
-    flex: 1 1 auto;
-    margin: 5px
+  text-align: right;
+  flex: 1 1 auto;
+  margin: 5px;
 }
 
 .p-nav-opposite-link {
-    color: #f1f1f1;
-    font-weight: bold;
+  color: #f1f1f1;
+  font-weight: bold;
 }
 
 .p-nav-png {
-    width: 220px;
-    height: 37.7167px;
+  width: 220px;
+  height: 37.7167px;
 }
 
 .p-nav-info p {
-    color: #ff0000;
-    /* Red text */
-    font-size: 14px;
-    margin: 20px;
+  color: #ff0000;
+  /* Red text */
+  font-size: 14px;
+  margin: 20px;
 }
 
 /* Mobile layout */
 @media (max-width: 768px) {
-    .p-nav-scroller {
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        /* Center-align items vertically */
-    }
+  .p-nav-scroller {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Center-align items vertically */
+  }
 
-    .p-nav-info p {
-        margin-left: 0;
-        margin-top: 10px;
-        /* Add some space between the logo and the text */
-    }
+  .p-nav-info p {
+    margin-left: 0;
+    margin-top: 10px;
+    /* Add some space between the logo and the text */
+  }
 }
 
 .Title {
-    color: #f1f1f1;
-    font-size: x-large;
-    font-weight: bold;
-    border-width: 1px;
-    border-style: solid;
-    border-image:
-        linear-gradient(to right,
-            #ebc729,
-            transparent) 1 0%;
-    border-top: transparent;
+  color: #f1f1f1;
+  font-size: x-large;
+  font-weight: bold;
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(to right, #ebc729, transparent) 1 0%;
+  border-top: transparent;
 }
 
 @media only screen and (max-width: 1000px) {
-    .Title {
-        border-image: none;
-        border-color: #ebc729;
-        border-left: transparent;
-        border-right: transparent;
-    }
+  .Title {
+    border-image: none;
+    border-color: #ebc729;
+    border-left: transparent;
+    border-right: transparent;
+  }
 }
 
 /* This is a very hack-y way to make the borders look proper on mobile browsers. This is because the border image property does not appear to be properly supported with IOS' Safari */
 
 .Subtitle {
-    color: #f1f1f1;
-    font-size: larger;
-    font-weight: bold;
-    padding-top: 15px;
-    padding-bottom: 15px;
+  color: #f1f1f1;
+  font-size: larger;
+  font-weight: bold;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .Title:hover {
-    text-decoration: none;
-    cursor: pointer;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-
 .HeaderContainer {
-    display: flex;
+  display: flex;
 }
 
 .Counter {
-    font-size: smaller;
-    padding-top: 20px;
-    padding-bottom: 15px;
-    margin-left: auto;
+  font-size: smaller;
+  padding-top: 20px;
+  padding-bottom: 15px;
+  margin-left: auto;
 }
 
 .ItemList table {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .ItemList thead {
-    display: none;
+  display: none;
 }
 
 .ItemList td {
-    padding-bottom: 7px;
-    padding-left: 10px;
-    width: 50%;
+  padding-bottom: 7px;
+  padding-left: 10px;
+  width: 50%;
 }
 
 a {
-    color: #ebc729;
-    text-decoration: none;
+  color: #ebc729;
+  text-decoration: none;
 }
 
 a:hover {
-    color: #ebc729;
-    text-decoration: underline;
+  color: #ebc729;
+  text-decoration: underline;
 }
 
 .Collapsible__trigger {
-    display: block;
-    position: relative;
+  display: block;
+  position: relative;
 }
 
 .Collapsible__trigger:after {
-    content: url('./style/themes/Chevron.png');
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    display: block;
-    transition: transform 300ms;
-    transform: rotateZ(90deg);
+  content: url("./style/themes/Chevron.png");
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  display: block;
+  transition: transform 300ms;
+  transform: rotateZ(90deg);
 
-    /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
-    transform-origin: 67% 67%;
+  /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
+  transform-origin: 67% 67%;
 }
 
 .Collapsible__trigger.is-open::after {
-    transform: rotateZ(180deg);
-    position: absolute;
-    right: 0px;
-    top: 0px;
+  transform: rotateZ(180deg);
+  position: absolute;
+  right: 0px;
+  top: 0px;
 
-    /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
-    transform-origin: 67% 67%;
+  /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
+  transform-origin: 67% 67%;
 }

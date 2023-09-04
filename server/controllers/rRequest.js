@@ -1,11 +1,11 @@
-const cacheManager = require('../controllers/cacheManager');
+const cacheManager = require("../controllers/cacheManager");
 
 module.exports = async (req, res) => {
-    const cachedReserveRoster = cacheManager.getCachedReserveRoster();
+  const cachedReserveRoster = cacheManager.getCachedReserveRoster();
 
-    if (cachedReserveRoster) {
-        res.send(cachedReserveRoster);
-    } else {
-        res.status(503).send("Cache is empty");
-    }
+  if (cachedReserveRoster) {
+    res.send(cachedReserveRoster);
+  } else {
+    res.status(503).send("Cache is empty");
+  }
 };
