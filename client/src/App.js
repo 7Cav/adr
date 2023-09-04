@@ -3,6 +3,7 @@ import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
+import ErrorMessage from "./errorMessage";
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
@@ -12,6 +13,7 @@ function MilpacRequest() {
   const [milpacList, setMilpacList] = useState([]);
   const [reserveList, setReserveList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const clscript = `<script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -37,7 +39,7 @@ function MilpacRequest() {
       setFunction(responseJSON);
     } catch (error) {
       console.error(`Error fetching data from ${url}: `, error);
-      // Implement user feedback here
+      setError(error);
     }
   }
 
@@ -98,6 +100,14 @@ function MilpacRequest() {
               src={require("./style/themes/7cav/hamster-hamtaro.gif")}
               alt="Loading"
             />
+          </div>
+        </div>
+      ) : error ? (
+        <div className="error-container">
+          <div className="error-wrapper">
+            <div>
+              <ErrorMessage message={error.message} />
+            </div>
           </div>
         </div>
       ) : (
