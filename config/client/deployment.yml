@@ -25,9 +25,9 @@ spec:
                   key: REACT_APP_CLIENT_TOKEN
                   name: adr-client-token
             - name: REACT_APP_COMBAT_API_URL
-              value: https://bff.adr.7cav.us/roster/combat
+              value: "https://bff.adr.7cav.us/roster/combat"
             - name: REACT_APP_RESERVE_API_URL
-              value: https://bff.adr.7cav.us/roster/reserve
+              value: "https://bff.adr.7cav.us/roster/reserve"
 
 ---
 apiVersion: v1
