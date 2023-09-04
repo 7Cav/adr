@@ -11,7 +11,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # deployment
-  client_deployment:
+  lint_format_check:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -24,5 +24,4 @@ jobs:
       - name: Prettiier
         uses: creyD/prettier_action@v4.3
         with:
-          prettier_options: --check
-          dry: True
+          prettier_options: "--check {**/*,*}.{js,jsx,json,html,css,yml,yaml}"
