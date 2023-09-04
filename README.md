@@ -1,16 +1,34 @@
 # 7th Cavalry ADR
-[![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml) [![Client ADR Deployment](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml)
 
-A react app intended to display roster data from the 7th Cavalry API.
-Uses client and server components with some basic authentication for security.
+[![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml)
+[![Client ADR Deployment](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml)
+
+## Overview
+
+This is a React application designed to display roster data fetched from the 7th Cavalry API. The project is structured as a client-server architecture and includes basic authentication for enhanced security.
+
+## Table of Contents
+
+- [Updating ADR](#updating-adr)
+  - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
+  - [Add New Category](#add-new-category)
+- [TODO](#todo)
 
 ## Updating ADR
-### New billet in existing category:
-Updating the ADR for new billets is done by modifying the `BilletBank.js` file in the `client/src/modules/Generic` directory. This file is a set of simple arrays of the category the billet should be placed in and the ID of the billet. The ID is the same as the billet ID in the 7th Cavalry API. The order you add the billet IDs will be the same order the billets are displayed in the app.
+
+### Add New Billet in Existing Category
+
+To add a new billet to an existing category, you need to update the `BilletBank.js` file located in `client/src/modules/Generic`.
+
+#### Step-by-Step Instructions
+
+1. Open `BilletBank.js`.
+2. Locate the array that corresponds to the category where you wish to add the new billet.
+3. Append the new billet ID to this array.
 
 #### Example:
-If you wanted to add a new billet with an ID of 28 to "Information Management Office Command" you would modify the following line in the `BilletBank.js` file:
-<hr></hr>
+
+Suppose you want to add a new billet with an ID of `28` to the "Information Management Office Command" category. Update `imoCommand` as follows:
 
 ##### Before:
 ```javascript
@@ -21,22 +39,30 @@ const imoCommand = ['5','9'];
 const imoCommand = ['5','9','28'];
 ```
 
-<hr></hr>
+---
 
-### New Category:
-Adding a new category is done by modifying the `BilletBank.js` file in the `client/src/modules/Generic` directory. This file is a set of simple arrays of the category each billet should be placed in and the ID of the billet. The ID is the same as the billet ID in the 7th Cavalry API. The order you add the billet IDs will be the same order the billets are displayed in the app.
+### Add New Category
 
-You will also need to modify the App.js to display the new category. Each major category is split into a class named `Department Container` and each sub department is split into subclasses. You will also need to mark if the parse will be Primary Only or if secondary billets are included.
+To introduce a new category, both `BilletBank.js` and `App.js` need to be updated.
+
+#### Step-by-Step Instructions
+
+1. **In `BilletBank.js`:**
+    - Add a new array for the subcategory and populate it with billet IDs.
+    - Add this new subcategory to the `billetBank` constant.
+
+2. **In `App.js`:**
+    - Create a new `<div>` with the class `DepartmentContainer`.
+    - Inside this `<div>`, add a `Collapsible` component for the new category and subcategory.
 
 #### Example:
-If you wanted to add a new major category called "test" with a subcategory of "subTest" that is only used as a primary billet you would add the following line in the `BilletBank.js` file:
-<hr></hr>
 
+To add a new major category called "test" with a subcategory "subTest," do the following:
+
+**In `BilletBank.js`:**
 ```javascript
-const subTest = ['1','2','3'];
-```
-You then also need to add the new subcategory to the `const billetBank` array in the same file.
-```javascript
+const subTest = ['1', '2', '3'];
+
 const billetBank = {
     regiCommand,
     oneSevenCommand,
@@ -44,23 +70,23 @@ const billetBank = {
 };
 ```
 
-You would then also add the following lines in the `App.js` file:
+**In `App.js`:**
 ```javascript
-        <div className='DepartmentContainer'>
-          <Collapsible trigger="test"
-          triggerClassName="Title"
-          triggerOpenedClassName="Title" open
-          {true}>
-            <div className='subTest'>
-              <MilpacParse usePrimaryOnly
-              {true} milpacArray={milpacArray}
-              billetIDs={lists.subTest}
-              subtitle={'Subcategory of Test'} 
-            </div>
-        </div>
+<div className='DepartmentContainer'>
+  <Collapsible trigger="test" triggerClassName="Title" triggerOpenedClassName="Title" open={true}>
+    <div className='subTest'>
+      <MilpacParse usePrimaryOnly={true} milpacArray={milpacArray} billetIDs={lists.subTest} subtitle={'Subcategory of Test'} />
+    </div>
+  </Collapsible>
+</div>
 ```
-It is important to note these need to be added in proper div location in app.js to preserve necessary formatting.
-## TODO:
 
-- [ ] Look into sorting by rank after sorting by billet (Subsorting? QuickSort maybe?)
-- [ ] Implement a sort of graph for easier data visualization
+> Note: Ensure that you add these elements in the proper locations in `App.js` to maintain the formatting.
+
+---
+
+## TODO
+
+- [ ] Change cache warning on client to display time since cache refresh
+- [ ] Investigate the feasibility of sorting by rank after billet sorting (Subsorting? Consider using QuickSort)
+- [ ] Add graphical data visualization
