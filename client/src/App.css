@@ -33,14 +33,15 @@
   padding: 3px;
 }
 
+/* commented out because it was causing the logo to be off center
 .p-nav-inner {
   margin-left: 25%;
-}
+} */
 
 .p-nav-scroller {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .p-nav-png {
