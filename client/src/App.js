@@ -4,6 +4,8 @@ import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
+const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
+const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
 // import {Helmet} from 'react-helmet';
 
 function MilpacRequest() {
@@ -44,8 +46,8 @@ function MilpacRequest() {
     setLoading(true);
 
     Promise.all([
-      fetchData("https://bff.adr.7cav.us/roster/combat", setMilpacList),
-      fetchData("https://bff.adr.7cav.us/roster/reserves", setReserveList),
+      fetchData(combatApiUrl, setMilpacList),
+      fetchData(reserveApiUrl, setReserveList),
     ]).then(() => {
       // Set loading to false once both promises are resolved
       setLoading(false);
@@ -88,7 +90,16 @@ function MilpacRequest() {
         </div>
       </div>
       {loading ? (
-        <p>Loading...</p> // Implement loading animation here
+        <div className="loading-container">
+          <div className="gif-spinner-wrapper">
+            <div className="spinner"></div>
+            <img
+              className="p-loading-png"
+              src={require("./style/themes/7cav/hamster-hamtaro.gif")}
+              alt="Loading"
+            />
+          </div>
+        </div>
       ) : (
         <>
           <div className="ListContainer">
