@@ -1,15 +1,15 @@
 name: PROD_URL_CHECK
 
 on:
-    pull_request:
-      branches: [ main ]
-      paths:
-        - 'client/src/App.js'
+  pull_request:
+    branches: [main]
+    paths:
+      - "client/src/App.js"
 
 jobs:
-    check-url:
-      runs-on: ubuntu-latest
-      steps:
+  check-url:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Check API URL
