@@ -37,7 +37,7 @@ const updateReserveRosterCache = async () => {
   }
 };
 
-const scheduleCacheUpdate = (updateFunction, key) => {
+const scheduleCacheUpdate = (updateFunction) => {
   const now = new Date();
   const delay =
     (60 - now.getMinutes()) * 60 * 1000 + (60 - now.getSeconds()) * 1000;
@@ -50,9 +50,9 @@ const scheduleCacheUpdate = (updateFunction, key) => {
 
 // Initialize the cache and schedule the updates
 updateCombatRosterCache();
-scheduleCacheUpdate(updateCombatRosterCache, "combat");
+scheduleCacheUpdate(updateCombatRosterCache);
 updateReserveRosterCache();
-scheduleCacheUpdate(updateReserveRosterCache, "reserve");
+scheduleCacheUpdate(updateReserveRosterCache);
 
 const getCachedCombatRoster = () => {
   return cachedCombatRoster;
