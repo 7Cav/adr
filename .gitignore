@@ -3,4 +3,4 @@ credentials/token.js
 server/credentials/token.js
 package-lock.json
 client/src/credentials/token.js
-"client/.env"
+client/.env
