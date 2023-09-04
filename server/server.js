@@ -1,5 +1,6 @@
 const middleware = require("./routes");
 const express = require("express");
+const compression = require("compression");
 const app = express();
 const cors = require("cors");
 const port = 4000;
@@ -30,6 +31,8 @@ const checkToken = (req, res, next) => {
     res.status(403).send("Forbidden");
   }
 };
+
+app.use(compression());
 
 app.use(
   cors({
