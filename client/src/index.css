@@ -8,10 +8,11 @@ body {
   line-height: 1.5;
   color: #a1a1a1;
   background-color: #121212;
+  background-image: url("./style/themes/7cav/page-bg2.png");
+  background-size: cover;
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-position: center center;
   background-attachment: fixed;
-  background-image: url("style/themes/7cav/page-bg2.png");
   align-content: space-evenly;
 }
 
