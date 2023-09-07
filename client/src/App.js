@@ -7,6 +7,11 @@ import ErrorMessage from "./errorMessage";
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
+const cacheTimestampUrl = process.env.REACT_APP_CACHE_TIMESTAMP_URL;
+const millisecondsToMinutes = (milliseconds) => {
+  return Math.round(milliseconds / (1000 * 60));
+};
+
 // import {Helmet} from 'react-helmet';
 
 function MilpacRequest() {
@@ -14,6 +19,7 @@ function MilpacRequest() {
   const [reserveList, setReserveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cacheTime, setCacheTime] = useState(null);
   const clscript = `<script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -46,6 +52,17 @@ function MilpacRequest() {
   useEffect(() => {
     // Set loading to true
     setLoading(true);
+    fetch(cacheTimestampUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        setCacheTime({
+          combat: millisecondsToMinutes(Date.now() - data.cacheTime.combat),
+          reserve: millisecondsToMinutes(Date.now() - data.cacheTime.reserve),
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching cache timestamp: ", error);
+      });
 
     Promise.all([
       fetchData(combatApiUrl, setMilpacList),
@@ -84,7 +101,16 @@ function MilpacRequest() {
                 </div>
                 {/* Data Age Warning */}
                 <div className="p-nav-info">
-                  <p>Data may be up to 1 hour old</p>
+                  {cacheTime && cacheTime.combat !== null && (
+                    <div className="cache-time">
+                      Combat Roster Age: {cacheTime.combat} minutes old
+                    </div>
+                  )}
+                  {cacheTime && cacheTime.reserve !== null && (
+                    <div className="cache-time">
+                      Reserve Roster Age: {cacheTime.reserve} minutes old
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

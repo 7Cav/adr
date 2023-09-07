@@ -33,11 +33,6 @@
   padding: 3px;
 }
 
-/* commented out because it was causing the logo to be off center
-.p-nav-inner {
-  margin-left: 25%;
-} */
-
 .loading-container {
   display: flex;
   justify-content: center;
@@ -80,6 +75,12 @@
   }
 }
 
+.cache-time {
+  color: #ebc729;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
 .error-container {
   display: flex;
   justify-content: center;
@@ -117,10 +118,8 @@
 }
 
 .p-nav-info p {
-  color: #ff0000;
-  /* Red text */
-  font-size: 14px;
-  margin: 20px;
+  display: flex;
+  align-items: center;
 }
 
 /* Mobile layout */

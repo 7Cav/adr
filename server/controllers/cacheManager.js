@@ -65,4 +65,5 @@ const getCachedReserveRoster = () => {
 module.exports = {
   getCachedCombatRoster,
   getCachedReserveRoster,
+  cacheTime,
 };

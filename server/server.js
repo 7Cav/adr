@@ -5,6 +5,7 @@ const app = express();
 const cors = require("cors");
 const port = 4000;
 const { CLIENT_TOKEN } = require("./credentials/token");
+const { cacheTime } = require("./controllers/cacheManager");
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -45,6 +46,10 @@ app.get("/", (req, res) => {
   res.send(
     "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://adr.7cav.us/"
   );
+});
+
+app.get("/cache-timestamp", (req, res) => {
+  res.json({ cacheTime });
 });
 
 app.listen(port, () => {
