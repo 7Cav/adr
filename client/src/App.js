@@ -3,6 +3,7 @@ import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
+import StrengthCount from "./modules/Generic/StrengthCount";
 import ErrorMessage from "./errorMessage";
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -452,6 +453,147 @@ function MilpacRequest() {
                     milpacArray={milpacArray}
                     billetIDs={lists.ld}
                     subtitle={"Leadership Development"}
+                  />
+                </div>
+              </Collapsible>
+            </div>
+            <div className="DepartmentContainer">
+              <Collapsible
+                trigger="Statistics"
+                triggerClassName="Title"
+                triggerOpenedClassName="Title"
+                open={true}
+              >
+                {/* We need to do a count for combined, 1-7, 2-7 and acd in that order*/}
+                <div className="OneSevenStrength">
+                  <StrengthCount
+                    milpacArray={milpacArray}
+                    billetIDs={[
+                      lists.oneSevenCommand,
+                      lists.alpha1,
+                      lists.bravo1,
+                      lists.charlie1,
+                    ]}
+                    subtitle={"First Battalion"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.oneSevenCommand]}
+                    subSubtitle={"Headquarters"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.alpha1]}
+                    subSubtitle={"Alpha Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.bravo1]}
+                    subSubtitle={"Bravo Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.charlie1]}
+                    subSubtitle={"Charlie Co"}
+                  />
+                </div>
+                <div className="TwoSevenStrength">
+                  <StrengthCount
+                    milpacArray={milpacArray}
+                    billetIDs={[
+                      lists.twoSevenCommand,
+                      lists.alpha2,
+                      lists.bravo2,
+                      lists.charlie2,
+                    ]}
+                    subtitle={"Second Battalion"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.twoSevenCommand]}
+                    subSubtitle={"Headquarters"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.alpha2]}
+                    subSubtitle={"Alpha Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.bravo2]}
+                    subSubtitle={"Bravo Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.charlie2]}
+                    subSubtitle={"Charlie Co"}
+                  />
+                </div>
+                <div className="ACDStrength">
+                  <StrengthCount
+                    milpacArray={milpacArray}
+                    billetIDs={[
+                      lists.acdCommand,
+                      lists.alpha3,
+                      lists.bravo3,
+                      lists.charlie3,
+                      lists.delta3,
+                    ]}
+                    subtitle={"ACD"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.acdCommand]}
+                    subSubtitle={"Headquarters"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.alpha3]}
+                    subSubtitle={"Alpha Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.bravo3]}
+                    subSubtitle={"Bravo Co"}
+                  />
+                  <StrengthCount
+                    useCompanyLevelLogic={true}
+                    milpacArray={milpacArray}
+                    billetIDs={[lists.charlie3]}
+                    subSubtitle={"Charlie Co"}
+                  />
+                </div>
+                <div className="CombinedStrength">
+                  <StrengthCount
+                    milpacArray={milpacArray}
+                    billetIDs={[
+                      lists.regiCommand,
+                      lists.oneSevenCommand,
+                      lists.alpha1,
+                      lists.bravo1,
+                      lists.charlie1,
+                      lists.twoSevenCommand,
+                      lists.alpha2,
+                      lists.bravo2,
+                      lists.charlie2,
+                      lists.acdCommand,
+                      lists.alpha3,
+                      lists.bravo3,
+                      lists.charlie3,
+                      lists.delta3,
+                    ]}
+                    subtitle={"Overall Strength"}
                   />
                 </div>
               </Collapsible>
