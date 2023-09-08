@@ -1,3 +1,5 @@
+<p align="center"><img src="./client/src/style/themes/7cav/logo-m.png"></p>
+
 # 7th Cavalry ADR
 
 [![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml)
@@ -9,10 +11,25 @@ This is a React application designed to display roster data fetched from the 7th
 
 ## Table of Contents
 
+- [Running Locally](#running-locally)
+  - [Requirements](#requirements)
+  - [Authorization](#authorization)
+    - [Getting a Token](#getting-a-token)
 - [Updating ADR](#updating-adr)
   - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
   - [Add New Category](#add-new-category)
 - [TODO](#todo)
+
+## Running Locally
+
+### Requirements
+
+In order to run the ADR locally for development, you need the following:
+- 
+
+### Authorization
+
+#### Getting a Token
 
 ## Updating ADR
 
