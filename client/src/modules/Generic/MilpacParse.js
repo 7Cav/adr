@@ -1,6 +1,7 @@
 import React from "react";
 
 function MilpacParse(props) {
+  const uniqueNamesSet = new Set();
   var array = [];
   var milpacArray = props.milpacArray;
   var billetIDs = props.billetIDs;
@@ -25,6 +26,7 @@ function MilpacParse(props) {
           itemKey: milpacIdCombat,
           listKey: primarySortKey + milpacIdCombat,
         });
+        uniqueNamesSet.add(fullName);
       }
 
       for (var index in milpacArray[0].combat.profiles[milpacIdCombat]
@@ -47,6 +49,7 @@ function MilpacParse(props) {
           itemKey: milpacIdCombat,
           listKey: secondarySortKey + milpacIdCombat,
         });
+        uniqueNamesSet.add(fullName);
       }
     }
 
@@ -68,6 +71,7 @@ function MilpacParse(props) {
           itemKey: milpacIdReserve,
           listKey: rPrimarySortKey + milpacIdReserve,
         });
+        uniqueNamesSet.add(rFullName);
       }
 
       for (var rIndex in milpacArray[0].reserve.profiles[milpacIdReserve]
@@ -90,6 +94,7 @@ function MilpacParse(props) {
           itemKey: milpacIdReserve,
           listKey: rSecondarySortKey + milpacIdReserve,
         });
+        uniqueNamesSet.add(rFullName);
       }
     }
 
@@ -104,7 +109,7 @@ function MilpacParse(props) {
       <div className="ResponseContainer">
         <div className="HeaderContainer">
           <div className="Subtitle">{subtitle}</div>
-          <div className="Counter">Unit Strength: {array.length}</div>
+          <div className="Counter">Unit Strength: {uniqueNamesSet.size}</div>
         </div>
         <div className="ItemList">
           <table>
@@ -152,6 +157,7 @@ function MilpacParse(props) {
           itemKey: milpacIdCombat,
           listKey: primarySortKey + milpacIdCombat,
         });
+        uniqueNamesSet.add(fullName);
       }
     }
 
@@ -166,7 +172,7 @@ function MilpacParse(props) {
       <div className="ResponseContainer">
         <div className="HeaderContainer">
           <div className="Subtitle">{subtitle}</div>
-          <div className="Counter">Unit Strength: {array.length}</div>
+          <div className="Counter">Unit Strength: {uniqueNamesSet.size}</div>
         </div>
         <div className="ItemList">
           <table>
