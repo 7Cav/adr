@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
 import StrengthCount from "./modules/Generic/StrengthCount";
 import ErrorMessage from "./errorMessage";
-import { PieChart } from 'react-minimal-pie-chart';
+import Piechart from "./modules/Generic/Piechart"
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
@@ -76,8 +76,6 @@ function MilpacRequest() {
   }, []);
 
   var piechartArray = [];
-
-  var testnumber = 500
 
   var milpacArray = [];
   milpacArray.push({
@@ -510,15 +508,15 @@ function MilpacRequest() {
                     subSubtitle={"Charlie Co"}
                   />
                 </div>
-                <div className="OneSevenBreakdown">
-                <PieChart
-                 data={[
-                    { title: 'One', value: 2, color: '#E38627' },
-                    { title: 'Two', value: 3, color: '#C13C37' },
-                    { title: 'Three', value: 3, color: '#6A2135' },
-                  ]}
-                />
-                </div>
+                 {/*<div className="OneSevenBreakdown">
+                  <Piechart
+                  piechartArray = {piechartArray}
+                  useSelector0={false}
+                  useSelector2={true}
+                  useSelector4={true}
+                  useSelector6={true}
+                  />
+                  </div> */}
                 <div className="TwoSevenStrength">
                   <StrengthCount
                     piechartArray={piechartArray}

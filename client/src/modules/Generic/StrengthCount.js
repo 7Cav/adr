@@ -2,8 +2,8 @@ import React from "react";
 
 function StrengthCount(props) {
   var useCompanyLevelLogic = props.useCompanyLevelLogic;
-  var piechartArray=props.piechartArray;
-
+  var piechartArray = props.piechartArray;
+  
   if (useCompanyLevelLogic !== true) {
     var combinedArray = [];
     var milpacArray = props.milpacArray;
@@ -21,6 +21,7 @@ function StrengthCount(props) {
     }
 
     piechartArray.push(combinedArray.length)
+
     console.log(piechartArray)
 
     return (
@@ -51,7 +52,9 @@ function StrengthCount(props) {
     }
 
     piechartArray.push(combinedArray.length)
+
     console.log(piechartArray)
+    
 
     return (
       <div className="Response Container">
