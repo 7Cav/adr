@@ -5,6 +5,7 @@ import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
 import StrengthCount from "./modules/Generic/StrengthCount";
 import ErrorMessage from "./errorMessage";
+import { PieChart } from 'react-minimal-pie-chart';
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
@@ -73,6 +74,10 @@ function MilpacRequest() {
       setLoading(false);
     });
   }, []);
+
+  var piechartArray = [];
+
+  var testnumber = 500
 
   var milpacArray = [];
   milpacArray.push({
@@ -464,9 +469,9 @@ function MilpacRequest() {
                 triggerOpenedClassName="Title"
                 open={true}
               >
-                {/* We need to do a count for combined, 1-7, 2-7 and acd in that order*/}
                 <div className="OneSevenStrength">
                   <StrengthCount
+                    piechartArray={piechartArray}
                     milpacArray={milpacArray}
                     billetIDs={[
                       lists.oneSevenCommand,
@@ -477,32 +482,46 @@ function MilpacRequest() {
                     subtitle={"First Battalion"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.oneSevenCommand]}
                     subSubtitle={"Headquarters"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.alpha1]}
                     subSubtitle={"Alpha Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.bravo1]}
                     subSubtitle={"Bravo Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.charlie1]}
                     subSubtitle={"Charlie Co"}
                   />
                 </div>
+                <div className="OneSevenBreakdown">
+                <PieChart
+                 data={[
+                    { title: 'One', value: 2, color: '#E38627' },
+                    { title: 'Two', value: 3, color: '#C13C37' },
+                    { title: 'Three', value: 3, color: '#6A2135' },
+                  ]}
+                />
+                </div>
                 <div className="TwoSevenStrength">
                   <StrengthCount
+                    piechartArray={piechartArray}
                     milpacArray={milpacArray}
                     billetIDs={[
                       lists.twoSevenCommand,
@@ -513,24 +532,28 @@ function MilpacRequest() {
                     subtitle={"Second Battalion"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.twoSevenCommand]}
                     subSubtitle={"Headquarters"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.alpha2]}
                     subSubtitle={"Alpha Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.bravo2]}
                     subSubtitle={"Bravo Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.charlie2]}
@@ -539,6 +562,7 @@ function MilpacRequest() {
                 </div>
                 <div className="ACDStrength">
                   <StrengthCount
+                    piechartArray={piechartArray}
                     milpacArray={milpacArray}
                     billetIDs={[
                       lists.acdCommand,
@@ -550,24 +574,28 @@ function MilpacRequest() {
                     subtitle={"ACD"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.acdCommand]}
                     subSubtitle={"Headquarters"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.alpha3]}
                     subSubtitle={"Alpha Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.bravo3]}
                     subSubtitle={"Bravo Co"}
                   />
                   <StrengthCount
+                    piechartArray={piechartArray}
                     useCompanyLevelLogic={true}
                     milpacArray={milpacArray}
                     billetIDs={[lists.charlie3]}
@@ -576,6 +604,7 @@ function MilpacRequest() {
                 </div>
                 <div className="CombinedStrength">
                   <StrengthCount
+                    piechartArray={piechartArray}
                     milpacArray={milpacArray}
                     billetIDs={[
                       lists.regiCommand,
