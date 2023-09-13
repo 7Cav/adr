@@ -58,10 +58,6 @@ class Statistics extends Component {
                 labels: {
                   fontFamily: "Segoe UI",
                   show: true,
-                  value: {
-                    show: true,
-                    fontFamily: "Segoe UI",
-                  },
                   name: {
                     fontFamily: "Segoe UI",
                   },
@@ -127,10 +123,6 @@ class Statistics extends Component {
                 labels: {
                   fontFamily: "Segoe UI",
                   show: true,
-                  value: {
-                    show: true,
-                    fontFamily: "Segoe UI",
-                  },
                   name: {
                     fontFamily: "Segoe UI",
                   },
