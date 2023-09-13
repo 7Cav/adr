@@ -141,7 +141,9 @@ const billetBank = {
 
 ## TODO
 
+- [ ] Add tutorial for updating Pie Charts
 - [ ] Add tutorial for updating Statistics
 - [ ] Change cache warning on client to display time since cache refresh
 - [ ] Investigate the feasibility of sorting by rank after billet sorting (Subsorting? Consider using QuickSort)
 - [ ] Add graphical data visualization
+- [ ] Code Refactorizing
