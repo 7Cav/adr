@@ -3,8 +3,9 @@ import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import MilpacParse from "./modules/Generic/MilpacParse";
-import StrengthCount from "./modules/Generic/StrengthCount";
 import ErrorMessage from "./errorMessage";
+import Statistics from "./modules/Generic/Statistics";
+
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
@@ -27,7 +28,7 @@ function MilpacRequest() {
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "dig85agbqz");
-</script>`;
+  </script>`;
 
   // Reusable API fetching function
   async function fetchData(url, setFunction) {
@@ -464,119 +465,12 @@ function MilpacRequest() {
                 triggerOpenedClassName="Title"
                 open={true}
               >
-                {/* We need to do a count for combined, 1-7, 2-7 and acd in that order*/}
-                <div className="OneSevenStrength">
-                  <StrengthCount
-                    milpacArray={milpacArray}
-                    billetIDs={[
-                      lists.oneSevenCommand,
-                      lists.alpha1,
-                      lists.bravo1,
-                      lists.charlie1,
-                    ]}
-                    subtitle={"First Battalion"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.oneSevenCommand]}
-                    subSubtitle={"Headquarters"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.alpha1]}
-                    subSubtitle={"Alpha Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.bravo1]}
-                    subSubtitle={"Bravo Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.charlie1]}
-                    subSubtitle={"Charlie Co"}
-                  />
-                </div>
-                <div className="TwoSevenStrength">
-                  <StrengthCount
-                    milpacArray={milpacArray}
-                    billetIDs={[
-                      lists.twoSevenCommand,
-                      lists.alpha2,
-                      lists.bravo2,
-                      lists.charlie2,
-                    ]}
-                    subtitle={"Second Battalion"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.twoSevenCommand]}
-                    subSubtitle={"Headquarters"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.alpha2]}
-                    subSubtitle={"Alpha Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.bravo2]}
-                    subSubtitle={"Bravo Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.charlie2]}
-                    subSubtitle={"Charlie Co"}
-                  />
-                </div>
-                <div className="ACDStrength">
-                  <StrengthCount
-                    milpacArray={milpacArray}
-                    billetIDs={[
-                      lists.acdCommand,
-                      lists.alpha3,
-                      lists.bravo3,
-                      lists.charlie3,
-                      lists.delta3,
-                    ]}
-                    subtitle={"ACD"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.acdCommand]}
-                    subSubtitle={"Headquarters"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.alpha3]}
-                    subSubtitle={"Alpha Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.bravo3]}
-                    subSubtitle={"Bravo Co"}
-                  />
-                  <StrengthCount
-                    useCompanyLevelLogic={true}
-                    milpacArray={milpacArray}
-                    billetIDs={[lists.charlie3]}
-                    subSubtitle={"Charlie Co"}
-                  />
-                </div>
-                <div className="CombinedStrength">
-                  <StrengthCount
-                    milpacArray={milpacArray}
+                <div className="RegimentBreakdown">
+                  <div className="Subtitle">
+                    7th Cavalry Regiment {"("}Active Duty and Line Billets only
+                    {")"}
+                  </div>
+                  <Statistics
                     billetIDs={[
                       lists.regiCommand,
                       lists.oneSevenCommand,
@@ -591,9 +485,85 @@ function MilpacRequest() {
                       lists.alpha3,
                       lists.bravo3,
                       lists.charlie3,
-                      lists.delta3,
+                      lists.starterPlatoon,
                     ]}
-                    subtitle={"Overall Strength"}
+                    labelArray={[
+                      "General Staff",
+                      "1-7 Headquarters",
+                      "Alpha Company 1-7",
+                      "Bravo Troop 1-7",
+                      "Charlie Company 1-7",
+                      "2-7 Headquarters",
+                      "Alpha Company 2-7",
+                      "Bravo Company 2-7",
+                      "Charlie Company 2-7",
+                      "ACD Headquarters",
+                      "Alpha Company ACD",
+                      "Bravo Company ACD",
+                      "Charlie Company ACD",
+                      "Star Citizen Starter Platoon",
+                    ]}
+                    milpacArray={milpacArray}
+                    useRegiLogic={true}
+                  />
+                </div>
+                <div className="OneSevenBreakdown">
+                  <div className="Subtitle">First Battalion</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.oneSevenCommand,
+                      lists.alpha1,
+                      lists.bravo1,
+                      lists.charlie1,
+                    ]}
+                    centerLabel={"Total 1-7 Strength"}
+                    labelArray={[
+                      "1-7 Headquarters",
+                      "Alpha Company",
+                      "Bravo Troop",
+                      "Charlie Company",
+                    ]}
+                    milpacArray={milpacArray}
+                  />
+                </div>
+                <div className="TwoSevenBreakdown">
+                  <div className="Subtitle">Second Battalion</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.twoSevenCommand,
+                      lists.alpha2,
+                      lists.bravo2,
+                      lists.charlie2,
+                    ]}
+                    centerLabel={"Total 2-7 Strength"}
+                    labelArray={[
+                      "2-7 Headquarters",
+                      "Alpha Company",
+                      "Bravo Company",
+                      "Charlie Company",
+                    ]}
+                    milpacArray={milpacArray}
+                  />
+                </div>
+                <div className="ACDStrength">
+                  <div className="Subtitle">Auxillary Combat Division</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.acdCommand,
+                      lists.alpha3,
+                      lists.bravo3,
+                      lists.charlie3,
+                      lists.starterPlatoon,
+                    ]}
+                    centerLabel={"Total ACD Strength"}
+                    labelArray={[
+                      "ACD Headquarters",
+                      "Alpha Company",
+                      "Bravo Company",
+                      "Charlie Company",
+                      "Star Citizen Starter Platoon",
+                    ]}
+                    milpacArray={milpacArray}
                   />
                 </div>
               </Collapsible>
