@@ -168,6 +168,8 @@ function MilpacParse(props) {
       return aIndex - bIndex;
     });
 
+    //console.log (array)
+
     return (
       <div className="ResponseContainer">
         <div className="HeaderContainer">

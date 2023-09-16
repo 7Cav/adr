@@ -652,7 +652,71 @@ const s7 = [
 const ld = ["126", "127", "128", "129", "130", "131", "132", "539"]; //I think...
 const spd = ["175", "176"];
 
+
+//Bulk Billets for export
+
+const regi = {
+  regiCommand: regiCommand
+}
+const oneSeven = [oneSevenCommand,alpha1,bravo1,charlie1]
+const twoSeven = {
+  twoSevenCommand: twoSevenCommand,
+  alpha2: alpha2,
+  bravo2: bravo2,
+  charlie2: charlie2
+};
+const acd = {
+  acdCommand: acdCommand,
+  alpha3: alpha3,
+  bravo3: bravo3,
+  charlie3: charlie3,
+  delta3: delta3,
+  echo3: echo3,
+  starterPlatoon: starterPlatoon,
+  futureC: futureC
+};
+const imo = {
+  imoCommand: imoCommand,
+  s1: s1,
+  s6: s6,
+  wag: wag
+};
+const secOps = {
+  secOpsCommand: secOpsCommand,
+  jag: jag,
+  mp: mp,
+  s2: s2
+};
+const roo = {
+  rooCommand: rooCommand,
+  rrd: rrd,
+  rtc: rtc,
+  s5: s5
+};
+const supportDepartments = {
+  spd: spd,
+  s3: s3,
+  s7: s7,
+  ld: ld
+}
+
+// Overall export
+const billetBankObject = {
+  regi: regi,
+  oneSeven: oneSeven,
+  twoSeven: twoSeven,
+  acd: acd,
+  imo: imo,
+  secOps: secOps,
+  roo: roo,
+  supportDepartments: supportDepartments
+};
+
+
+//console.log(billetBankObject)
+
 const billetBank = {
+  billetBankObject,
   regiCommand,
   oneSevenCommand,
   alpha1,
