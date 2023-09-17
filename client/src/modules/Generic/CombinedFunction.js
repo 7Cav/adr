@@ -9,13 +9,12 @@ function CombinedFunction (props) {
     let collapsibleTitle = props.collapsibleTitle;
     let headerTitles = props.headerTitles;
     let milpacArray = props.milpacArray;
-    let usePrimaryOnly = props.usePrimaryOnly;
 
     let array = Array(billetBankObject.length).fill().map(() => []);
 
     //console.log (billetBankObject)
 
-    if (usePrimaryOnly === true) {
+    if (props.usePrimaryOnly === true) {
 
         for (let milpacIdCombat in milpacArray[0].combat.profiles) {
             let name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
@@ -48,7 +47,7 @@ function CombinedFunction (props) {
             }
         } 
 
-    } else if (usePrimaryOnly !== true) {
+    } else if (props.usePrimaryOnly !== true) {
         
         for (let milpacIdCombat in milpacArray[0].combat.profiles) {
             let name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
