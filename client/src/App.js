@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
-import MilpacParse from "./modules/Generic/MilpacParse";
 import ErrorMessage from "./errorMessage";
 import Statistics from "./modules/Generic/Statistics";
-import CombinedFunction from "./modules/CombinedFunction";
+import CombinedFunction from "./modules/Generic/CombinedFunction";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -142,28 +141,56 @@ function MilpacRequest() {
       ) : (
         <>
           <div className="ListContainer">
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Regimental Command"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <MilpacParse
-                  usePrimaryOnly={true}
-                  milpacArray={milpacArray}
-                  billetIDs={lists.billetBankObject.regi.regiCommand}
-                  subtitle={"Command Staff"}
-                />
-              </Collapsible>
-            </div>
-            {/*New code goes Here*/}
             <CombinedFunction
-              collapsibleTitle = 'Test'
-              subtitle = 'test'
-              billetBankObject = {lists.billetBankObject.oneSeven}
+              billetBankObject = {lists.billetBankObject.regi.positionIds}
+              collapsibleTitle = 'Regimental Command'
+              headerTitles = {lists.billetBankObject.regi.positionTitles}
               milpacArray = {milpacArray}
               usePrimaryOnly = {true}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.oneSeven.positionIds}
+              collapsibleTitle = 'First Battalion'
+              headerTitles = {lists.billetBankObject.oneSeven.positionTitles}
+              milpacArray = {milpacArray}
+              usePrimaryOnly = {true}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.twoSeven.positionIds}
+              collapsibleTitle = 'Second Battalion'
+              headerTitles = {lists.billetBankObject.twoSeven.positionTitles}
+              milpacArray = {milpacArray}
+              usePrimaryOnly = {true}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.acd.positionIds}
+              collapsibleTitle = 'Auxillary Combat Division'
+              headerTitles = {lists.billetBankObject.acd.positionTitles}
+              milpacArray = {milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.imo.positionIds}
+              collapsibleTitle = 'Information Management Office'
+              headerTitles = {lists.billetBankObject.imo.positionTitles}
+              milpacArray = {milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.secOps.positionIds}
+              collapsibleTitle = 'Security Operations'
+              headerTitles = {lists.billetBankObject.secOps.positionTitles}
+              milpacArray = {milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.roo.positionIds}
+              collapsibleTitle = 'Recruitment Oversight Office'
+              headerTitles = {lists.billetBankObject.roo.positionTitles}
+              milpacArray = {milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject = {lists.billetBankObject.supportDepartments.positionIds}
+              collapsibleTitle = 'Support Departments'
+              headerTitles = {lists.billetBankObject.supportDepartments.positionTitles}
+              milpacArray = {milpacArray}
             />
             <div className="DepartmentContainer">
               <Collapsible
@@ -212,6 +239,65 @@ function MilpacRequest() {
                     ]}
                     milpacArray={milpacArray}
                     useRegiLogic={true}
+                  />
+                </div>
+                <div className="OneSevenBreakdown">
+                  <div className="Subtitle">First Battalion</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.oneSevenCommand,
+                      lists.alpha1,
+                      lists.bravo1,
+                      lists.charlie1,
+                    ]}
+                    centerLabel={"Total 1-7 Strength"}
+                    labelArray={[
+                      "1-7 Headquarters",
+                      "Alpha Company",
+                      "Bravo Troop",
+                      "Charlie Company",
+                    ]}
+                    milpacArray={milpacArray}
+                  />
+                </div>
+                <div className="TwoSevenBreakdown">
+                  <div className="Subtitle">Second Battalion</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.twoSevenCommand,
+                      lists.alpha2,
+                      lists.bravo2,
+                      lists.charlie2,
+                    ]}
+                    centerLabel={"Total 2-7 Strength"}
+                    labelArray={[
+                      "2-7 Headquarters",
+                      "Alpha Company",
+                      "Bravo Company",
+                      "Charlie Company",
+                    ]}
+                    milpacArray={milpacArray}
+                  />
+                </div>
+                <div className="ACDStrength">
+                  <div className="Subtitle">Auxillary Combat Division</div>
+                  <Statistics
+                    billetIDs={[
+                      lists.acdCommand,
+                      lists.alpha3,
+                      lists.bravo3,
+                      lists.charlie3,
+                      lists.starterPlatoon,
+                    ]}
+                    centerLabel={"Total ACD Strength"}
+                    labelArray={[
+                      "ACD Headquarters",
+                      "Alpha Company",
+                      "Bravo Company",
+                      "Charlie Company",
+                      "Star Citizen Starter Platoon",
+                    ]}
+                    milpacArray={milpacArray}
                   />
                 </div>
               </Collapsible>
