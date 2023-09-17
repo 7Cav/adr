@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
-import MilpacParse from "./modules/Generic/MilpacParse";
 import ErrorMessage from "./errorMessage";
 import Statistics from "./modules/Generic/Statistics";
+import CombinedFunction from "./modules/Generic/CombinedFunction";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -141,323 +141,61 @@ function MilpacRequest() {
       ) : (
         <>
           <div className="ListContainer">
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Regimental Command"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <MilpacParse
-                  usePrimaryOnly={true}
-                  milpacArray={milpacArray}
-                  billetIDs={lists.regiCommand}
-                  subtitle={"Command Staff"}
-                />
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="First Battalion"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="OneSevenCommand">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.oneSevenCommand}
-                    subtitle={"1-7 Command"}
-                  />
-                </div>
-                <div className="Alpha1">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.alpha1}
-                    subtitle={"Alpha Company 1-7"}
-                  />
-                </div>
-                <div className="Bravo1">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.bravo1}
-                    subtitle={"Bravo Company 1-7"}
-                  />
-                </div>
-                <div className="Charlie1">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.charlie1}
-                    subtitle={"Charlie Company 1-7"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Second Battalion"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="TwoSevenCommand">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.twoSevenCommand}
-                    subtitle={"2-7 Command"}
-                  />
-                </div>
-                <div className="Alpha2">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.alpha2}
-                    subtitle={"Alpha Company 2-7"}
-                  />
-                </div>
-                <div className="Bravo2">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.bravo2}
-                    subtitle={"Bravo Company 2-7"}
-                  />
-                </div>
-                <div className="Charlie2">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.charlie2}
-                    subtitle={"Charlie Company 2-7"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Auxillary Combat Division"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="ACDCommand">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.acdCommand}
-                    subtitle={"ACD Command"}
-                  />
-                </div>
-                <div className="Alpha3">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.alpha3}
-                    subtitle={"Alpha Company"}
-                  />
-                </div>
-                <div className="Bravo3">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.bravo3}
-                    subtitle={"Bravo Company"}
-                  />
-                </div>
-                <div className="Charlie3">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.charlie3}
-                    subtitle={"Charlie Company"}
-                  />
-                </div>
-                <div className="Delta3">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.delta3}
-                    subtitle={"Delta Company"}
-                  />
-                </div>
-                <div className="Echo3">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.echo3}
-                    subtitle={"Echo Company"}
-                  />
-                </div>
-                <div className="starterPlatoon">
-                  <MilpacParse
-                    usePrimaryOnly={true}
-                    milpacArray={milpacArray}
-                    billetIDs={lists.starterPlatoon}
-                    subtitle={"Starter Platoon"}
-                  />
-                </div>
-                <div className="futureC">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.futureC}
-                    subtitle={"Futures and Concepts Center"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Information Management Office"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="IMOStaff">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.imoCommand}
-                    subtitle={"Information Management Office Command"}
-                  />
-                </div>
-                <div className="S1">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s1}
-                    subtitle={"S1 - Administration"}
-                  />
-                </div>
-                <div className="S6">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s6}
-                    subtitle={"S6 - Information Management"}
-                  />
-                </div>
-                <div className="WAG">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.wag}
-                    subtitle={"Wiki Administration Group"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Security Operations Department"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="SecOpsStaff">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.secOpsCommand}
-                    subtitle={"Security Operations Command"}
-                  />
-                </div>
-                <div className="JAG">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.jag}
-                    subtitle={"Judge Advocate General Corps"}
-                  />
-                </div>
-                <div className="MP">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.mp}
-                    subtitle={"Military Police"}
-                  />
-                </div>
-                <div className="S2">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s2}
-                    subtitle={"S2 - Intelligence and Security"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Recruitment Oversight Office"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="ROOStaff">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.rooCommand}
-                    subtitle={"Recruitment Oversight Command"}
-                  />
-                </div>
-                <div className="RRD">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.rrd}
-                    subtitle={"Regimental Recruiting Department"}
-                  />
-                </div>
-                <div className="RTC">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.rtc}
-                    subtitle={"Recruit Training Command"}
-                  />
-                </div>
-                <div className="S5">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s5}
-                    subtitle={"S5 - Public Relations"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Support Departments"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="SPD">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.spd}
-                    subtitle={"Special Projects Division"}
-                  />
-                </div>
-                <div className="S3">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s3}
-                    subtitle={"S3 - Operations"}
-                  />
-                </div>
-                <div className="S7">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.s7}
-                    subtitle={"S7 - Training"}
-                  />
-                </div>
-                <div className="LD">
-                  <MilpacParse
-                    milpacArray={milpacArray}
-                    billetIDs={lists.ld}
-                    subtitle={"Leadership Development"}
-                  />
-                </div>
-              </Collapsible>
-            </div>
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.regi.positionIds}
+              collapsibleTitle="Regimental Command"
+              headerTitles={lists.billetBankObject.regi.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.oneSeven.positionIds}
+              collapsibleTitle="First Battalion"
+              headerTitles={lists.billetBankObject.oneSeven.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.twoSeven.positionIds}
+              collapsibleTitle="Second Battalion"
+              headerTitles={lists.billetBankObject.twoSeven.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.acd.positionIds}
+              collapsibleTitle="Auxillary Combat Division"
+              headerTitles={lists.billetBankObject.acd.positionTitles}
+              milpacArray={milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.imo.positionIds}
+              collapsibleTitle="Information Management Office"
+              headerTitles={lists.billetBankObject.imo.positionTitles}
+              milpacArray={milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.secOps.positionIds}
+              collapsibleTitle="Security Operations"
+              headerTitles={lists.billetBankObject.secOps.positionTitles}
+              milpacArray={milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject={lists.billetBankObject.roo.positionIds}
+              collapsibleTitle="Recruitment Oversight Office"
+              headerTitles={lists.billetBankObject.roo.positionTitles}
+              milpacArray={milpacArray}
+            />
+            <CombinedFunction
+              billetBankObject={
+                lists.billetBankObject.supportDepartments.positionIds
+              }
+              collapsibleTitle="Support Departments"
+              headerTitles={
+                lists.billetBankObject.supportDepartments.positionTitles
+              }
+              milpacArray={milpacArray}
+            />
             <div className="DepartmentContainer">
               <Collapsible
                 trigger="Statistics"
