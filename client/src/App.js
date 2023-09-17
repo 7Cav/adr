@@ -142,55 +142,59 @@ function MilpacRequest() {
         <>
           <div className="ListContainer">
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.regi.positionIds}
-              collapsibleTitle = 'Regimental Command'
-              headerTitles = {lists.billetBankObject.regi.positionTitles}
-              milpacArray = {milpacArray}
-              usePrimaryOnly = {true}
+              billetBankObject={lists.billetBankObject.regi.positionIds}
+              collapsibleTitle="Regimental Command"
+              headerTitles={lists.billetBankObject.regi.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.oneSeven.positionIds}
-              collapsibleTitle = 'First Battalion'
-              headerTitles = {lists.billetBankObject.oneSeven.positionTitles}
-              milpacArray = {milpacArray}
-              usePrimaryOnly = {true}
+              billetBankObject={lists.billetBankObject.oneSeven.positionIds}
+              collapsibleTitle="First Battalion"
+              headerTitles={lists.billetBankObject.oneSeven.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.twoSeven.positionIds}
-              collapsibleTitle = 'Second Battalion'
-              headerTitles = {lists.billetBankObject.twoSeven.positionTitles}
-              milpacArray = {milpacArray}
-              usePrimaryOnly = {true}
+              billetBankObject={lists.billetBankObject.twoSeven.positionIds}
+              collapsibleTitle="Second Battalion"
+              headerTitles={lists.billetBankObject.twoSeven.positionTitles}
+              milpacArray={milpacArray}
+              usePrimaryOnly={true}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.acd.positionIds}
-              collapsibleTitle = 'Auxillary Combat Division'
-              headerTitles = {lists.billetBankObject.acd.positionTitles}
-              milpacArray = {milpacArray}
+              billetBankObject={lists.billetBankObject.acd.positionIds}
+              collapsibleTitle="Auxillary Combat Division"
+              headerTitles={lists.billetBankObject.acd.positionTitles}
+              milpacArray={milpacArray}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.imo.positionIds}
-              collapsibleTitle = 'Information Management Office'
-              headerTitles = {lists.billetBankObject.imo.positionTitles}
-              milpacArray = {milpacArray}
+              billetBankObject={lists.billetBankObject.imo.positionIds}
+              collapsibleTitle="Information Management Office"
+              headerTitles={lists.billetBankObject.imo.positionTitles}
+              milpacArray={milpacArray}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.secOps.positionIds}
-              collapsibleTitle = 'Security Operations'
-              headerTitles = {lists.billetBankObject.secOps.positionTitles}
-              milpacArray = {milpacArray}
+              billetBankObject={lists.billetBankObject.secOps.positionIds}
+              collapsibleTitle="Security Operations"
+              headerTitles={lists.billetBankObject.secOps.positionTitles}
+              milpacArray={milpacArray}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.roo.positionIds}
-              collapsibleTitle = 'Recruitment Oversight Office'
-              headerTitles = {lists.billetBankObject.roo.positionTitles}
-              milpacArray = {milpacArray}
+              billetBankObject={lists.billetBankObject.roo.positionIds}
+              collapsibleTitle="Recruitment Oversight Office"
+              headerTitles={lists.billetBankObject.roo.positionTitles}
+              milpacArray={milpacArray}
             />
             <CombinedFunction
-              billetBankObject = {lists.billetBankObject.supportDepartments.positionIds}
-              collapsibleTitle = 'Support Departments'
-              headerTitles = {lists.billetBankObject.supportDepartments.positionTitles}
-              milpacArray = {milpacArray}
+              billetBankObject={
+                lists.billetBankObject.supportDepartments.positionIds
+              }
+              collapsibleTitle="Support Departments"
+              headerTitles={
+                lists.billetBankObject.supportDepartments.positionTitles
+              }
+              milpacArray={milpacArray}
             />
             <div className="DepartmentContainer">
               <Collapsible
