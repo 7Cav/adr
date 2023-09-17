@@ -649,10 +649,113 @@ const s7 = [
   "643",
   "644",
 ];
-const ld = ["126", "127", "128", "129", "130", "131", "132", "539"]; //I think...
+const ld = ["126", "127", "128", "129", "130", "131", "132", "539"];
 const spd = ["175", "176"];
 
+//Bulk Billets for export
+
+const regi = {
+  positionIds: [regiCommand],
+  positionTitles: ["Command Staff"],
+};
+const oneSeven = {
+  positionIds: [oneSevenCommand, alpha1, bravo1, charlie1],
+  positionTitles: [
+    "1-7 Headquarters",
+    "Alpha Company",
+    "Bravo Troop",
+    "Charlie Company",
+  ],
+};
+const twoSeven = {
+  positionIds: [twoSevenCommand, alpha2, bravo2, charlie2],
+  positionTitles: [
+    "2-7 Headquarters",
+    "Alpha Company",
+    "Bravo Company",
+    "Charlie Company",
+  ],
+};
+
+const acd = {
+  positionIds: [
+    acdCommand,
+    alpha3,
+    bravo3,
+    charlie3,
+    delta3,
+    echo3,
+    starterPlatoon,
+    futureC,
+  ],
+  positionTitles: [
+    "ACD Headquarters",
+    "Alpha Company",
+    "Bravo Company",
+    "Charlie Company",
+    "Delta Company",
+    "Echo Company",
+    "Star Citizen Starter Platoon",
+    "Future Concepts Center",
+  ],
+};
+
+const imo = {
+  positionIds: [imoCommand, s1, s6, wag],
+  positionTitles: [
+    "Information Management Command",
+    "S1 - Administration",
+    "S6 - Information Management",
+    "Wiki Administration Group",
+  ],
+};
+
+const secOps = {
+  positionIds: [secOpsCommand, jag, mp, s2],
+  positionTitles: [
+    "Security Operations Command",
+    "Judge Advocate General Corps",
+    "Military Police",
+    "S2 - Intelligence and Security",
+  ],
+};
+
+const roo = {
+  positionIds: [rooCommand, rrd, rtc, s5],
+  positionTitles: [
+    "Recruitment Oversight Command",
+    "Regimental Recruiting Department",
+    "Recruit Training Command",
+    "S5 - Public Relations",
+  ],
+};
+
+const supportDepartments = {
+  positionIds: [spd, s3, s7, ld],
+  positionTitles: [
+    "Special Projects Division",
+    "S3 - Operations",
+    "S7 - Training",
+    "Leadership Development",
+  ],
+};
+
+// Overall export
+const billetBankObject = {
+  regi: regi,
+  oneSeven: oneSeven,
+  twoSeven: twoSeven,
+  acd: acd,
+  imo: imo,
+  secOps: secOps,
+  roo: roo,
+  supportDepartments: supportDepartments,
+};
+
+//keeping a shortlist of individual exports open so that it doesnt break the Statistics section.
+
 const billetBank = {
+  billetBankObject,
   regiCommand,
   oneSevenCommand,
   alpha1,
@@ -669,23 +772,6 @@ const billetBank = {
   delta3,
   echo3,
   starterPlatoon,
-  futureC,
-  imoCommand,
-  s1,
-  s6,
-  wag,
-  rooCommand,
-  rrd,
-  rtc,
-  s5,
-  secOpsCommand,
-  jag,
-  mp,
-  s2,
-  s3,
-  s7,
-  spd,
-  ld,
 };
 
 export default billetBank;
