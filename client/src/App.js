@@ -92,12 +92,13 @@ function MilpacRequest() {
               <div className="p-nav-scroller">
                 <div className="p-nav-logo">
                   <a href="https://7cav.us">
-                    <Logo 
+                    <Logo
                       className="p-nav-svg"
                       alt="ADR Logo"
                       title="Return to the main website"
                       width="17em"
-                      height=""/>
+                      height=""
+                    />
                   </a>
                 </div>
                 {/* Data Age Warning */}
