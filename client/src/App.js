@@ -92,11 +92,11 @@ function MilpacRequest() {
                 <div className="p-nav-logo">
                   <a href="https://7cav.us">
                     <img
-                      className="p-nav-png"
-                      src={require("./style/themes/7cav/logo-m.png")}
+                      className="p-nav-svg"
+                      src={require("./style/themes/7cav/logo.svg")}
                       alt="ADR Logo"
                       title="Return to the main website"
-                      width=""
+                      width="225em"
                       height=""
                     />
                   </a>

@@ -1,4 +1,4 @@
-<p align="center"><img src="./client/src/style/themes/7cav/logo-m.png"></p>
+<p align="center"><img src="./client/src/style/themes/7cav/logo.svg"></p>
 
 ## Overview
 [![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml)
