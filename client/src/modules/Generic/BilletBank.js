@@ -15,6 +15,11 @@ const regiCommand = [
   "743",
 ];
 
+const regi = {
+  positionIds: [regiCommand],
+  positionTitles: ["Command Staff"],
+};
+
 //1-7
 
 const oneSevenCommand = ["178", "179", "180", "530"];
@@ -174,6 +179,16 @@ const charlie1 = [
   "344",
 ];
 
+const oneSeven = {
+  positionIds: [oneSevenCommand, alpha1, bravo1, charlie1],
+  positionTitles: [
+    "1-7 Headquarters",
+    "Alpha Company",
+    "Bravo Troop",
+    "Charlie Company",
+  ],
+};
+
 //2-7
 
 const twoSevenCommand = ["182", "183", "184"];
@@ -324,6 +339,16 @@ const charlie2 = [
   "478",
   "479",
 ];
+
+const twoSeven = {
+  positionIds: [twoSevenCommand, alpha2, bravo2, charlie2],
+  positionTitles: [
+    "2-7 Headquarters",
+    "Alpha Company",
+    "Bravo Company",
+    "Charlie Company",
+  ],
+};
 
 //ACD
 
@@ -478,6 +503,29 @@ const echo3 = [];
 const starterPlatoon = ["759"];
 const futureC = ["753"];
 
+const acd = {
+  positionIds: [
+    acdCommand,
+    alpha3,
+    bravo3,
+    charlie3,
+    delta3,
+    echo3,
+    starterPlatoon,
+    futureC,
+  ],
+  positionTitles: [
+    "ACD Headquarters",
+    "Alpha Company",
+    "Bravo Company",
+    "Charlie Company",
+    "Delta Company",
+    "Echo Company",
+    "Star Citizen Starter Platoon",
+    "Future Concepts Center",
+  ],
+};
+
 //IMO
 
 const imoCommand = ["5", "9"];
@@ -508,6 +556,16 @@ const s1 = [
 ];
 const s6 = ["50", "51", "52", "53", "54", "55", "56", "57", "58", "59"];
 const wag = ["39", "40", "41", "42", "43", "44", "45", "46", "47", "48"];
+
+const imo = {
+  positionIds: [imoCommand, s1, s6, wag],
+  positionTitles: [
+    "Information Management Command",
+    "S1 - Administration",
+    "S6 - Information Management",
+    "Wiki Administration Group",
+  ],
+};
 
 //ROO
 
@@ -545,12 +603,32 @@ const s5 = [
   "741",
 ];
 
+const roo = {
+  positionIds: [rooCommand, rrd, rtc, s5],
+  positionTitles: [
+    "Recruitment Oversight Command",
+    "Regimental Recruiting Department",
+    "Recruit Training Command",
+    "S5 - Public Relations",
+  ],
+};
+
 //SecOps
 
 const secOpsCommand = ["2", "62"]; //Interesting case for Kleinmen, will need to be renamed to a new billetID if he ever leaves
 const jag = ["584"];
 const mp = ["168", "169", "170", "171", "172", "173"];
 const s2 = ["161", "162", "163", "164", "165", "166"];
+
+const secOps = {
+  positionIds: [secOpsCommand, jag, mp, s2],
+  positionTitles: [
+    "Security Operations Command",
+    "Judge Advocate General Corps",
+    "Military Police",
+    "S2 - Intelligence and Security",
+  ],
+};
 
 //Support
 
@@ -652,84 +730,6 @@ const s7 = [
 const ld = ["126", "127", "128", "129", "130", "131", "132", "539"];
 const spd = ["175", "176"];
 
-//Bulk Billets for export
-
-const regi = {
-  positionIds: [regiCommand],
-  positionTitles: ["Command Staff"],
-};
-const oneSeven = {
-  positionIds: [oneSevenCommand, alpha1, bravo1, charlie1],
-  positionTitles: [
-    "1-7 Headquarters",
-    "Alpha Company",
-    "Bravo Troop",
-    "Charlie Company",
-  ],
-};
-const twoSeven = {
-  positionIds: [twoSevenCommand, alpha2, bravo2, charlie2],
-  positionTitles: [
-    "2-7 Headquarters",
-    "Alpha Company",
-    "Bravo Company",
-    "Charlie Company",
-  ],
-};
-
-const acd = {
-  positionIds: [
-    acdCommand,
-    alpha3,
-    bravo3,
-    charlie3,
-    delta3,
-    echo3,
-    starterPlatoon,
-    futureC,
-  ],
-  positionTitles: [
-    "ACD Headquarters",
-    "Alpha Company",
-    "Bravo Company",
-    "Charlie Company",
-    "Delta Company",
-    "Echo Company",
-    "Star Citizen Starter Platoon",
-    "Future Concepts Center",
-  ],
-};
-
-const imo = {
-  positionIds: [imoCommand, s1, s6, wag],
-  positionTitles: [
-    "Information Management Command",
-    "S1 - Administration",
-    "S6 - Information Management",
-    "Wiki Administration Group",
-  ],
-};
-
-const secOps = {
-  positionIds: [secOpsCommand, jag, mp, s2],
-  positionTitles: [
-    "Security Operations Command",
-    "Judge Advocate General Corps",
-    "Military Police",
-    "S2 - Intelligence and Security",
-  ],
-};
-
-const roo = {
-  positionIds: [rooCommand, rrd, rtc, s5],
-  positionTitles: [
-    "Recruitment Oversight Command",
-    "Regimental Recruiting Department",
-    "Recruit Training Command",
-    "S5 - Public Relations",
-  ],
-};
-
 const supportDepartments = {
   positionIds: [spd, s3, s7, ld],
   positionTitles: [
@@ -740,7 +740,8 @@ const supportDepartments = {
   ],
 };
 
-// Overall export
+// Overall export Object
+
 const billetBankObject = {
   regi: regi,
   oneSeven: oneSeven,

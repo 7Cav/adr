@@ -1,3 +1,6 @@
+The Billet List is a list of all (known) billets within the 7th Cavalry Regiment. However, there are no mechanisms in place to automatically update this document.
+As such, if there are new billets added to the website, this document should be updated as well as BilletBank.js.
+
 ********************************** CHANGE LOG *********************************************************
 Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCIAL MEDIA
 
