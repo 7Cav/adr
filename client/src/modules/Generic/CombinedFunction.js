@@ -13,8 +13,6 @@ function CombinedFunction(props) {
     .fill()
     .map(() => []);
 
-  //console.log (billetBankObject)
-
   if (props.usePrimaryOnly === true) {
     for (let milpacIdCombat in milpacArray[0].combat.profiles) {
       let name = milpacArray[0].combat.profiles[milpacIdCombat].realName;

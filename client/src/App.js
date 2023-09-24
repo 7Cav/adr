@@ -5,6 +5,7 @@ import lists from "./modules/Generic/BilletBank";
 import ErrorMessage from "./errorMessage";
 import Statistics from "./modules/Generic/Statistics";
 import CombinedFunction from "./modules/Generic/CombinedFunction";
+import Logo from "./style/themes/7cav/logo";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -91,12 +92,11 @@ function MilpacRequest() {
               <div className="p-nav-scroller">
                 <div className="p-nav-logo">
                   <a href="https://7cav.us">
-                    <img
-                      className="p-nav-png"
-                      src={require("./style/themes/7cav/logo-m.png")}
+                    <Logo
+                      className="p-nav-svg"
                       alt="ADR Logo"
                       title="Return to the main website"
-                      width=""
+                      width="17em"
                       height=""
                     />
                   </a>
