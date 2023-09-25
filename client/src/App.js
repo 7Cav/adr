@@ -97,7 +97,7 @@ function MilpacRequest() {
                       alt="ADR Logo"
                       title="Return to the main website"
                       width="17em"
-                      height=""
+                      height="3em"
                     />
                   </a>
                 </div>
@@ -143,46 +143,46 @@ function MilpacRequest() {
           <div className="ListContainer">
             <CombinedFunction
               billetBankObject={lists.billetBankObject.regi.positionIds}
-              collapsibleTitle="Regimental Command"
+              collapsibleTitle={lists.billetBankObject.regi.collapsibleTitle}
               headerTitles={lists.billetBankObject.regi.positionTitles}
               milpacArray={milpacArray}
-              usePrimaryOnly={true}
+              usePrimaryOnly={lists.billetBankObject.regi.isPrimaryOnly}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.oneSeven.positionIds}
-              collapsibleTitle="First Battalion"
+              collapsibleTitle={lists.billetBankObject.oneSeven.collapsibleTitle}
               headerTitles={lists.billetBankObject.oneSeven.positionTitles}
               milpacArray={milpacArray}
-              usePrimaryOnly={true}
+              usePrimaryOnly={lists.billetBankObject.oneSeven.isPrimaryOnly}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.twoSeven.positionIds}
-              collapsibleTitle="Second Battalion"
+              collapsibleTitle={lists.billetBankObject.twoSeven.collapsibleTitle}
               headerTitles={lists.billetBankObject.twoSeven.positionTitles}
               milpacArray={milpacArray}
-              usePrimaryOnly={true}
+              usePrimaryOnly={lists.billetBankObject.twoSeven.isPrimaryOnly}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.acd.positionIds}
-              collapsibleTitle="Auxillary Combat Division"
+              collapsibleTitle={lists.billetBankObject.acd.collapsibleTitle}
               headerTitles={lists.billetBankObject.acd.positionTitles}
               milpacArray={milpacArray}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.imo.positionIds}
-              collapsibleTitle="Information Management Office"
+              collapsibleTitle={lists.billetBankObject.imo.collapsibleTitle}
               headerTitles={lists.billetBankObject.imo.positionTitles}
               milpacArray={milpacArray}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.secOps.positionIds}
-              collapsibleTitle="Security Operations"
+              collapsibleTitle={lists.billetBankObject.secOps.collapsibleTitle}
               headerTitles={lists.billetBankObject.secOps.positionTitles}
               milpacArray={milpacArray}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.roo.positionIds}
-              collapsibleTitle="Recruitment Oversight Office"
+              collapsibleTitle={lists.billetBankObject.roo.collapsibleTitle}
               headerTitles={lists.billetBankObject.roo.positionTitles}
               milpacArray={milpacArray}
             />

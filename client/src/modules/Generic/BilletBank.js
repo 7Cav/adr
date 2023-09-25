@@ -18,6 +18,8 @@ const regiCommand = [
 const regi = {
   positionIds: [regiCommand],
   positionTitles: ["Command Staff"],
+  isPrimaryOnly: true,
+  collapsibleTitle: 'Regimental Command'
 };
 
 //1-7
@@ -187,6 +189,8 @@ const oneSeven = {
     "Bravo Troop",
     "Charlie Company",
   ],
+  isPrimaryOnly: true,
+  collapsibleTitle: 'First Battalion'
 };
 
 //2-7
@@ -348,6 +352,8 @@ const twoSeven = {
     "Bravo Company",
     "Charlie Company",
   ],
+  isPrimaryOnly: true,
+  collapsibleTitle: 'Second Battalion'
 };
 
 //ACD
@@ -524,6 +530,9 @@ const acd = {
     "Star Citizen Starter Platoon",
     "Future Concepts Center",
   ],
+  // Someone in command staff thought it would be a halarious idea to ask that FCC be under ACD command, since FCC is a secondary billet, we gotta iterate the secondaries.
+  isPrimaryOnly: false,
+  collapsibleTitle: 'First Battalion'
 };
 
 //IMO
@@ -565,6 +574,8 @@ const imo = {
     "S6 - Information Management",
     "Wiki Administration Group",
   ],
+  isPrimaryOnly: false,
+  collapsibleTitle: 'Information Management Office'
 };
 
 //ROO
@@ -611,6 +622,8 @@ const roo = {
     "Recruit Training Command",
     "S5 - Public Relations",
   ],
+  isPrimaryOnly: false,
+  collapsibleTitle: 'Recruitment Oversight Office'
 };
 
 //SecOps
@@ -628,6 +641,8 @@ const secOps = {
     "Military Police",
     "S2 - Intelligence and Security",
   ],
+  isPrimaryOnly: false,
+  collapsibleTitle: 'Security Operations'
 };
 
 //Support
@@ -738,6 +753,8 @@ const supportDepartments = {
     "S7 - Training",
     "Leadership Development",
   ],
+  isPrimaryOnly: false,
+  collapsibleTitle: 'Support Departments'
 };
 
 // Overall export Object
