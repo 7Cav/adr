@@ -141,6 +141,7 @@ function MilpacRequest() {
       ) : (
         <>
           <div className="ListContainer">
+            {/*
             <CombinedFunction
               billetBankObject={lists.billetBankObject.regi.positionIds}
               collapsibleTitle={lists.billetBankObject.regi.collapsibleTitle}
@@ -148,6 +149,7 @@ function MilpacRequest() {
               milpacArray={milpacArray}
               usePrimaryOnly={lists.billetBankObject.regi.isPrimaryOnly}
             />
+            */}
             <CombinedFunction
               billetBankObject={lists.billetBankObject.oneSeven.positionIds}
               collapsibleTitle={lists.billetBankObject.oneSeven.collapsibleTitle}
@@ -155,6 +157,7 @@ function MilpacRequest() {
               milpacArray={milpacArray}
               usePrimaryOnly={lists.billetBankObject.oneSeven.isPrimaryOnly}
             />
+            {/*
             <CombinedFunction
               billetBankObject={lists.billetBankObject.twoSeven.positionIds}
               collapsibleTitle={lists.billetBankObject.twoSeven.collapsibleTitle}
@@ -190,13 +193,15 @@ function MilpacRequest() {
               billetBankObject={
                 lists.billetBankObject.supportDepartments.positionIds
               }
-              collapsibleTitle="Support Departments"
+              collapsibleTitle={lists.billetBankObject.supportDepartments.collapsibleTitle}
               headerTitles={
                 lists.billetBankObject.supportDepartments.positionTitles
               }
               milpacArray={milpacArray}
             />
+            */}
             <div className="DepartmentContainer">
+              {/*
               <Collapsible
                 trigger="Statistics"
                 triggerClassName="Title"
@@ -305,6 +310,7 @@ function MilpacRequest() {
                   />
                 </div>
               </Collapsible>
+              */}
             </div>
           </div>
         </>
