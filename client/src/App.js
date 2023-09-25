@@ -150,14 +150,18 @@ function MilpacRequest() {
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.oneSeven.positionIds}
-              collapsibleTitle={lists.billetBankObject.oneSeven.collapsibleTitle}
+              collapsibleTitle={
+                lists.billetBankObject.oneSeven.collapsibleTitle
+              }
               headerTitles={lists.billetBankObject.oneSeven.positionTitles}
               milpacArray={milpacArray}
               usePrimaryOnly={lists.billetBankObject.oneSeven.isPrimaryOnly}
             />
             <CombinedFunction
               billetBankObject={lists.billetBankObject.twoSeven.positionIds}
-              collapsibleTitle={lists.billetBankObject.twoSeven.collapsibleTitle}
+              collapsibleTitle={
+                lists.billetBankObject.twoSeven.collapsibleTitle
+              }
               headerTitles={lists.billetBankObject.twoSeven.positionTitles}
               milpacArray={milpacArray}
               usePrimaryOnly={lists.billetBankObject.twoSeven.isPrimaryOnly}
@@ -190,7 +194,9 @@ function MilpacRequest() {
               billetBankObject={
                 lists.billetBankObject.supportDepartments.positionIds
               }
-              collapsibleTitle={lists.billetBankObject.supportDepartments.collapsibleTitle}
+              collapsibleTitle={
+                lists.billetBankObject.supportDepartments.collapsibleTitle
+              }
               headerTitles={
                 lists.billetBankObject.supportDepartments.positionTitles
               }
