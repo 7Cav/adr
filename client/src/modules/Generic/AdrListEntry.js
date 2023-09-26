@@ -4,7 +4,6 @@ import MilpacParse from "./MilpacParse.js";
 import lists from "./BilletBank.js";
 
 function AdrListEntry(props) {
-
   let billetBankObject = lists.billetBankObject;
   let selector = props.billetBankGroup;
 
