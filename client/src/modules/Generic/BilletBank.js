@@ -18,6 +18,7 @@ const regiCommand = [
 const regi = {
   positionIds: [regiCommand],
   positionTitles: ["Command Staff"],
+  collapsibleTitle: "Regimental Command",
 };
 
 //1-7
@@ -187,6 +188,7 @@ const oneSeven = {
     "Bravo Troop",
     "Charlie Company",
   ],
+  collapsibleTitle: "First Battalion",
 };
 
 //2-7
@@ -348,6 +350,7 @@ const twoSeven = {
     "Bravo Company",
     "Charlie Company",
   ],
+  collapsibleTitle: "Second Battalion",
 };
 
 //ACD
@@ -524,6 +527,7 @@ const acd = {
     "Star Citizen Starter Platoon",
     "Future Concepts Center",
   ],
+  collapsibleTitle: "First Battalion",
 };
 
 //IMO
@@ -565,6 +569,7 @@ const imo = {
     "S6 - Information Management",
     "Wiki Administration Group",
   ],
+  collapsibleTitle: "Information Management Office",
 };
 
 //ROO
@@ -611,6 +616,7 @@ const roo = {
     "Recruit Training Command",
     "S5 - Public Relations",
   ],
+  collapsibleTitle: "Recruitment Oversight Office",
 };
 
 //SecOps
@@ -628,6 +634,7 @@ const secOps = {
     "Military Police",
     "S2 - Intelligence and Security",
   ],
+  collapsibleTitle: "Security Operations",
 };
 
 //Support
@@ -738,6 +745,7 @@ const supportDepartments = {
     "S7 - Training",
     "Leadership Development",
   ],
+  collapsibleTitle: "Support Departments",
 };
 
 // Overall export Object
