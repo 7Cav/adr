@@ -4,7 +4,7 @@ import Collapsible from "react-collapsible";
 import lists from "./modules/Generic/BilletBank";
 import ErrorMessage from "./errorMessage";
 import Statistics from "./modules/Generic/Statistics";
-import CombinedFunction from "./modules/Generic/CombinedFunction";
+import AdrListEntry from "./modules/Generic/AdrListEntry";
 import Logo from "./style/themes/7cav/logo";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
@@ -141,65 +141,14 @@ function MilpacRequest() {
       ) : (
         <>
           <div className="ListContainer">
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.regi.positionIds}
-              collapsibleTitle={lists.billetBankObject.regi.collapsibleTitle}
-              headerTitles={lists.billetBankObject.regi.positionTitles}
-              milpacArray={milpacArray}
-              usePrimaryOnly={lists.billetBankObject.regi.isPrimaryOnly}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.oneSeven.positionIds}
-              collapsibleTitle={
-                lists.billetBankObject.oneSeven.collapsibleTitle
-              }
-              headerTitles={lists.billetBankObject.oneSeven.positionTitles}
-              milpacArray={milpacArray}
-              usePrimaryOnly={lists.billetBankObject.oneSeven.isPrimaryOnly}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.twoSeven.positionIds}
-              collapsibleTitle={
-                lists.billetBankObject.twoSeven.collapsibleTitle
-              }
-              headerTitles={lists.billetBankObject.twoSeven.positionTitles}
-              milpacArray={milpacArray}
-              usePrimaryOnly={lists.billetBankObject.twoSeven.isPrimaryOnly}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.acd.positionIds}
-              collapsibleTitle={lists.billetBankObject.acd.collapsibleTitle}
-              headerTitles={lists.billetBankObject.acd.positionTitles}
-              milpacArray={milpacArray}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.imo.positionIds}
-              collapsibleTitle={lists.billetBankObject.imo.collapsibleTitle}
-              headerTitles={lists.billetBankObject.imo.positionTitles}
-              milpacArray={milpacArray}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.secOps.positionIds}
-              collapsibleTitle={lists.billetBankObject.secOps.collapsibleTitle}
-              headerTitles={lists.billetBankObject.secOps.positionTitles}
-              milpacArray={milpacArray}
-            />
-            <CombinedFunction
-              billetBankObject={lists.billetBankObject.roo.positionIds}
-              collapsibleTitle={lists.billetBankObject.roo.collapsibleTitle}
-              headerTitles={lists.billetBankObject.roo.positionTitles}
-              milpacArray={milpacArray}
-            />
-            <CombinedFunction
-              billetBankObject={
-                lists.billetBankObject.supportDepartments.positionIds
-              }
-              collapsibleTitle={
-                lists.billetBankObject.supportDepartments.collapsibleTitle
-              }
-              headerTitles={
-                lists.billetBankObject.supportDepartments.positionTitles
-              }
+            <AdrListEntry billetBankGroup={"regi"} milpacArray={milpacArray} />
+            <AdrListEntry billetBankGroup={"oneSeven"} milpacArray={milpacArray}/>
+            <AdrListEntry billetBankGroup={"twoSeven"} milpacArray={milpacArray}/>
+            <AdrListEntry billetBankGroup={"acd"} milpacArray={milpacArray} />
+            <AdrListEntry billetBankGroup={"imo"} milpacArray={milpacArray} />
+            <AdrListEntry billetBankGroup={"secOps"} milpacArray={milpacArray}/>
+            <AdrListEntry billetBankGroup={"roo"} milpacArray={milpacArray} />
+            <AdrListEntry billetBankGroup={"supportDepartments"}
               milpacArray={milpacArray}
             />
             <div className="DepartmentContainer">

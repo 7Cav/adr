@@ -1,12 +1,17 @@
 import React from "react";
 import Collapsible from "react-collapsible";
 import MilpacParse from "./MilpacParse.js";
+import lists from "./BilletBank.js";
 
-function CombinedFunction(props) {
+function AdrListEntry(props) {
+
+  let billetBankObject = lists.billetBankObject;
+  let selector = props.billetBankGroup;
+
   return (
     <div className="DepartmentContainer">
       <Collapsible
-        trigger={props.collapsibleTitle}
+        trigger={billetBankObject[selector].collapsibleTitle}
         triggerClassName="Title"
         triggerOpenedClassName="Title"
         open={true}
@@ -14,8 +19,8 @@ function CombinedFunction(props) {
         <div className="ResponseContainer">
           <MilpacParse
             milpacArray={props.milpacArray}
-            headerTitles={props.headerTitles}
-            billetBankObject={props.billetBankObject}
+            headerTitles={billetBankObject[selector].positionTitles}
+            billetBankObject={billetBankObject[selector].positionIds}
           />
         </div>
       </Collapsible>
@@ -23,4 +28,4 @@ function CombinedFunction(props) {
   );
 }
 
-export default CombinedFunction;
+export default AdrListEntry;

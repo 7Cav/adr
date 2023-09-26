@@ -527,7 +527,7 @@ const acd = {
     "Star Citizen Starter Platoon",
     "Future Concepts Center",
   ],
-  collapsibleTitle: "First Battalion",
+  collapsibleTitle: "Auxillary Combat Division",
 };
 
 //IMO
