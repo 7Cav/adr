@@ -527,7 +527,7 @@ const acd = {
     "Star Citizen Starter Platoon",
     "Future Concepts Center",
   ],
-  collapsibleTitle: "First Battalion",
+  collapsibleTitle: "Auxillary Combat Division",
 };
 
 //IMO
@@ -737,7 +737,7 @@ const s7 = [
 const ld = ["126", "127", "128", "129", "130", "131", "132", "539"];
 const spd = ["175", "176"];
 
-const supportDepartments = {
+const support = {
   positionIds: [spd, s3, s7, ld],
   positionTitles: [
     "Special Projects Division",
@@ -758,7 +758,7 @@ const billetBankObject = {
   imo: imo,
   secOps: secOps,
   roo: roo,
-  supportDepartments: supportDepartments,
+  support: support,
 };
 
 //keeping a shortlist of individual exports open so that it doesnt break the Statistics section.
