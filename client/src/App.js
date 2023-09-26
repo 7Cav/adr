@@ -141,16 +141,15 @@ function MilpacRequest() {
       ) : (
         <>
           <div className="ListContainer">
-            <AdrListEntry billetBankGroup={"regi"} milpacArray={milpacArray} />
-            <AdrListEntry billetBankGroup={"oneSeven"} milpacArray={milpacArray}/>
-            <AdrListEntry billetBankGroup={"twoSeven"} milpacArray={milpacArray}/>
-            <AdrListEntry billetBankGroup={"acd"} milpacArray={milpacArray} />
-            <AdrListEntry billetBankGroup={"imo"} milpacArray={milpacArray} />
-            <AdrListEntry billetBankGroup={"secOps"} milpacArray={milpacArray}/>
-            <AdrListEntry billetBankGroup={"roo"} milpacArray={milpacArray} />
-            <AdrListEntry billetBankGroup={"supportDepartments"}
-              milpacArray={milpacArray}
-            />
+            {/*note: BbGroup = billetBankGroup*/}
+            <AdrListEntry bBGroup={"regi"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"oneSeven"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"twoSeven"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"acd"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"imo"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"secOps"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"roo"} milpacArray={milpacArray} />
+            <AdrListEntry bBGroup={"support"} milpacArray={milpacArray} />
             <div className="DepartmentContainer">
               <Collapsible
                 trigger="Statistics"
