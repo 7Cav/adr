@@ -5,7 +5,7 @@ import lists from "./BilletBank.js";
 
 function AdrListEntry(props) {
   let billetBankObject = lists.billetBankObject;
-  let selector = props.billetBankGroup;
+  let selector = props.bBGroup;
 
   return (
     <div className="DepartmentContainer">
