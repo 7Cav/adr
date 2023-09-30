@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
-import Collapsible from "react-collapsible";
-import lists from "./modules/Generic/BilletBank";
-import ErrorMessage from "./errorMessage";
-import Statistics from "./modules/Generic/Statistics";
-import AdrListEntry from "./modules/Generic/AdrListEntry";
-import Logo from "./style/themes/7cav/logo";
+import "./Activedutyroster.css";
+import ErrorMessage from "../errorMessage";
+import AdrListEntry from "../modules/Generic/AdrListEntry";
+import Logo from "../style/themes/7cav/logo";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -17,7 +14,7 @@ const millisecondsToMinutes = (milliseconds) => {
 
 // import {Helmet} from 'react-helmet';
 
-function MilpacRequest() {
+function ActiveDutyRoster() {
   const [milpacList, setMilpacList] = useState([]);
   const [reserveList, setReserveList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +122,7 @@ function MilpacRequest() {
             <div className="spinner"></div>
             <img
               className="p-loading-png"
-              src={require("./style/themes/7cav/hamster-hamtaro.gif")}
+              src={require("../style/themes/7cav/hamster-hamtaro.gif")}
               alt="Loading"
             />
           </div>
@@ -150,120 +147,11 @@ function MilpacRequest() {
             <AdrListEntry bBGroup={"secOps"} milpacArray={milpacArray} />
             <AdrListEntry bBGroup={"roo"} milpacArray={milpacArray} />
             <AdrListEntry bBGroup={"support"} milpacArray={milpacArray} />
-            <div className="DepartmentContainer">
-              <Collapsible
-                trigger="Statistics"
-                triggerClassName="Title"
-                triggerOpenedClassName="Title"
-                open={true}
-              >
-                <div className="RegimentBreakdown">
-                  <div className="Subtitle">
-                    7th Cavalry Regiment {"("}Active Duty and Line Billets only
-                    {")"}
-                  </div>
-                  <Statistics
-                    billetIDs={[
-                      lists.regiCommand,
-                      lists.oneSevenCommand,
-                      lists.alpha1,
-                      lists.bravo1,
-                      lists.charlie1,
-                      lists.twoSevenCommand,
-                      lists.alpha2,
-                      lists.bravo2,
-                      lists.charlie2,
-                      lists.acdCommand,
-                      lists.alpha3,
-                      lists.bravo3,
-                      lists.charlie3,
-                      lists.starterPlatoon,
-                    ]}
-                    labelArray={[
-                      "General Staff",
-                      "1-7 Headquarters",
-                      "Alpha Company 1-7",
-                      "Bravo Troop 1-7",
-                      "Charlie Company 1-7",
-                      "2-7 Headquarters",
-                      "Alpha Company 2-7",
-                      "Bravo Company 2-7",
-                      "Charlie Company 2-7",
-                      "ACD Headquarters",
-                      "Alpha Company ACD",
-                      "Bravo Company ACD",
-                      "Charlie Company ACD",
-                      "Star Citizen Starter Platoon",
-                    ]}
-                    milpacArray={milpacArray}
-                    useRegiLogic={true}
-                  />
-                </div>
-                <div className="OneSevenBreakdown">
-                  <div className="Subtitle">First Battalion</div>
-                  <Statistics
-                    billetIDs={[
-                      lists.oneSevenCommand,
-                      lists.alpha1,
-                      lists.bravo1,
-                      lists.charlie1,
-                    ]}
-                    centerLabel={"Total 1-7 Strength"}
-                    labelArray={[
-                      "1-7 Headquarters",
-                      "Alpha Company",
-                      "Bravo Troop",
-                      "Charlie Company",
-                    ]}
-                    milpacArray={milpacArray}
-                  />
-                </div>
-                <div className="TwoSevenBreakdown">
-                  <div className="Subtitle">Second Battalion</div>
-                  <Statistics
-                    billetIDs={[
-                      lists.twoSevenCommand,
-                      lists.alpha2,
-                      lists.bravo2,
-                      lists.charlie2,
-                    ]}
-                    centerLabel={"Total 2-7 Strength"}
-                    labelArray={[
-                      "2-7 Headquarters",
-                      "Alpha Company",
-                      "Bravo Company",
-                      "Charlie Company",
-                    ]}
-                    milpacArray={milpacArray}
-                  />
-                </div>
-                <div className="ACDStrength">
-                  <div className="Subtitle">Auxillary Combat Division</div>
-                  <Statistics
-                    billetIDs={[
-                      lists.acdCommand,
-                      lists.alpha3,
-                      lists.bravo3,
-                      lists.charlie3,
-                      lists.starterPlatoon,
-                    ]}
-                    centerLabel={"Total ACD Strength"}
-                    labelArray={[
-                      "ACD Headquarters",
-                      "Alpha Company",
-                      "Bravo Company",
-                      "Charlie Company",
-                      "Star Citizen Starter Platoon",
-                    ]}
-                    milpacArray={milpacArray}
-                  />
-                </div>
-              </Collapsible>
-            </div>
           </div>
         </>
       )}
     </div>
   );
 }
-export default MilpacRequest;
+
+export default ActiveDutyRoster;

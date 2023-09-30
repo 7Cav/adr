@@ -215,7 +215,7 @@ a:hover {
 }
 
 .Collapsible__trigger:after {
-  content: url("./style/themes/7cav/Chevron.png");
+  content: url("../style/themes/7cav/Chevron.png");
   position: absolute;
   right: 0px;
   top: 0px;

@@ -1,0 +1,36 @@
+.masterbox {
+    height: 100vh;
+    width: 100vw;
+}
+
+.logobox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10%;
+    padding-bottom: 5em;
+}
+
+.buttonbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button {
+    background-color: #214861;
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    font-family: "Roboto","Segoe UI","Times New Roman";
+    font-size: 12px;
+    cursor: pointer;
+
+    border-radius: 0.5em;
+
+    padding: 1em;
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+    
+}
