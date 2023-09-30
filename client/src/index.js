@@ -15,9 +15,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<CavApps />} />
-          <Route path="adr" element={<ActiveDutyRoster />} />
-          <Route path="rosterstatistics" element={<Statistics />} />
+          <Route index element={<CavApps title="7th Cavalry Apps"/>} />
+          <Route path="adr" element={<ActiveDutyRoster title="7th Cavalry ADR"/>} />
+          <Route path="rosterstatistics" element={<Statistics title="7th Cavalry Statistics"/>} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

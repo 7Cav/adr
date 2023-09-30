@@ -15,7 +15,7 @@ const millisecondsToMinutes = (milliseconds) => {
 
 // import {Helmet} from 'react-helmet';
 
-function ActiveDutyRoster() {
+function ActiveDutyRoster(props) {
   const [milpacList, setMilpacList] = useState([]);
   const [reserveList, setReserveList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +28,9 @@ function ActiveDutyRoster() {
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "dig85agbqz");
   </script>`;
+
+  // Change Page Title
+  useEffect(() => document.title = props.title, [])
 
   // Reusable API fetching function
   async function fetchData(url, setFunction) {
