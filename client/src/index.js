@@ -5,7 +5,7 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
 import Layout from "./pages/Layout";
-import CavApps from "./pages/CavApps";
+import CavApps from "./pages/Cavapps";
 import ActiveDutyRoster from "./pages/Activedutyroster"
 import Statistics from "./pages/Rosterstatistics";
 import NoPage from "./pages/NoPage";

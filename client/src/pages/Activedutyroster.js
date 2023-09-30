@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Activedutyroster.css";
 import ErrorMessage from "../errorMessage";
 import AdrListEntry from "../modules/Generic/AdrListEntry";
-import Logo from "../style/themes/7cav/logo";
+import Logo from "../style/themes/7cav/adrLogo";
+import { Outlet, Link } from "react-router-dom";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -88,15 +89,14 @@ function ActiveDutyRoster() {
             <div className="p-nav-inner">
               <div className="p-nav-scroller">
                 <div className="p-nav-logo">
-                  <a href="https://7cav.us">
-                    <Logo
-                      className="p-nav-svg"
-                      alt="ADR Logo"
-                      title="Return to the main website"
-                      width="17em"
-                      height="3em"
-                    />
-                  </a>
+                <Link to='/'>
+                  <Logo
+                        alt="ADR Logo"
+                        title="Return to CavApps"
+                        width="17em"
+                        height="3em"
+                      />
+                  </Link>
                 </div>
                 {/* Data Age Warning */}
                 <div className="p-nav-info">

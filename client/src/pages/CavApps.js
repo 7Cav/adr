@@ -1,5 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
-import Logo from '../style/themes/7cav/logo'
+import Logo from '../style/themes/7cav/appsLogo'
 import './CavApps.css';
 
 function CavApps() {
