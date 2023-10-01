@@ -10,7 +10,7 @@ const NoPage = () => {
         <a href="https://7cav.us/tickets/categories/2/create">ticket</a> to S6.
         Otherwise, please enjoy this sick music!
       </h3>
-      <iframe
+      <iframe title="Aliens"
         width="420"
         height="315"
         src="https://www.youtube.com/embed/4vkR1G_DUVc"
