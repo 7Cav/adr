@@ -1,15 +1,22 @@
-import '../index.css';
+import "../index.css";
 
 const NoPage = () => {
-    return (
+  return (
     <div>
-        <h1>404 Error</h1>
-        <h2>Oh no! you have encountered a page that does not exist!</h2>
-        <h3>If you believe this is in error, please submit a <a href='https://7cav.us/tickets/categories/2/create'>ticket</a> to S6. Otherwise, please enjoy this sick music!</h3>
-        <iframe width="420" height="315" src="https://www.youtube.com/embed/4vkR1G_DUVc"/>
-    </div> 
-    )
+      <h1>404 Error</h1>
+      <h2>Oh no! you have encountered a page that does not exist!</h2>
+      <h3>
+        If you believe this is in error, please submit a{" "}
+        <a href="https://7cav.us/tickets/categories/2/create">ticket</a> to S6.
+        Otherwise, please enjoy this sick music!
+      </h3>
+      <iframe
+        width="420"
+        height="315"
+        src="https://www.youtube.com/embed/4vkR1G_DUVc"
+      />
+    </div>
+  );
 };
-  
+
 export default NoPage;
-  

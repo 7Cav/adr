@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import Layout from "./pages/Layout";
 import CavApps from "./pages/Cavapps";
-import ActiveDutyRoster from "./pages/Activedutyroster"
+import ActiveDutyRoster from "./pages/Activedutyroster";
 import Statisticspage from "./pages/Rosterstatistics";
 import NoPage from "./pages/NoPage";
 
@@ -15,9 +15,15 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<CavApps title="7th Cavalry Apps"/>} />
-          <Route path="adr" element={<ActiveDutyRoster title="7th Cavalry ADR"/>} />
-          <Route path="rosterstatistics" element={<Statisticspage title="7th Cavalry Statistics"/>} />
+          <Route index element={<CavApps title="7th Cavalry Apps" />} />
+          <Route
+            path="adr"
+            element={<ActiveDutyRoster title="7th Cavalry ADR" />}
+          />
+          <Route
+            path="rosterstatistics"
+            element={<Statisticspage title="7th Cavalry Statistics" />}
+          />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

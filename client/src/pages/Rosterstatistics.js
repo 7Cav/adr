@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import lists from "../modules/Generic/BilletBank"
+import lists from "../modules/Generic/BilletBank";
 import ErrorMessage from "../errorMessage";
 import "./Rosterstatistics.css";
-import Statistics from '../modules/Generic/Statistics'
+import Statistics from "../modules/Generic/Statistics";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -27,7 +27,7 @@ const StatisticsPage = (props) => {
   </script>`;
 
   // Change Page Title
-  document.title = props.title
+  document.title = props.title;
 
   // Reusable API fetching function
   async function fetchData(url, setFunction) {
@@ -48,7 +48,7 @@ const StatisticsPage = (props) => {
       console.error(`Error fetching data from ${url}: `, error);
       setError(error);
     }
-  };
+  }
 
   useEffect(() => {
     // Set loading to true
@@ -83,7 +83,10 @@ const StatisticsPage = (props) => {
   return (
     <div className="MasterContainer">
       <div className="DepartmentContainer">
-        <h4>Please note, the Statistics app is currently pending rewrite by S6. The values, while accurate, only apply to Active Duty Personell</h4>
+        <h4>
+          Please note, the Statistics app is currently pending rewrite by S6.
+          The values, while accurate, only apply to Active Duty Personell
+        </h4>
       </div>
       {cacheTime && cacheTime.combat !== null && (
         <div className="DepartmentContainer">
@@ -219,6 +222,6 @@ const StatisticsPage = (props) => {
       )}
     </div>
   );
-}
+};
 
 export default StatisticsPage;

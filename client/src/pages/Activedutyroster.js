@@ -28,7 +28,7 @@ function ActiveDutyRoster(props) {
   </script>`;
 
   // Change Page Title
-  document.title = props.title
+  document.title = props.title;
 
   // Reusable API fetching function
   async function fetchData(url, setFunction) {
@@ -90,13 +90,13 @@ function ActiveDutyRoster(props) {
             <div className="p-nav-inner">
               <div className="p-nav-scroller">
                 <div className="p-nav-logo">
-                <Link to='/'>
-                  <Logo
-                        alt="ADR Logo"
-                        title="Return to CavApps"
-                        width="17em"
-                        height="3em"
-                      />
+                  <Link to="/">
+                    <Logo
+                      alt="ADR Logo"
+                      title="Return to CavApps"
+                      width="17em"
+                      height="3em"
+                    />
                   </Link>
                 </div>
                 {/* Data Age Warning */}
