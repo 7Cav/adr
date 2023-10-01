@@ -4,11 +4,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 
-import Layout from "./pages/Layout";
-import CavApps from "./pages/Cavapps";
-import ActiveDutyRoster from "./pages/Activedutyroster";
-import Statisticspage from "./pages/Rosterstatistics";
-import NoPage from "./pages/NoPage";
+import Layout from "./pages/Layout.js";
+import CavApps from "./pages/Cavapps.js";
+import ActiveDutyRoster from "./pages/Activedutyroster.js";
+import Statisticspage from "./pages/Rosterstatistics.js";
+import NoPage from "./pages/NoPage.js";
 
 export default function App() {
   return (
