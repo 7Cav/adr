@@ -3,7 +3,7 @@ import "./Activedutyroster.css";
 import ErrorMessage from "../errorMessage";
 import AdrListEntry from "../modules/Generic/AdrListEntry";
 import Logo from "../style/themes/7cav/adrLogo";
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
@@ -12,8 +12,6 @@ const cacheTimestampUrl = process.env.REACT_APP_CACHE_TIMESTAMP_URL;
 const millisecondsToMinutes = (milliseconds) => {
   return Math.round(milliseconds / (1000 * 60));
 };
-
-// import {Helmet} from 'react-helmet';
 
 function ActiveDutyRoster(props) {
   const [milpacList, setMilpacList] = useState([]);
@@ -30,7 +28,7 @@ function ActiveDutyRoster(props) {
   </script>`;
 
   // Change Page Title
-  useEffect(() => document.title = props.title, [])
+  document.title = props.title
 
   // Reusable API fetching function
   async function fetchData(url, setFunction) {

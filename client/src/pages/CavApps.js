@@ -1,12 +1,11 @@
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo from '../style/themes/7cav/appsLogo'
 import './CavApps.css';
-import React, { useEffect } from "react";
 
 function CavApps(props) {
 
   // Change Page Title
-  useEffect(() => document.title = props.title, [])
+  document.title = props.title
 
   return (
     <div className='masterbox'>
