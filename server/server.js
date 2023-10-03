@@ -11,9 +11,9 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowlist = [
       "http://localhost:3000",
-      "http://adr.7cav.us",
-      "https://adr.7cav.us",
-      "https://adr.7cav.us/",
+      "http://apps.7cav.us",
+      "https://apps.7cav.us",
+      "https://apps.7cav.us/",
     ];
     if (allowlist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
