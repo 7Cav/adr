@@ -13,4 +13,4 @@ RUN npm install -g http-server
 EXPOSE 8080
 
 # Set the command to run the HTTP server when the container starts
-CMD [ "http-server", "build" ]
+CMD [ "http-server", "build", "-P", "http://localhost:8080?/" ]
