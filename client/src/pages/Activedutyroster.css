@@ -49,14 +49,17 @@
   border: 0.5em solid #f3f3f3;
   border-top: 0.5em solid #ebc729;
   border-radius: 50%;
-  width: 8em; /* Make this larger than the GIF */
-  height: 8em; /* Make this larger than the GIF */
+  width: 8em;
+  /* Make this larger than the GIF */
+  height: 8em;
+  /* Make this larger than the GIF */
   animation: spin 2s linear infinite;
   position: absolute;
   top: 50%;
   left: 50%;
   z-index: 1;
-  margin: -4em 0 0 -4.5em; /* Half of width and height */
+  margin: -4em 0 0 -4.5em;
+  /* Half of width and height */
 }
 
 .p-loading-png {
@@ -70,6 +73,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -215,7 +219,7 @@ a:hover {
 }
 
 .Collapsible__trigger:after {
-  content: url("./style/themes/7cav/Chevron.png");
+  content: url("../style/themes/7cav/Chevron.png");
   position: absolute;
   right: 0px;
   top: 0px;

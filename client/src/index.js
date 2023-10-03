@@ -1,8 +1,35 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+
+import Layout from "./pages/Layout.js";
+import CavApps from "./pages/Cavapps.js";
+import ActiveDutyRoster from "./pages/Activedutyroster.js";
+import Statisticspage from "./pages/Rosterstatistics.js";
+import NoPage from "./pages/NoPage.js";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<CavApps title="7th Cavalry Apps" />} />
+          <Route
+            path="adr"
+            element={<ActiveDutyRoster title="7th Cavalry ADR" />}
+          />
+          <Route
+            path="rosterstatistics"
+            element={<Statisticspage title="7th Cavalry Statistics" />}
+          />
+          <Route path="*" element={<NoPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 ReactDOM.render(
   <React.StrictMode>
