@@ -61,7 +61,7 @@ spec:
     - host: apps.7cav.us
       http:
         paths:
-          - path: /
+          - path: /*
             pathType: Prefix
             backend:
               service:
