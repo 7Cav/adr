@@ -55,11 +55,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "bff.adr.7cav.us"
+        - "bff.apps.7cav.us"
       secretName: letsencrypt-adr-server
   ingressClassName: nginx
   rules:
-    - host: bff.adr.7cav.us
+    - host: bff.apps.7cav.us
       http:
         paths:
           - path: /
