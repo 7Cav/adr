@@ -7,12 +7,7 @@ body {
   font-weight: 400;
   line-height: 1.5;
   color: #a1a1a1;
-  background-color: #121212;
-  background-image: url("./style/themes/7cav/page-bg2.png");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
+  background-color: #111111;
   align-content: space-evenly;
 }
 

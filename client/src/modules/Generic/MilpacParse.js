@@ -128,8 +128,6 @@ function MilpacParse(props) {
     }
   }
 
-  console.log(returnArray);
-
   return (
     <div className="ItemList">
       <ArrayMap inputArray={returnArray} headerTitles={props.headerTitles} />

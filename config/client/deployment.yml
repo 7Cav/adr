@@ -54,11 +54,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "adr.7cav.us"
+        - "apps.7cav.us"
       secretName: letsencrypt-adr-client
   ingressClassName: nginx
   rules:
-    - host: adr.7cav.us
+    - host: apps.7cav.us
       http:
         paths:
           - path: /
