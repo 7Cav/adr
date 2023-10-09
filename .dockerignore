@@ -1,6 +1,0 @@
-.env
-.gitignore
-.git
-*.md
-!README*.md
-.github

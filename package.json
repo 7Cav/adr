@@ -1,23 +1,21 @@
 {
-  "name": "react-roster",
-  "version": "1.0.0",
-  "description": "ExpressJS-ReactJS Roster for 7cav.us",
-  "main": "index.js",
+  "name": "cavapps",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [
-    "7cav"
-  ],
-  "author": "Josh Edson",
-  "license": "ISC",
   "dependencies": {
-    "axios": "^0.25.0",
-    "compression": "^1.7.4",
-    "cors": "^2.8.5",
-    "express": "^4.17.2",
-    "react": "^18.2.0",
-    "react-collapsible": "^2.8.4",
-    "react-helmet": "^6.1.0"
+    "react": "^18",
+    "react-dom": "^18",
+    "next": "13.5.4"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10",
+    "postcss": "^8",
+    "tailwindcss": "^3"
   }
 }
