@@ -1,0 +1,45 @@
+# This is a basic workflow to help you get started with Actions
+
+name: BUILD_CHECK
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/client_adr_push.yml"
+      - "client/**"
+      - "config/client/**"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # deployment
+  client_deployment:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_CLIENT_TOKEN: ${{ secrets.CLIENT_TOKEN }}
+      REACT_APP_COMBAT_API_URL: "https://bff.apps.7cav.us/roster/combat"
+      REACT_APP_RESERVE_API_URL: "https://bff.apps.7cav.us/roster/reserve"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout the Repo
+        uses: actions/checkout@v3
+
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+
+      - name: Install Dependancies
+        run: npm i
+        working-directory: client
+
+      - name: Update Browserlist
+        run: npx browserslist@latest --update-db
+        working-directory: client
+
+      - name: Build Client to Prod
+        run: npm run build
+        working-directory: client

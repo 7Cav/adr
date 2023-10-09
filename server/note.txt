@@ -1,0 +1,4 @@
+I am currently unsure if the server is needed for NextJS apps. 
+
+The initial reason for having the server folder was to bypass CORS on the cav API.
+If you are aware of a way to make this server redundant, please feel free to toy with it.

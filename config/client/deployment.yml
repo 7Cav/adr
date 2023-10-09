@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adr-client
+  namespace: 7cav
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adr-client
+  template:
+    metadata:
+      labels:
+        app: adr-client
+    spec:
+      containers:
+        - name: adr-client
+          image: <IMAGE>
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REACT_APP_CLIENT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: REACT_APP_CLIENT_TOKEN
+                  name: adr-client-token
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adr-client
+  namespace: 7cav
+spec:
+  selector:
+    app: adr-client
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adr-client
+  namespace: 7cav
+  labels:
+    app.kubernetes.io/name: adr-client
+    app.kubernetes.io/instance: adr-client
+  annotations:
+    cert-manager.io/issuer: letsencrypt-nginx
+spec:
+  tls:
+    - hosts:
+        - "apps.7cav.us"
+      secretName: letsencrypt-adr-client
+  ingressClassName: nginx
+  rules:
+    - host: apps.7cav.us
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adr-client
+                port:
+                  name: http
