@@ -11,6 +11,7 @@ async function GetCombatRoster() {
     headers: {
       Authorization: CLIENT_TOKEN,
     },
+    cache: "no-store",
   });
 
   if (!response.ok) {
