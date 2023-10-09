@@ -1,5 +1,5 @@
 import React from "react";
-import ArrayMap from "./ArrayMap.js";
+import ArrayMap from "./ArrayMap";
 
 /*Milpac Parse is used to compare the API response (milpacArray) against desired position ID's (billetBankObject). If for example, a person is a Milpacs Clerk and billetBankObject
 is set to check for Milpacs Clerks, Milpac Parse will search for matching entries within the API resonse. If there is someone that matches, they are pushed to an output array. (returnArray)

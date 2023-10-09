@@ -1,5 +1,4 @@
-//This is included to generate arrays for large ammounts of billets. This is otherwise unused in the final product
-
+//This is included as a dev tool to do bulk billet list entries. run this outside of cavApps.
 let countString = "";
 let i = 629;
 let stopper = 644;

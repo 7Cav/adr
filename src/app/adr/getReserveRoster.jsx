@@ -1,9 +1,5 @@
 const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
 const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
-const cacheTimestampUrl = process.env.REACT_APP_CACHE_TIMESTAMP_URL;
-const millisecondsToMinutes = (milliseconds) => {
-  return Math.round(milliseconds / (1000 * 60));
-};
 
 async function GetReserveRoster() {
   "use server";
