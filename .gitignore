@@ -36,3 +36,4 @@ next-env.d.ts
 
 # Server Token
 server/credentials/token.js
+.env
