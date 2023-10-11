@@ -28,7 +28,7 @@ function ArrayMap(props) {
                     {item.fullName}
                   </a>
                 </td>
-                <td>{item.position.positionTitle}</td>
+                <td className="positionName">{item.position.positionTitle}</td>
               </tr>
             ))}
           </React.Fragment>

@@ -8,7 +8,7 @@ function AdrListEntry(props) {
 
   return (
     <div className="DepartmentContainer">
-      <h1>{billetBankObject[selector].collapsibleTitle}</h1>
+      <div className="Title">{billetBankObject[selector].collapsibleTitle}</div>
       <div className="ResponseContainer">
         <MilpacParse
           milpacArray={props.milpacArray}
