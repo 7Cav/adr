@@ -203,16 +203,6 @@
   width: 50%;
 }
 
-a {
-  color: #ebc729;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #ebc729;
-  text-decoration: underline;
-}
-
 .Collapsible__trigger {
   display: block;
   position: relative;

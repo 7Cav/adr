@@ -10,10 +10,21 @@
   font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-size: 13px;
+
   font-weight: 400;
+  font-size: 13px;
   line-height: 1.5;
   color: #a1a1a1;
   background-color: #111111;
   align-content: space-evenly;
+}
+
+a {
+  color: #ebc729;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ebc729;
+  text-decoration: underline;
 }

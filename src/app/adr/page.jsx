@@ -1,9 +1,14 @@
+import Link from "next/link";
 import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
 import AdrListEntry from "./modules/AdrListEntry";
 import Logo from "../theme/adrLogo";
 import "./page.css";
 import "../globals.css";
+
+export const metadata = {
+  title: "Active Duty Roster",
+};
 
 let milpacArray = [];
 
@@ -22,12 +27,14 @@ export default async function ActiveDutyRoster() {
             <div className="p-nav-inner">
               <div className="p-nav-scroller">
                 <div className="p-nav-logo">
-                  <Logo
-                    alt="ADR Logo"
-                    title="Return to CavApps"
-                    width="17em"
-                    height="3em"
-                  />
+                  <Link href={"/"}>
+                    <Logo
+                      alt="ADR Logo"
+                      title="Return to CavApps"
+                      width="17em"
+                      height="3em"
+                    />
+                  </Link>
                 </div>
                 {/* Data Age Warning NEEDS REWORK */}
                 <div className="p-nav-info">
