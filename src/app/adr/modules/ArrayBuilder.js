@@ -1,4 +1,4 @@
-//This is included as a dev tool to do bulk billet list entries. run this outside of cavApps.
+//This is included as a dev tool to generate bulk billet list entries in sequential order. run this outside of cavApps.
 let countString = "";
 let i = 629;
 let stopper = 644;
