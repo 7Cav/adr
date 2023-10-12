@@ -20,7 +20,6 @@ milpacArray.push({
 export default async function ActiveDutyRoster() {
   return (
     <div className="MasterContainer">
-      {/* <div dangerouslySetInnerHTML={{ __html: clscript }} /> I cant recall what this is for? */}
       <div className="p-nav-primary">
         <div className="p-nav-wrapper">
           <nav className="p-nav">
