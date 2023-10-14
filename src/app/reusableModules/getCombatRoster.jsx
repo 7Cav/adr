@@ -6,7 +6,6 @@ const millisecondsToMinutes = (milliseconds) => {
 };
 
 async function GetCombatRoster() {
-  "use server";
   const response = await fetch(combatApiUrl, {
     headers: {
       Authorization: CLIENT_TOKEN,

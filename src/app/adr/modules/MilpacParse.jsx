@@ -10,9 +10,8 @@ function MilpacParse(props) {
   const billetBankObject = props.billetBankObject;
   let milpacArray = props.milpacArray;
 
-  /*Currently broken. Sypolt, pls fix.
-    const uniqueNamesSet = new Set();
-    */
+  //Currently broken. Sypolt, pls fix.
+  //const uniqueNamesSet = new Set();
 
   let returnArray = Array(billetBankObject.length)
     .fill()

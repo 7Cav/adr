@@ -1,6 +1,7 @@
 import Link from "next/link";
 import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
+import GetApiTimestamp from "../reusableModules/getApiTimestamp";
 import AdrListEntry from "./modules/AdrListEntry";
 import Logo from "../theme/adrLogo";
 import "./page.css";
@@ -10,6 +11,7 @@ export const metadata = {
   title: "Active Duty Roster",
 };
 
+// look into moving this into the API calls
 let milpacArray = [];
 
 milpacArray.push({
@@ -35,59 +37,18 @@ export default async function ActiveDutyRoster() {
                     />
                   </Link>
                 </div>
-                {/* Data Age Warning NEEDS REWORK */}
                 <div className="p-nav-info">
-                  {/*{cacheTime && cacheTime.combat !== null && (
+                  {GetApiTimestamp && GetApiTimestamp[0].combat !== null && (
                     <div className="cache-time">
-                      Combat Roster Age: {cacheTime.combat} minutes old
+                      Database is {GetApiTimestamp[0].combat} minutes old
                     </div>
                   )}
-                  {cacheTime && cacheTime.reserve !== null && (
-                    <div className="cache-time">
-                      Reserve Roster Age: {cacheTime.reserve} minutes old
-                    </div>
-                  )} */}
                 </div>
               </div>
             </div>
           </nav>
         </div>
       </div>
-      {/*            Need to set Loading cases and Error Cases to reactivate this section
-        loading ? (
-        <div className="loading-container">
-          <div className="gif-spinner-wrapper">
-            <div className="spinner"></div>
-            <img
-              className="p-loading-png"
-              src={require("../style/themes/7cav/hamster-hamtaro.gif")}
-              alt="Loading"
-            />
-          </div>
-        </div>
-      ) : error ? (
-        <div className="error-container">
-          <div className="error-wrapper">
-            <div>
-              <ErrorMessage message={error.message} />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="ListContainer">
-            note: bBGroup = Billet Bank Group
-            <AdrListEntry bBGroup={"regi"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"oneSeven"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"twoSeven"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"acd"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"imo"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"secOps"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"roo"} milpacArray={milpacArray} />
-            <AdrListEntry bBGroup={"support"} milpacArray={milpacArray} />
-          </div>
-        </>
-      ) */}
       <div className="ListContainer">
         {/* note: bBGroup = Billet Bank Group */}
         <AdrListEntry bBGroup={"regi"} milpacArray={milpacArray} />
