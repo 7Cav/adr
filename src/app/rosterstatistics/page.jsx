@@ -9,6 +9,10 @@ const Statistics = dynamic(() => import("./modules/statistics"), {
   ssr: false,
 });
 
+export const metadata = {
+  title: "Roster Statistics",
+};
+
 // look into moving this into the API calls
 let milpacArray = [];
 
