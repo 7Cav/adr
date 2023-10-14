@@ -1,6 +1,6 @@
 import React from "react";
 import MilpacParse from "./MilpacParse";
-import lists from "./BilletBank";
+import lists from "../../reusableModules/BilletBank";
 
 function AdrListEntry(props) {
   let billetBankObject = lists.billetBankObject;
