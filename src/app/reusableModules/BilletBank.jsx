@@ -575,7 +575,7 @@ const roo = {
 const secOpsCommand = ["2", "62"]; //Interesting case for Kleinmen, will need to be renamed to a new billetID if he ever leaves
 const jag = ["584"];
 const mp = ["168", "169", "170", "171", "172", "173"];
-const s2 = ["161", "162", "163", "164", "165", "166"];
+const s2 = ["161", "162", "163", "164", "165", "166", "771"];
 
 const secOps = {
   positionIds: [secOpsCommand, jag, mp, s2],
