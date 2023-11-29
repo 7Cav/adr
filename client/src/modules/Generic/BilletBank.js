@@ -465,65 +465,16 @@ const charlie3 = [
   "671",
   "672",
 ];
-const delta3 = [
-  "538",
-  "698",
-  "699",
-  "700",
-  "701",
-  "702",
-  "704",
-  "705",
-  "706",
-  "712",
-  "713",
-  "714",
-  "715",
-  "716",
-  "717",
-  "718",
-  "719",
-  "720",
-  "707",
-  "708",
-  "709",
-  "710",
-  "711",
-  "721",
-  "722",
-  "723",
-  "724",
-  "725",
-  "726",
-  "727",
-  "728",
-  "729",
-  "739",
-  "740",
-  "741",
-];
-const echo3 = [];
 const starterPlatoon = ["759"];
 const futureC = ["753"];
 
 const acd = {
-  positionIds: [
-    acdCommand,
-    alpha3,
-    bravo3,
-    charlie3,
-    delta3,
-    echo3,
-    starterPlatoon,
-    futureC,
-  ],
+  positionIds: [acdCommand, alpha3, bravo3, charlie3, starterPlatoon, futureC],
   positionTitles: [
     "ACD Headquarters",
     "Alpha Company",
     "Bravo Company",
     "Charlie Company",
-    "Delta Company",
-    "Echo Company",
     "Star Citizen Starter Platoon",
     "Future Concepts Center",
   ],
@@ -624,7 +575,7 @@ const roo = {
 const secOpsCommand = ["2", "62"]; //Interesting case for Kleinmen, will need to be renamed to a new billetID if he ever leaves
 const jag = ["584"];
 const mp = ["168", "169", "170", "171", "172", "173"];
-const s2 = ["161", "162", "163", "164", "165", "166"];
+const s2 = ["161", "162", "163", "164", "165", "166", "771"];
 
 const secOps = {
   positionIds: [secOpsCommand, jag, mp, s2],
@@ -778,8 +729,6 @@ const billetBank = {
   alpha3,
   bravo3,
   charlie3,
-  delta3,
-  echo3,
   starterPlatoon,
 };
 
