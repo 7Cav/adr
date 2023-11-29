@@ -3,7 +3,7 @@ As such, if there are new billets added to the website, this document should be 
 
 ********************************** CHANGE LOG *********************************************************
 Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCIAL MEDIA
-
+Vercin.G - 11-19-23 - Added S2 Assistant
 
 
 ********************************** END CHANGE LOG *********************************************************
@@ -388,6 +388,8 @@ Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCI
 /165/edit">S2 Investigator</a></td>
 
 /166/edit">S2 Investigator IT</a></td>
+
+771 = S2 Assistant
 
 /167/edit">----------MP DEPARTMENT----------</a></td>
 
