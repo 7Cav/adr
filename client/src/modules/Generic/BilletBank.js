@@ -470,7 +470,15 @@ const starterPlatoon2 = ["780", "781", "782"];
 const futureC = ["753"];
 
 const acd = {
-  positionIds: [acdCommand, alpha3, bravo3, charlie3, starterPlatoon, starterPlatoon2, futureC],
+  positionIds: [
+    acdCommand,
+    alpha3,
+    bravo3,
+    charlie3,
+    starterPlatoon,
+    starterPlatoon2,
+    futureC,
+  ],
   positionTitles: [
     "ACD Headquarters",
     "Alpha Company",
