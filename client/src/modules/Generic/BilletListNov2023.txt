@@ -4,7 +4,7 @@ As such, if there are new billets added to the website, this document should be 
 ********************************** CHANGE LOG *********************************************************
 Strider.R - 07-26-23 - Added S3 DCS, S3 SQUAD, S7 SQUAD, D/ACD, 2/A/ACD, S5 SOCIAL MEDIA
 Vercin.G - 11-19-23 - Added S2 Assistant
-
+Vercin.G - 12-13-23 - Added SWRPG SP Billets
 
 ********************************** END CHANGE LOG *********************************************************
 
@@ -1306,7 +1306,9 @@ Vercin.G - 11-19-23 - Added S2 Assistant
 
 759/edit">Star Citizen Start-Up
 
-
+780 Start Citizen SL
+781 Start Citizen ASL
+782 SWRPG Start up 
 
 /193/edit">New Recruit</a></td>
 
