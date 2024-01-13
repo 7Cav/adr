@@ -1,0 +1,27 @@
+{
+  "name": "cavapps",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "apexcharts": "^3.43.0",
+    "axios": "^0.25.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "next": "13.5.4",
+    "react": "^18",
+    "react-apexcharts": "^1.4.1",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10",
+    "postcss": "^8",
+    "tailwindcss": "^3"
+  }
+}
