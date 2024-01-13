@@ -1,15 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: BUILD_CHECK
+name: BETA_BUILD_CHECK
 
 # Controls when the workflow will run
 on:
   pull_request:
     branches:
-      - main
+      - beta
     paths:
-      - ".github/workflows/client_adr_push.yml"
-      - "client/**"
+      - ".github/workflows/beta_client_adr_push.yml"
+      - "src/app/**"
       - "config/client/**"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

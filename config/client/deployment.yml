@@ -17,7 +17,7 @@ spec:
         - name: adr-client
           image: <IMAGE>
           ports:
-            - containerPort: 8080
+            - containerPort: 8090
           env:
             - name: REACT_APP_CLIENT_TOKEN
               valueFrom:
@@ -37,8 +37,8 @@ spec:
   ports:
     - name: http
       protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8090
+      targetPort: 8090
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
@@ -54,11 +54,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "apps.7cav.us"
+        - "beta.apps.7cav.us"
       secretName: letsencrypt-adr-client
   ingressClassName: nginx
   rules:
-    - host: apps.7cav.us
+    - host: beta.apps.7cav.us
       http:
         paths:
           - path: /
