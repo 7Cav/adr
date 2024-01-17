@@ -34,12 +34,12 @@ jobs:
 
       - name: Install Dependancies
         run: npm i
-        working-directory: client
+        working-directory: src/app
 
       - name: Update Browserlist
         run: npx browserslist@latest --update-db
-        working-directory: client
+        working-directory: src/app
 
       - name: Build Client to Prod
         run: npm run build
-        working-directory: client
+        working-directory: src/app
