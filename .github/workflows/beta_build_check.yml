@@ -6,7 +6,7 @@ name: BETA_BUILD_CHECK
 on:
   pull_request:
     branches:
-      - beta
+      - Development
     paths:
       - ".github/workflows/beta_client_adr_push.yml"
       - "src/app/**"

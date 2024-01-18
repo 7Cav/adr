@@ -6,7 +6,7 @@ name: BETA_CLIENT_ADR_PUSH
 on:
   push:
     branches:
-      - beta
+      - Development
     paths:
       - ".github/workflows/beta_client_adr_push.yml"
       - "src/app/**"
@@ -36,18 +36,18 @@ jobs:
 
       - name: Install Dependancies
         run: npm i
-        working-directory: client
+        working-directory: src/app
 
       - name: Update Browserlist
         run: npx browserslist@latest --update-db
-        working-directory: client
+        working-directory: src/app
 
       - name: Build Client to Prod
         run: npm run build
-        working-directory: client
+        working-directory: src/app
 
       - name: Build client Image
-        run: docker build --file ./client/Dockerfile --tag registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7) .
+        run: docker build --file ./src/app/Dockerfile --tag registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7) .
 
       - name: Instal doctl
         uses: digitalocean/action-doctl@v2
