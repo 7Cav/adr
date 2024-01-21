@@ -22,6 +22,7 @@ jobs:
       REACT_APP_CLIENT_TOKEN: ${{ secrets.CLIENT_TOKEN }}
       REACT_APP_COMBAT_API_URL: "https://bff.apps.7cav.us/roster/combat"
       REACT_APP_RESERVE_API_URL: "https://bff.apps.7cav.us/roster/reserve"
+      REACT_APP_CACHE_TIMESTAMP_URL: "http://localhost:4000/cache-timestamp"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
