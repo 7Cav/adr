@@ -9,7 +9,7 @@ on:
       - Development
     paths:
       - ".github/workflows/beta_client_adr_push.yml"
-      - "src/app/**"
+      - "src/**"
       - "config/client/**"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -34,11 +34,11 @@ jobs:
 
       - name: Install Dependancies
         run: npm i
-        working-directory: src/app
+        working-directory: src
 
       - name: Update Browserlist
         run: npx browserslist@latest --update-db
-        working-directory: src/app
+        working-directory: src
 
       - name: Build Client to Prod
         run: npm run build
