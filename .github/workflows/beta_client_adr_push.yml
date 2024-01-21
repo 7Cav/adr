@@ -44,7 +44,7 @@ jobs:
 
       - name: Build Client to Prod
         run: npm run build
-        working-directory: src/app
+        working-directory: src
 
       - name: Build client Image
         run: docker build --file ./src/app/Dockerfile --tag registry.digitalocean.com/s6containers/adr_client:$(echo $GITHUB_SHA | head -c7) .
