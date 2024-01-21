@@ -42,5 +42,5 @@ jobs:
         working-directory: src
 
       - name: Build Client to Prod
-        run: npm run build
+        run: npm run dev
         working-directory: src
