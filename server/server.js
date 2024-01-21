@@ -14,7 +14,9 @@ const corsOptions = {
       "http://apps.7cav.us",
       "https://apps.7cav.us",
       "https://apps.7cav.us/",
+      "http://beta.apps.7cav.us",
       "https://beta.apps.7cav.us",
+      "https://beta.apps.7cav.us/",
     ];
     if (allowlist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
