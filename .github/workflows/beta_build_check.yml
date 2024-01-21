@@ -18,7 +18,7 @@ jobs:
   client_deployment:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    env:
+    env.local:
       REACT_APP_CLIENT_TOKEN: ${{ secrets.CLIENT_TOKEN }}
       REACT_APP_COMBAT_API_URL: "https://bff.apps.7cav.us/roster/combat"
       REACT_APP_RESERVE_API_URL: "https://bff.apps.7cav.us/roster/reserve"
