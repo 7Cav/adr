@@ -1,16 +1,9 @@
 # This is a basic workflow to help you get started with Actions
 
-name: BETA_CLIENT_ADR_PUSH
+name: BETA_CLIENT_MANUAL_DEPLOY
 
 # Controls when the workflow will run
 on:
-  push:
-    branches:
-      - Development
-    paths:
-      - ".github/workflows/beta_client_adr_push.yml"
-      - "src/app/**"
-      - "config/client/**"
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
