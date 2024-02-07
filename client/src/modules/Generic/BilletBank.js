@@ -465,8 +465,8 @@ const charlie3 = [
   "671",
   "672",
 ];
-const starterPlatoon = ["759"];
-const starterPlatoon2 = ["780", "781", "782"];
+const starterPlatoon = ["780", "781", "759"];
+const starterPlatoon2 = ["782", "786", "787"];
 const futureC = ["753"];
 
 const acd = {
