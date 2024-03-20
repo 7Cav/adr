@@ -49,7 +49,15 @@ class Statistics extends Component {
             colors: ["#222222"],
             width: 1.5,
           },
-          colors: ["#109640", "#b61217", "#2a487c", "#ebc729", "#e68c08"],
+          colors: [
+            "#109640",
+            "#b61217",
+            "#2a487c",
+            "#ebc729",
+            "#e68c08",
+            "#d62466",
+            "#8924d6",
+          ],
           plotOptions: {
             pie: {
               donut: {
@@ -100,20 +108,27 @@ class Statistics extends Component {
             width: 1.5,
           },
           colors: [
-            "#109640",
-            "#b61217",
-            "#b61217",
-            "#b61217",
-            "#b61217",
-            "#2a487c",
-            "#2a487c",
-            "#2a487c",
-            "#2a487c",
-            "#ebc729",
-            "#ebc729",
-            "#ebc729",
-            "#ebc729",
-            "#ebc729",
+            "#109640", // Genstaff
+            "#b61217", // 1-7 Command
+            "#b61217", // A/1-7
+            "#b61217", // B/1-7
+            "#b61217", // C/1-7
+            "#2a487c", // 2-7 Command
+            "#2a487c", // A/2-7
+            "#2a487c", // B/2-7
+            "#2a487c", // C/2-7
+            "#2a487c", // E/2-7
+            "#ebc729", // 3-7 Command
+            "#ebc729", // A/2-7
+            "#ebc729", // B/2-7
+            "#ebc729", // C/2-7
+            "#d62466", // ACD Command
+            "#d62466", // A/ACD
+            "#d62466", // B/ACD
+            "#d62466", // C/ACD
+            "#d62466", // Star Citizen SP
+            "#d62466", // Star Wars RPG SP
+            "#d62466", // Counter Strike SP
           ],
           plotOptions: {
             pie: {
