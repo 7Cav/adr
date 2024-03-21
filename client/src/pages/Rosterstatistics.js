@@ -132,11 +132,18 @@ const StatisticsPage = (props) => {
                   lists.alpha2,
                   lists.bravo2,
                   lists.charlie2,
-                  lists.acdCommand,
+                  lists.echo2,
+                  lists.threeSevenCommand,
                   lists.alpha3,
                   lists.bravo3,
                   lists.charlie3,
+                  lists.acdCommand,
+                  lists.alpha4,
+                  lists.bravo4,
+                  lists.charlie4,
                   lists.starterPlatoon,
+                  lists.starterPlatoon2,
+                  lists.starterPlatoon3,
                 ]}
                 labelArray={[
                   "General Staff",
@@ -148,11 +155,18 @@ const StatisticsPage = (props) => {
                   "Alpha Company 2-7",
                   "Bravo Company 2-7",
                   "Charlie Company 2-7",
+                  "Echo Company 2-7",
+                  "3-7 Headquarters",
+                  "Alpha Company 3-7",
+                  "Bravo Company 3-7",
+                  "Charlie Company 3-7",
                   "ACD Headquarters",
                   "Alpha Company ACD",
                   "Bravo Company ACD",
                   "Charlie Company ACD",
-                  "Star Citizen Starter Platoon",
+                  "Star Citizen SP",
+                  "Star Wars RPG SP",
+                  "Counter Strike 2 SP",
                 ]}
                 milpacArray={milpacArray}
                 useRegiLogic={true}
@@ -185,10 +199,31 @@ const StatisticsPage = (props) => {
                   lists.alpha2,
                   lists.bravo2,
                   lists.charlie2,
+                  lists.echo2,
                 ]}
                 centerLabel={"Total 2-7 Strength"}
                 labelArray={[
                   "2-7 Headquarters",
+                  "Able Company",
+                  "Baker Company",
+                  "Charlie Company",
+                  "Easy Company",
+                ]}
+                milpacArray={milpacArray}
+              />
+            </div>
+            <div className="threeSevenBreakdown">
+              <div className="Subtitle">Third Battalion</div>
+              <Statistics
+                billetIDs={[
+                  lists.threeSevenCommand,
+                  lists.alpha3,
+                  lists.bravo3,
+                  lists.charlie3,
+                ]}
+                centerLabel={"Total Third Battalion Strength"}
+                labelArray={[
+                  "3-7 Headquarters",
                   "Alpha Company",
                   "Bravo Company",
                   "Charlie Company",
@@ -201,10 +236,12 @@ const StatisticsPage = (props) => {
               <Statistics
                 billetIDs={[
                   lists.acdCommand,
-                  lists.alpha3,
-                  lists.bravo3,
-                  lists.charlie3,
+                  lists.alpha4,
+                  lists.bravo4,
+                  lists.charlie4,
                   lists.starterPlatoon,
+                  lists.starterPlatoon2,
+                  lists.starterPlatoon3,
                 ]}
                 centerLabel={"Total ACD Strength"}
                 labelArray={[
@@ -212,7 +249,9 @@ const StatisticsPage = (props) => {
                   "Alpha Company",
                   "Bravo Company",
                   "Charlie Company",
-                  "Star Citizen Starter Platoon",
+                  "Star Citizen SP",
+                  "Star Wars RPG SP",
+                  "Counter Strike 2 SP",
                 ]}
                 milpacArray={milpacArray}
               />
