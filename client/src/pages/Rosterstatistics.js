@@ -85,7 +85,7 @@ const StatisticsPage = (props) => {
       <div className="DepartmentContainer">
         <h4>
           Please note, the Statistics app is currently pending rewrite by S6.
-          The values, while accurate, only apply to Active Duty Personell
+          The values, while accurate, only apply to active duty personnel
         </h4>
       </div>
       {cacheTime && cacheTime.combat !== null && (
@@ -221,7 +221,7 @@ const StatisticsPage = (props) => {
                   lists.bravo3,
                   lists.charlie3,
                 ]}
-                centerLabel={"Total Third Battalion Strength"}
+                centerLabel={"Total 3-7 Strength"}
                 labelArray={[
                   "3-7 Headquarters",
                   "Alpha Company",
