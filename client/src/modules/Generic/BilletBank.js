@@ -13,6 +13,7 @@ const regiCommand = [
   "62",
   "676",
   "743",
+  "772",
 ];
 
 const regi = {
@@ -698,64 +699,18 @@ const acd = {
   collapsibleTitle: "Auxillary Combat Division",
 };
 
-//IMO
+//IMO - OLD CODE KEPT HERE FOR POSTERERY SAKE
 
-const imoCommand = ["5", "9"];
-const s1 = [
-  "7",
-  "8",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31",
-  "32",
-  "33",
-  "34",
-  "35",
-  "36",
-  "37",
-];
-const s6 = [
-  "50",
-  "51",
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "57",
-  "58",
-  "59",
-  "774",
-  "775",
-  "776",
-  "777",
-  "778",
-  "779",
-];
-const wag = ["39", "40", "41", "42", "43", "44", "45", "46", "47", "48"];
-
-const imo = {
-  positionIds: [imoCommand, s1, s6, wag],
-  positionTitles: [
-    "Information Management Command",
-    "S1 - Administration",
-    "S6 - Information Management",
-    "Wiki Administration Group",
-  ],
-  collapsibleTitle: "Information Management Office",
-};
+// const imo = {
+//   positionIds: [imoCommand, s1, s6, wag],
+//   positionTitles: [
+//     "Information Management Command",
+//     "S1 - Administration",
+//     "S6 - Information Management",
+//     "Wiki Administration Group",
+//   ],
+//   collapsibleTitle: "Information Management Office",
+// };
 
 //ROO
 
@@ -824,6 +779,34 @@ const secOps = {
 
 //Support
 
+const spd = ["175", "176"];
+
+const s1 = [
+  "7",
+  "8",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31",
+  "32",
+  "33",
+  "34",
+  "35",
+  "36",
+  "37",
+];
+
 const s3 = [
   "134",
   "135",
@@ -863,6 +846,26 @@ const s3 = [
   "646",
   "647",
   "648",
+];
+
+const s6 = [
+  "50",
+  "51",
+  "52",
+  "53",
+  "54",
+  "55",
+  "56",
+  "57",
+  "58",
+  "59",
+  "773",
+  "774",
+  "775",
+  "776",
+  "777",
+  "778",
+  "779",
 ];
 
 const s7 = [
@@ -924,15 +927,18 @@ const s7 = [
   "680",
 ];
 const ld = ["126", "127", "128", "129", "130", "131", "132", "539"];
-const spd = ["175", "176"];
+const wag = ["39", "40", "41", "42", "43", "44", "45", "46", "47", "48"];
 
 const support = {
-  positionIds: [spd, s3, s7, ld],
+  positionIds: [s1, s3, s6, s7, ld, spd, wag],
   positionTitles: [
-    "Special Projects Division",
+    "S1 - Administration",
     "S3 - Operations",
+    "S6 - Information Management",
     "S7 - Training",
     "Leadership Development",
+    "Special Projects Division",
+    "Wiki Administration Group",
   ],
   collapsibleTitle: "Support Departments",
 };
@@ -945,7 +951,7 @@ const billetBankObject = {
   twoSeven: twoSeven,
   threeSeven: threeSeven,
   acd: acd,
-  imo: imo,
+  // imo: imo,
   secOps: secOps,
   roo: roo,
   support: support,
