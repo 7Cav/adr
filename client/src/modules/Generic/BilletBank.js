@@ -699,7 +699,7 @@ const acd = {
   collapsibleTitle: "Auxillary Combat Division",
 };
 
-//IMO - OLD CODE KEPT HERE FOR POSTERERY SAKE
+//IMO - OLD CODE KEPT HERE FOR POSTERITY SAKE
 
 // const imo = {
 //   positionIds: [imoCommand, s1, s6, wag],
