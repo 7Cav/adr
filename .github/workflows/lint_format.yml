@@ -21,7 +21,7 @@ jobs:
       - name: Checkout the Repo
         uses: actions/checkout@v3
 
-      - name: Prettiier
+      - name: Prettier
         uses: creyD/prettier_action@v4.3
         with:
           prettier_options: "--check {**/*,*}.{js,jsx,json,html,css,yml,yaml}"

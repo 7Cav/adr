@@ -14,6 +14,9 @@ const corsOptions = {
       "http://apps.7cav.us",
       "https://apps.7cav.us",
       "https://apps.7cav.us/",
+      "http://beta.apps.7cav.us",
+      "https://beta.apps.7cav.us",
+      "https://beta.apps.7cav.us/",
     ];
     if (allowlist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
@@ -44,7 +47,7 @@ app.use(
 app.use("/roster", checkToken, middleware);
 app.get("/", (req, res) => {
   res.send(
-    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://adr.7cav.us/"
+    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/"
   );
 });
 
