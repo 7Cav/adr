@@ -10,8 +10,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-key: ${{ secrets.THE_KEY }}
+          ssh-private-key: ${{ secrets.THE_KEY }}
 
       - name: Deploy to Server
         run: |
