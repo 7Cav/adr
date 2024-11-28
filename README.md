@@ -2,8 +2,7 @@
 
 ## Overview
 
-[![Server ADR Deployment](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/server_adr_push.yml)
-[![Client ADR Deployment](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml/badge.svg)](https://github.com/7Cav/adr/actions/workflows/client_adr_push.yml)
+[![Development Deployment](https://github.com/7Cav/adr/actions/workflows/dev_deploy.yml/badge.svg)](https://beta.apps.7cav.us/)
 
 7th Cavalry Apps (CavApps) is a Nextjs based collection of tools and apps designed to aid the 7th Cavalry Gaming Regiment in its day to day functions. In its current form, CavApps currently includes the Active Duty Roster (ADR) and a small collection of Roster Statistics. Future iterations of CavApps can include a more advanced statistics tool, an AWOL tracker, and a potential migration of S1 Documents among other possible tools. CavApps is currently structured as a Frontend-Backend architecture and includes basic authentication for enhanced security.
 
@@ -14,14 +13,14 @@ The live deployment can be found at https://apps.7cav.us/ and the backend at htt
 ## Table of Contents
 
 - [Running Locally](#running-locally)
-  - [Requirements](#requirements)
-    - [Authorization](#authorization)
-  - [Getting Started](#getting-started)
+    - [Requirements](#requirements)
+        - [Authorization](#authorization)
+    - [Getting Started](#getting-started)
 - [Updating the ADR](#updating-the-adr)
-  - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
-  - [Add New Category](#add-new-category)
+    - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
+    - [Add New Category](#add-new-category)
 - [Server Deployment](#server-deployment)
-  - [Requirements](#requirements-1)
+    - [Requirements](#requirements-1)
 - [Roster Statistics](#roster-statistics)
 - [Future Goals](#future-goals)
 
@@ -121,12 +120,12 @@ To introduce a new category, both `BilletBank.jsx` and `page.jsx` located in `ca
 
 1. **In `BilletBank.jsx`:**
 
-   - Add a new array for each subcategory and populate it with the requred billet IDs.
-   - Add a new object for the new category and append the subcategories as well as their titles to the new object. additionally, add a `collapsibleTitle` with the name of the new category into the object.
-   - Add the new object to the billetbank object at the bottom of the file
+    - Add a new array for each subcategory and populate it with the requred billet IDs.
+    - Add a new object for the new category and append the subcategories as well as their titles to the new object. additionally, add a `collapsibleTitle` with the name of the new category into the object.
+    - Add the new object to the billetbank object at the bottom of the file
 
 2. **In `adr/page.jsx`:**
-   - Create a new `AdrListEntry` with the bBGroup value set to a string containing title of the new Object
+    - Create a new `AdrListEntry` with the bBGroup value set to a string containing title of the new Object
 
 #### Example:
 
@@ -143,24 +142,24 @@ const bravo3 = ['7','8','9']
 const charlie3 = ['10','11','12']
 
 const threeSeven = {
-  positionIds: [threeSevenCommand, alpha3, bravo3, charlie3],
-  positionTitles: [
-    "3-7 Headquarters",
-    "Alpha Company",
-    "Bravo Company",
-    "Charlie Company",
-  ],
-  collapsibleTitle: "Third Battalion",
+    positionIds: [threeSevenCommand, alpha3, bravo3, charlie3],
+    positionTitles: [
+        "3-7 Headquarters",
+        "Alpha Company",
+        "Bravo Company",
+        "Charlie Company",
+    ],
+    collapsibleTitle: "Third Battalion",
 };
 
 ...
 
 const billetBankObject = {
-  regi: regi,
-  oneSeven: oneSeven,
-  twoSeven: twoSeven,
-  threeSeven: threeSeven,
-  ...
+    regi: regi,
+    oneSeven: oneSeven,
+    twoSeven: twoSeven,
+    threeSeven: threeSeven,
+    ...
 };
 ```
 
@@ -186,15 +185,15 @@ const billetBankObject = {
 In order to deploy CavApps on a server, you need the following:
 
 - A linux (preferably ubuntu) based server with the following:
-  - Access via SSH
-  - Sudo level permissions
-  - Minimum 2GB RAM
+    - Access via SSH
+    - Sudo level permissions
+    - Minimum 2GB RAM
 - Alongside the following packages:
 
-  - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
-  - nodejs
-  - npm
-  - git
+    - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+    - nodejs
+    - npm
+    - git
 
   ```
   sudo apt install git npm nodejs
