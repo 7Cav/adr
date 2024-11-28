@@ -35,10 +35,6 @@ services:
     networks:
       edge:
 
-  redis:
-    image: "redis:alpine"
-
-
 networks:
   edge:
     external: true
