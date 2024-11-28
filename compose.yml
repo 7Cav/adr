@@ -6,8 +6,6 @@ services:
       - ./client/.env
     volumes:
       - ./server:/app
-    ports:
-      - "4001:4000"
     working_dir: /app
     command: /bin/sh -c "apk add curl && npm install && node server.js"
     healthcheck:
@@ -23,8 +21,6 @@ services:
     image: node:lts-alpine
     volumes:
       - ./client:/app
-    ports:
-      - "3001:3000"
     env_file:
       - ./client/.env
     depends_on:
