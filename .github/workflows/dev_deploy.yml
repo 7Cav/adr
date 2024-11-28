@@ -20,7 +20,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no thehub@traycer.7cav.us << 'EOF'
           cd /etc/compose/apps-beta/adr
-          git pull origin development
+          git fetch origin
+          git reset --hard origin/development
           cd /etc/compose/apps-beta/
           docker compose down
           docker compose up -d
