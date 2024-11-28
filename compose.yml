@@ -7,7 +7,7 @@ services:
     volumes:
       - ./server:/app
     ports:
-      - "4000:4000"
+      - "4001:4000"
     working_dir: /app
     command: /bin/sh -c "apk add curl && npm install && node server.js"
     healthcheck:
@@ -15,6 +15,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    networks:
+      edge:
 
   client:
     container_name: adr-client
@@ -22,7 +24,7 @@ services:
     volumes:
       - ./client:/app
     ports:
-      - "80:3000"
+      - "3001:3000"
     env_file:
       - ./client/.env
     depends_on:
@@ -30,10 +32,14 @@ services:
         condition: service_healthy
     command: /bin/sh -c "npm install && npm run build && npm run start"
     working_dir: /app
+    networks:
+      edge:
+
   redis:
     image: "redis:alpine"
 
+
 networks:
-  mynetwork:
-    driver: bridge
+  edge:
     external: true
+    name: edge
