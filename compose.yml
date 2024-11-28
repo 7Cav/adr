@@ -1,0 +1,37 @@
+services:
+  server:
+    container_name: adr-server
+    image: node:lts-alpine
+    env_file:
+      - ./client/.env
+    volumes:
+      - ./server:/app
+    working_dir: /app
+    command: /bin/sh -c "apk add curl && npm install && node server.js"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://server:4000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      edge:
+
+  client:
+    container_name: adr-client
+    image: node:lts-alpine
+    volumes:
+      - ./client:/app
+    env_file:
+      - ./client/.env
+    depends_on:
+      server:
+        condition: service_healthy
+    command: /bin/sh -c "npm install && npm run build && npm run start"
+    working_dir: /app
+    networks:
+      edge:
+
+networks:
+  edge:
+    external: true
+    name: edge
