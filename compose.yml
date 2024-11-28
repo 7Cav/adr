@@ -1,3 +1,5 @@
+name: apps
+
 services:
   server:
     container_name: adr-server

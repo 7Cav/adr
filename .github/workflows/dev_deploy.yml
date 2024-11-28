@@ -1,0 +1,27 @@
+name: Development Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.THE_KEY }}
+
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no thehub@traycer.7cav.us << 'EOF'
+          cd /etc/compose/apps-beta/adr
+          git pull origin development
+          cd /etc/compose/apps-beta/
+          docker compose down
+          docker compose up -d
+          EOF
