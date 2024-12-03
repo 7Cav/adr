@@ -13,6 +13,7 @@ const regiCommand = [
   "62",
   "676",
   "743",
+  "772",
 ];
 
 const regi = {
@@ -341,22 +342,230 @@ const charlie2 = [
   "478",
   "479",
 ];
+const echo2 = [
+  "480",
+  "481",
+  "482",
+  "483",
+  "484",
+  "485",
+  "486",
+  "487",
+  "488",
+  "489",
+  "490",
+  "491",
+  "492",
+  "493",
+  "494",
+  "495",
+  "496",
+  "497",
+  "498",
+  "499",
+  "500",
+  "501",
+  "502",
+  "503",
+  "504",
+  "505",
+  "506",
+  "507",
+  "508",
+  "509",
+  "510",
+  "511",
+  "512",
+  "513",
+  "514",
+  "515",
+  "516",
+  "517",
+  "518",
+  "519",
+  "520",
+  "521",
+  "522",
+  "523",
+  "524",
+];
 
 const twoSeven = {
-  positionIds: [twoSevenCommand, alpha2, bravo2, charlie2],
+  positionIds: [twoSevenCommand, alpha2, bravo2, charlie2, echo2],
   positionTitles: [
     "2-7 Headquarters",
-    "Alpha Company",
-    "Bravo Company",
+    "Able Company",
+    "Baker Company",
     "Charlie Company",
+    "Easy Company",
   ],
   collapsibleTitle: "Second Battalion",
 };
 
+//3-7
+
+const threeSevenCommand = ["796", "797", "798"];
+const alpha3 = [
+  "799",
+  "800",
+  "801",
+  "802",
+  "803",
+  "804",
+  "805",
+  "806",
+  "807",
+  "808",
+  "809",
+  "810",
+  "811",
+  "812",
+  "813",
+  "814",
+  "815",
+  "816",
+  "817",
+  "818",
+  "819",
+  "820",
+  "821",
+  "822",
+  "823",
+  "824",
+  "825",
+  "826",
+  "827",
+  "828",
+  "829",
+  "830",
+  "831",
+  "832",
+  "833",
+  "834",
+  "835",
+  "836",
+  "837",
+  "838",
+  "839",
+  "840",
+  "841",
+  "842",
+  "843",
+];
+
+// where were u wen 3-7 die?
+
+// const bravo3 = [
+//   "844",
+//   "845",
+//   "846",
+//   "847",
+//   "848",
+//   "849",
+//   "850",
+//   "851",
+//   "852",
+//   "853",
+//   "854",
+//   "855",
+//   "856",
+//   "857",
+//   "858",
+//   "859",
+//   "860",
+//   "861",
+//   "862",
+//   "863",
+//   "864",
+//   "865",
+//   "866",
+//   "867",
+//   "868",
+//   "869",
+//   "870",
+//   "871",
+//   "872",
+//   "873",
+//   "874",
+//   "875",
+//   "876",
+//   "877",
+//   "878",
+//   "879",
+//   "880",
+//   "881",
+//   "882",
+//   "883",
+//   "884",
+//   "885",
+//   "886",
+//   "887",
+//   "888",
+// ];
+// const charlie3 = [
+//   "889",
+//   "890",
+//   "891",
+//   "892",
+//   "893",
+//   "894",
+//   "895",
+//   "896",
+//   "897",
+//   "898",
+//   "899",
+//   "900",
+//   "901",
+//   "902",
+//   "903",
+//   "904",
+//   "905",
+//   "906",
+//   "907",
+//   "908",
+//   "909",
+//   "910",
+//   "911",
+//   "912",
+//   "913",
+//   "914",
+//   "915",
+//   "916",
+//   "917",
+//   "918",
+//   "919",
+//   "920",
+//   "921",
+//   "922",
+//   "923",
+//   "924",
+//   "925",
+//   "926",
+//   "927",
+//   "928",
+//   "929",
+//   "930",
+//   "931",
+//   "932",
+//   "933",
+// ];
+
+const threeSeven = {
+  //positionIds: [threeSevenCommand, alpha3, bravo3, charlie3],
+  positionIds: [threeSevenCommand, alpha3],
+  positionTitles: [
+    "3-7 Headquarters",
+    "Alpha Company",
+    //"Bravo Company",
+    //"Charlie Company",
+  ],
+  collapsibleTitle: "Third Battalion",
+};
+
 //ACD
 
-const acdCommand = ["552", "627", "645", "11"];
-const alpha3 = [
+const acdCommand = ["552", "627", "645", "11", "12"];
+const alpha4 = [
   "555",
   "556",
   "557",
@@ -407,7 +616,7 @@ const alpha3 = [
   "769",
   "770",
 ];
-const bravo3 = [
+const bravo4 = [
   "590",
   "591",
   "592",
@@ -446,7 +655,7 @@ const bravo3 = [
   "625",
   "626",
 ];
-const charlie3 = [
+const charlie4 = [
   "656",
   "657",
   "658",
@@ -464,91 +673,65 @@ const charlie3 = [
   "670",
   "671",
   "672",
+  "280",
+  "281",
+  "279",
+  "936",
+  "937",
+  "430",
+  "939",
+  "940",
+  "942",
+  "943",
+  "944",
+  "945",
+  "946",
+  "947",
+  "948",
+  "950",
+  "951",
 ];
-const starterPlatoon = ["759"];
-const starterPlatoon2 = ["780", "781", "782"];
+//const starterPlatoon = ["780", "781", "759"];
+//const starterPlatoon2 = ["782", "786", "787"];
+//const starterPlatoon3 = ["790"];
 const futureC = ["753"];
 
 const acd = {
   positionIds: [
     acdCommand,
-    alpha3,
-    bravo3,
-    charlie3,
-    starterPlatoon,
-    starterPlatoon2,
+    //alpha4,
+    bravo4,
+    charlie4,
+    //starterPlatoon,
+    //starterPlatoon2,
+    //starterPlatoon3,
     futureC,
   ],
   positionTitles: [
     "ACD Headquarters",
-    "Alpha Company",
+    //"Alpha Company",
     "Bravo Company",
     "Charlie Company",
-    "Star Citizen Starter Platoon",
-    "Star Wars RPG Starter Platoon",
+    //"Star Citizen Starter Platoon",
+    //"Star Wars RPG Starter Platoon",
+    //"Counter Strike Starter Platoon",
     "Future Concepts Center",
   ],
   collapsibleTitle: "Auxillary Combat Division",
 };
 
-//IMO
+//IMO - OLD CODE KEPT HERE FOR POSTERITY SAKE
 
-const imoCommand = ["5", "9"];
-const s1 = [
-  "7",
-  "8",
-  "17",
-  "18",
-  "19",
-  "20",
-  "21",
-  "22",
-  "23",
-  "24",
-  "25",
-  "26",
-  "27",
-  "28",
-  "29",
-  "30",
-  "31",
-  "32",
-  "33",
-  "34",
-  "35",
-  "36",
-  "37",
-];
-const s6 = [
-  "50",
-  "51",
-  "52",
-  "53",
-  "54",
-  "55",
-  "56",
-  "57",
-  "58",
-  "59",
-  "774",
-  "775",
-  "776",
-  "777",
-  "778",
-  "779",
-];
-const wag = ["39", "40", "41", "42", "43", "44", "45", "46", "47", "48"];
-
-const imo = {
-  positionIds: [imoCommand, s1, s6, wag],
-  positionTitles: [
-    "Information Management Command",
-    "S1 - Administration",
-    "S6 - Information Management",
-    "Wiki Administration Group",
-  ],
-  collapsibleTitle: "Information Management Office",
-};
+// const imo = {
+//   positionIds: [imoCommand, s1, s6, wag],
+//   positionTitles: [
+//     "Information Management Command",
+//     "S1 - Administration",
+//     "S6 - Information Management",
+//     "Wiki Administration Group",
+//   ],
+//   collapsibleTitle: "Information Management Office",
+// };
 
 //ROO
 
@@ -600,15 +783,15 @@ const roo = {
 //SecOps
 
 const secOpsCommand = ["2", "62"]; //Interesting case for Kleinmen, will need to be renamed to a new billetID if he ever leaves
-const jag = ["584"];
+//const jag = ["584"];
 const mp = ["168", "169", "170", "171", "172", "173"];
 const s2 = ["161", "162", "163", "164", "165", "166", "771"];
 
 const secOps = {
-  positionIds: [secOpsCommand, jag, mp, s2],
+  positionIds: [secOpsCommand, mp, s2],
   positionTitles: [
     "Security Operations Command",
-    "Judge Advocate General Corps",
+    //"Judge Advocate General Corps",
     "Military Police",
     "S2 - Intelligence and Security",
   ],
@@ -616,6 +799,34 @@ const secOps = {
 };
 
 //Support
+
+const spd = ["175", "176"];
+
+const s1 = [
+  "7",
+  "8",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "23",
+  "24",
+  "25",
+  "26",
+  "27",
+  "28",
+  "29",
+  "30",
+  "31",
+  "32",
+  "33",
+  "34",
+  "35",
+  "36",
+  "37",
+];
 
 const s3 = [
   "134",
@@ -656,6 +867,26 @@ const s3 = [
   "646",
   "647",
   "648",
+];
+
+const s6 = [
+  "50",
+  "51",
+  "52",
+  "53",
+  "54",
+  "55",
+  "56",
+  "57",
+  "58",
+  "59",
+  "773",
+  "774",
+  "775",
+  "776",
+  "777",
+  "778",
+  "779",
 ];
 
 const s7 = [
@@ -711,17 +942,25 @@ const s7 = [
   "642",
   "643",
   "644",
+  "677",
+  "678",
+  "679",
+  "680",
+  "682",
 ];
 const ld = ["126", "127", "128", "129", "130", "131", "132", "539"];
-const spd = ["175", "176"];
+const wag = ["39", "40", "41", "42", "43", "44", "45", "46", "47", "48"];
 
 const support = {
-  positionIds: [spd, s3, s7, ld],
+  positionIds: [s1, s3, s6, s7, ld, spd, wag],
   positionTitles: [
-    "Special Projects Division",
+    "S1 - Administration",
     "S3 - Operations",
+    "S6 - Information Management",
     "S7 - Training",
     "Leadership Development",
+    "Special Projects Division",
+    "Wiki Administration Group",
   ],
   collapsibleTitle: "Support Departments",
 };
@@ -732,8 +971,9 @@ const billetBankObject = {
   regi: regi,
   oneSeven: oneSeven,
   twoSeven: twoSeven,
+  threeSeven: threeSeven,
   acd: acd,
-  imo: imo,
+  // imo: imo,
   secOps: secOps,
   roo: roo,
   support: support,
@@ -752,11 +992,18 @@ const billetBank = {
   alpha2,
   bravo2,
   charlie2,
-  acdCommand,
+  echo2,
+  threeSevenCommand,
   alpha3,
-  bravo3,
-  charlie3,
-  starterPlatoon,
+  //bravo3,
+  //charlie3,
+  acdCommand,
+  alpha4,
+  bravo4,
+  charlie4,
+  //starterPlatoon,
+  //starterPlatoon2,
+  //starterPlatoon3,
 };
 
 export default billetBank;

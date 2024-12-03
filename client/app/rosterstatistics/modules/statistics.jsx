@@ -112,11 +112,13 @@ class Statistics extends Component {
             "#2a487c",
             "#2a487c",
             "#2a487c",
+            "#2a487c",
             "#ebc729",
             "#ebc729",
-            "#ebc729",
-            "#ebc729",
-            "#ebc729",
+            "#f7a8b8",
+            "#f7a8b8",
+            "#f7a8b8",
+            "#f7a8b8",
           ],
           plotOptions: {
             pie: {

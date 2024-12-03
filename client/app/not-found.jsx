@@ -13,10 +13,10 @@ export default function Error404() {
         Otherwise, please enjoy this sick music!
       </h3>
       <iframe
-        title="Aliens"
+        title="Vampires"
         width="420"
         height="315"
-        src="https://www.youtube.com/embed/4vkR1G_DUVc"
+        src="https://www.youtube.com/watch?v=QNrPkAS3utA"
       />
     </div>
   );
