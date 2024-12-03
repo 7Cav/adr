@@ -16,7 +16,7 @@ export default function Error404() {
         title="Vampires"
         width="420"
         height="315"
-        src="https://www.youtube.com/watch?v=QNrPkAS3utA"
+        src="https://www.youtube.com/embed/QNrPkAS3utA"
       />
     </div>
   );
