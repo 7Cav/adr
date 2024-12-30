@@ -5,7 +5,7 @@ const app = express();
 const cors = require("cors");
 const port = 4000;
 const { CLIENT_TOKEN } = require("./credentials/token");
-const { cacheTime } = require("./controllers/cacheManager");
+const { cacheTime, initializeCache } = require("./controllers/cacheManager");
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -55,6 +55,20 @@ app.get("/cache-timestamp", (req, res) => {
   res.json({ cacheTime });
 });
 
-app.listen(port, () => {
-  console.log(`Roster Server listening on ${port}`);
-});
+// Async function to initialize the server
+const startServer = async () => {
+  try {
+    console.log("Initializing cache...");
+    await initializeCache(); // Ensure cache initialization completes before proceeding
+    console.log("Cache initialized successfully.");
+
+    app.listen(port, () => {
+      console.log(`Roster Server listening on ${port}`);
+    });
+  } catch (error) {
+    console.error("Error initializing cache:", error);
+    process.exit(1); // Exit the process if initialization fails
+  }
+};
+
+startServer();
