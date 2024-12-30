@@ -1,9 +1,23 @@
 const axios = require("axios");
+const axiosRetry = require("axios-retry").default || require("axios-retry");
 const { API_TOKEN } = require("../credentials/token");
+
+let cacheStatus = {
+  combat: false,
+  reserve: false,
+};
 
 let cachedCombatRoster;
 let cachedReserveRoster;
 let cacheTime = {};
+
+axiosRetry(axios, {
+  retries: 5,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    return axiosRetry.isNetworkOrIdempotentRequestError(error);
+  },
+});
 
 const updateCombatRosterCache = async () => {
   try {
@@ -16,8 +30,10 @@ const updateCombatRosterCache = async () => {
     });
     cachedCombatRoster = response.data;
     cacheTime["combat"] = Date.now();
+    cacheStatus.combat = true;
   } catch (error) {
     console.error("Failed to update combat cache:", error);
+    cacheStatus.combat = false;
   }
 };
 
@@ -32,8 +48,10 @@ const updateReserveRosterCache = async () => {
     });
     cachedReserveRoster = response.data;
     cacheTime["reserve"] = Date.now();
+    cacheStatus.reserve = true;
   } catch (error) {
     console.error("Failed to update reserve cache:", error);
+    cacheStatus.reserve = false;
   }
 };
 
@@ -48,11 +66,26 @@ const scheduleCacheUpdate = (updateFunction) => {
   }, delay);
 };
 
-// Initialize the cache and schedule the updates
-updateCombatRosterCache();
-scheduleCacheUpdate(updateCombatRosterCache);
-updateReserveRosterCache();
-scheduleCacheUpdate(updateReserveRosterCache);
+const initializeCache = async () => {
+  try {
+    // Initial cache update
+    await updateCombatRosterCache();
+    await updateReserveRosterCache();
+
+    // Check if cache is valid
+    if (!cacheStatus["combat"] || !cacheStatus["reserve"]) {
+      console.error("Failed to initialize cache. Exiting...");
+      process.exit(1); // Exit to trigger Docker restart
+    }
+
+    // Schedule the updates
+    scheduleCacheUpdate(updateCombatRosterCache);
+    scheduleCacheUpdate(updateReserveRosterCache);
+  } catch (error) {
+    console.error("Critical error during cache initialization:", error);
+    process.exit(1); // Exit to trigger Docker restart
+  }
+};
 
 const getCachedCombatRoster = () => {
   return cachedCombatRoster;
@@ -66,4 +99,5 @@ module.exports = {
   getCachedCombatRoster,
   getCachedReserveRoster,
   cacheTime,
+  initializeCache
 };
