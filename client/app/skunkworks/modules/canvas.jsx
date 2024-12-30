@@ -8,6 +8,9 @@ const Canvas = (props) => {
     const uniformBase = new Image();
     uniformBase.src = "/skunkworks/uniformBase/uniformBase.png";
 
+    const uniformLapel = new Image();
+    uniformLapel.src = "/skunkworks/uniformBase/uniformRightLapel.png";
+
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.fillStyle = "#000000";
@@ -15,6 +18,7 @@ const Canvas = (props) => {
 
     uniformBase.onload = () => {
       context.drawImage(uniformBase, 0, 0);
+      context.drawImage(uniformLapel, 0, 0);
     };
   }, []);
 
