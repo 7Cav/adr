@@ -99,5 +99,5 @@ module.exports = {
   getCachedCombatRoster,
   getCachedReserveRoster,
   cacheTime,
-  initializeCache
+  initializeCache,
 };
