@@ -112,99 +112,99 @@ function getRankGrade(rankId) {
 
 function getAwardPriority(award) {
   switch (award) {
-    case "Brigadier General Krazee Lifetime Achievement Medal":
-      return 0;
-    case 'CSM Ronnie "Coldblud" Bussey Lifetime Achievement Medal':
+    case 'James "Krazee" Foster Lifetime Achievement Medal':
       return 1;
-    case "Army Distinguished Service Cross":
+    case 'Ronnie "Coldblud" Bussey Lifetime Achievement Medal':
       return 2;
-    case "Defense Distinguished Service Medal":
+    case "Army Distinguished Service Cross":
       return 3;
-    case "Army Distinguished Service Medal":
+    case "Defense Distinguished Service Medal":
       return 4;
-    case "Silver Star":
+    case "Army Distinguished Service Medal":
       return 5;
-    case "Defense Superior Service Medal":
+    case "Silver Star":
       return 6;
-    case "Legion of Merit":
+    case "Defense Superior Service Medal":
       return 7;
-    case "Distinguished Flying Cross":
+    case "Legion of Merit":
       return 8;
-    case "Soldier's Medal":
+    case "Distinguished Flying Cross":
       return 9;
+    case "Soldier's Medal":
+      return 10;
     case "Bronze Star with Valor":
     case "Bronze Star Medal":
     case "Bronze Star":
-      return 10;
-    case "Purple Heart":
       return 11;
-    case "Defense Meritorious Service Medal":
+    case "Purple Heart":
       return 12;
-    case "Meritorious Service Medal":
+    case "Defense Meritorious Service Medal":
       return 13;
-    case "Army Air Medal":
+    case "Meritorious Service Medal":
       return 14;
-    case "Joint Service Commendation Medal":
+    case "Army Air Medal":
       return 15;
+    case "Joint Service Commendation Medal":
+      return 16;
     case "Army Commendation Medal With Valor":
     case "Army Commendation Medal":
-      return 16;
-    case "Joint Service Achievement Medal":
       return 17;
-    case "Army Achievement Medal":
+    case "Joint Service Achievement Medal":
       return 18;
-    case "Prisoner of War Medal":
+    case "Army Achievement Medal":
       return 19;
-    case "Army Good Conduct Medal":
+    case "Prisoner of War Medal":
       return 20;
-    case "Armed Forces Expeditionary Medal":
+    case "Army Good Conduct Medal":
       return 21;
-    case "Afghanistan Campaign Medal":
+    case "Armed Forces Expeditionary Medal":
       return 22;
-    case "Iraq Campaign Medal":
+    case "Afghanistan Campaign Medal":
       return 23;
-    case "Global War on Terrorism Expeditionary Medal":
+    case "Iraq Campaign Medal":
       return 24;
-    case "National Defense Service Medal":
+    case "Global War on Terrorism Expeditionary Medal":
       return 25;
-    case "Armed Forces Service Medal":
+    case "National Defense Service Medal":
       return 26;
-    case "Humanitarian Service Medal":
+    case "Armed Forces Service Medal":
       return 27;
-    case "Donation Ribbon":
+    case "Humanitarian Service Medal":
       return 28;
-    case "7th Cavalry Server Upgrade Award":
+    case "Donation Ribbon":
       return 29;
-    case "StackUp Donation Medal":
+    case "7th Cavalry Server Upgrade Award":
       return 30;
-    case "Outstanding Volunteer Service Medal":
+    case "StackUp Donation Medal":
       return 31;
-    case "NCO Professional Development Ribbon":
+    case "Outstanding Volunteer Service Medal":
       return 32;
-    case "Honor Graduate Ribbon":
+    case "NCO Professional Development Ribbon":
       return 33;
-    case "Army Service Ribbon":
+    case "Honor Graduate Ribbon":
       return 34;
-    case "United Nations Service Medal":
+    case "Army Service Ribbon":
       return 35;
-    case "Overseas Service Ribbon":
+    case "United Nations Service Medal":
       return 36;
-    case "DCS Service Ribbon":
+    case "Overseas Service Ribbon":
       return 37;
-    case "Squad Service Ribbon":
+    case "DCS Service Ribbon":
       return 38;
-    case "World War II Service Ribbon":
+    case "Squad Service Ribbon":
       return 39;
-    case "Hell Let Loose Service Ribbon":
+    case "World War II Service Ribbon":
       return 40;
-    case "Recruiting Service Ribbon":
+    case "Hell Let Loose Service Ribbon":
       return 41;
-    case "D-Day Commemorative Medal":
+    case "Recruiting Service Ribbon":
       return 42;
-    case "Sniper Medal":
+    case "D-Day Commemorative Medal":
       return 43;
-    case "Basic Assault Course Ribbon":
+    case "Sniper Medal":
       return 44;
+    case "Basic Assault Course Ribbon":
+      return 45;
     default:
       return "N/A";
   }
