@@ -1,4 +1,5 @@
 import Link from "next/link";
+import GetCanvasObject from "./modules/getCanvasObject";
 import SkunkworksLogo from "../theme/skunkworksLogo";
 import Canvas from "./modules/canvas";
 import "./page.css";
@@ -11,7 +12,7 @@ export default function Skunkworks() {
       </div>
       <div className="textbox">Under Construction</div>
       <div className="canvasBox">
-        <Canvas />
+        <Canvas data={GetCanvasObject} />
       </div>
     </div>
   );
