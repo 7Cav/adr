@@ -11,7 +11,7 @@ async function GetCanvasObject() {
     nameTag: dataActive.profiles[userId].user.username,
     rank: dataActive.profiles[userId].rank.rankShort,
     rankId: dataActive.profiles[userId].rank.rankId,
-    joinDate: dataActive.profiles[userId].joinDate,
+    rankGrade: getRankGrade(dataActive.profiles[userId].rank.rankId),
   });
 
   for (let award in dataActive.profiles[userId].awards) {
@@ -26,7 +26,7 @@ async function GetCanvasObject() {
 
     // Find existing award object or create a new one based on base name
     const existingAward = awardCounts.find(
-      (obj) => obj.awardName == baseAwardName
+      (obj) => obj.awardName === baseAwardName
     );
 
     if (existingAward) {
@@ -67,6 +67,47 @@ async function GetCanvasObject() {
   });
 
   return awardCounts;
+}
+
+function getRankGrade(rankId) {
+  console.log(typeof rankId);
+
+  switch (rankId) {
+    case "1":
+      return "O11";
+    case "2":
+      return "O10";
+    case "3":
+      return "O9";
+    case "4":
+      return "O8";
+    case "5":
+      return "O7";
+    case "6":
+      return "O6";
+    case "7":
+      return "O5";
+    case "8":
+      return "O4";
+    case "9":
+      return "O3";
+    case "10":
+      return "O2";
+    case "11":
+      return "O1";
+    case "26":
+      return "W5";
+    case "27":
+      return "W4";
+    case "28":
+      return "W3";
+    case "29":
+      return "W2";
+    case "30":
+      return "W1";
+    default:
+      return "Unknown";
+  }
 }
 
 function getAwardPriority(award) {
