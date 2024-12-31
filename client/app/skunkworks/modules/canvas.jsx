@@ -6,7 +6,7 @@ const Canvas = (props) => {
 
   const data = props.data;
 
-  console.log(data[1]);
+  console.log(data);
 
   useEffect(() => {
     const uniformBase = new Image();
@@ -41,7 +41,7 @@ const Canvas = (props) => {
       const ribbonWidth = 43;
       const ribbonHeight = 14;
 
-      const ribbonSelection = data.awardPriority + 1;
+      const ribbonSelection = data.awardPriority;
 
       return context.drawImage(
         ribbonSprites,
