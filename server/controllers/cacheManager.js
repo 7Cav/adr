@@ -61,9 +61,9 @@ const updateReserveRosterCache = async () => {
 
 const updateCachedIndividual = async () => {
   try {
-    let userId = 19;
+    let userName = "Stetchkov.A";
     const response = await axios(
-      `https://api.7cav.us/api/v1/milpacs/profile/id/${userId}`,
+      `https://api.7cav.us/api/v1/milpacs/profile/username/${userName}`,
       {
         headers: {
           Accept: "application/json",
