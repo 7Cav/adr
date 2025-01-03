@@ -74,8 +74,6 @@ async function GetCanvasObject() {
   awardCounts[0].ribbonMedalCount = ribbonMedalCount;
   awardCounts[0].coordArray = GetCoordArray(ribbonMedalCount);
 
-  console.log(awardCounts[0]);
-
   // Ensure there are at least two elements to sort
   if (awardCounts.length > 1) {
     // Extract the first element
@@ -101,7 +99,7 @@ async function GetCanvasObject() {
     awardCounts.unshift(firstElement);
   }
 
-  //console.log(awardCounts);
+  console.log(awardCounts);
 
   return awardCounts;
 }
