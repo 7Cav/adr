@@ -128,7 +128,7 @@ const Canvas = (props) => {
         // Use Promise.all to wait for ALL ribbons to load
         await Promise.all(
           data
-            .slice(1, 31)
+            .slice(1, 33)
             .map((ribbonData, index) =>
               placeRibbon(
                 ribbonData,
