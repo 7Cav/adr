@@ -19,7 +19,7 @@ export default function GetCoordArray(numAwards) {
   let r13 = 119;
 
   switch (numAwards) {
-    case 30:
+    case 32:
       return [
         // {
         //dx: c3,

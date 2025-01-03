@@ -300,7 +300,7 @@ function getawardDetails(award, hasValorDevice) {
     case "Humanitarian Service Medal":
       return {
         awardPriority: 28,
-        awardAttachmentType: "oakClusters",
+        awardAttachmentType: "stars",
       };
     case "Donation Ribbon":
       return {
@@ -335,52 +335,66 @@ function getawardDetails(award, hasValorDevice) {
       return {
         awardPriority: 35,
       };
-    case "United Nations Service Medal":
+    case "Cavalry Centurion Medal":
       return {
         awardPriority: 36,
+        awardAttachmentType: "silverStars",
+      };
+    case "United Nations Service Medal":
+      return {
+        awardPriority: 37,
         awardAttachmentType: "stars",
       };
     case "Overseas Service Ribbon":
       return {
-        awardPriority: 36,
-        awardAttachmentType: "oakClusters", //will require extra logic
-      };
-    case "DCS Service Ribbon":
-      return {
         awardPriority: 38,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Squad Service Ribbon":
+    case "Ready or Not Service Ribbon":
       return {
         awardPriority: 39,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClusters", //will requrie extra logic
       };
-    case "World War II Service Ribbon":
+    case "DCS Service Ribbon":
       return {
         awardPriority: 40,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Hell Let Loose Service Ribbon":
+    case "Squad Service Ribbon":
       return {
         awardPriority: 41,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Recruiting Ribbon":
+    case "Hell Let Loose Service Ribbon":
       return {
         awardPriority: 42,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
+    case "Hell Let Loose Console Service Ribbon":
+      return {
+        awardPriority: 43,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
+    case "Recruiting Ribbon":
+      return {
+        awardPriority: 44,
         awardAttachmentType: "oakClusters",
       };
     case "D-Day Commemorative Medal":
       return {
-        awardPriority: 43,
+        awardPriority: 45,
+      };
+    case "Ranger Selection Ribbon":
+      return {
+        awardPriority: 46,
       };
     case "Sniper Medal":
       return {
-        awardPriority: 44,
+        awardPriority: 47,
       };
     case "Basic Assault Course Ribbon":
       return {
-        awardPriority: 45,
+        awardPriority: 48,
       };
     default:
       return {
