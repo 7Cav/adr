@@ -86,12 +86,72 @@ export default function GetCoordArray(numAwards) {
           dy: r6,
         },
         {
+          dx: c2,
+          dy: r5,
+        },
+        {
           dx: c3,
           dy: r5,
         },
         {
           dx: c4,
           dy: r5,
+        },
+        {
+          dx: c2,
+          dy: r4,
+        },
+        {
+          dx: c3,
+          dy: r4,
+        },
+        {
+          dx: c4,
+          dy: r4,
+        },
+        {
+          dx: c2,
+          dy: r3,
+        },
+        {
+          dx: c3,
+          dy: r3,
+        },
+        {
+          dx: c4,
+          dy: r3,
+        },
+        {
+          dx: c1,
+          dy: r2,
+        },
+        {
+          dx: c2,
+          dy: r2,
+        },
+        {
+          dx: c3,
+          dy: r2,
+        },
+        {
+          dx: c4,
+          dy: r2,
+        },
+        {
+          dx: c1,
+          dy: r1,
+        },
+        {
+          dx: c2,
+          dy: r1,
+        },
+        {
+          dx: c3,
+          dy: r1,
+        },
+        {
+          dx: c4,
+          dy: r1,
         },
       ];
   }
