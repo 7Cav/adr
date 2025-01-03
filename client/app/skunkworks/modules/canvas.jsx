@@ -6,8 +6,6 @@ const Canvas = (props) => {
 
   const data = props.data;
 
-  console.log(data);
-
   useEffect(() => {
     const uniformBase = new Image();
     uniformBase.src = "/skunkworks/uniformBase/uniformBase.png";
@@ -30,30 +28,72 @@ const Canvas = (props) => {
 
     uniformBase.onload = () => {
       context.drawImage(uniformBase, 0, 0);
-      for (let i = 1; i < 2; i++) {
-        placeRibbon(data[i], ribbonSprites);
+      for (let i = 1; i < 16; i++) {
+        placeRibbon(data[i], ribbonSprites, data[0].coordArray[i - 1]);
       }
       context.drawImage(uniformLapel, 0, 0);
       context.drawImage(uniformEpaulette, 0, 0);
     };
 
-    function placeRibbon(data, ribbonSprites) {
+    function placeRibbon(data, ribbonSprites, coordData) {
+      console.log(coordData);
+
       const ribbonWidth = 43;
       const ribbonHeight = 14;
 
-      const ribbonSelection = data.awardPriority;
+      const desiredX = coordData.dx;
+      const desiredY = coordData.dy;
 
-      return context.drawImage(
-        ribbonSprites,
-        0,
-        ribbonSelection * ribbonHeight,
-        ribbonWidth,
-        ribbonHeight,
-        524,
-        245,
-        ribbonWidth,
-        ribbonHeight
-      );
+      const ribbonSelection = data.awardDetails.awardPriority;
+
+      if (
+        data.count != 0 ||
+        data.awardDetails.awardAttachmentType == "oakClustersValor"
+      ) {
+        const attachmentType = data.awardDetails.awardAttachmentType;
+        const attachmentCount = data.count.toString();
+
+        const ribbonAttachment = new Image();
+        ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
+
+        ribbonAttachment.onload = () => {
+          context.drawImage(
+            ribbonSprites,
+            0,
+            ribbonSelection * ribbonHeight,
+            ribbonWidth,
+            ribbonHeight,
+            desiredX,
+            desiredY,
+            ribbonWidth,
+            ribbonHeight
+          );
+
+          context.drawImage(
+            ribbonAttachment,
+            0,
+            0,
+            ribbonWidth,
+            ribbonHeight,
+            desiredX,
+            desiredY,
+            ribbonWidth,
+            ribbonHeight
+          );
+        };
+      } else {
+        context.drawImage(
+          ribbonSprites,
+          0,
+          ribbonSelection * ribbonHeight,
+          ribbonWidth,
+          ribbonHeight,
+          desiredX,
+          desiredY,
+          ribbonWidth,
+          ribbonHeight
+        );
+      }
     }
   }, []);
 
