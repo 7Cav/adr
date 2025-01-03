@@ -1,22 +1,25 @@
-import GetCombatRoster from "../../reusableModules/getCombatRoster";
+import GetIndividual from "../../reusableModules/getIndividual";
+import GetCoordArray from "./getCoordArray";
 
 async function GetCanvasObject() {
-  let userId = 19;
-
-  let dataActive = GetCombatRoster;
+  let dataActive = GetIndividual;
 
   let awardCounts = [];
 
+  //console.log(dataActive);
+
   awardCounts.push({
-    nameTag: dataActive.profiles[userId].user.username,
-    rank: dataActive.profiles[userId].rank.rankShort,
-    rankId: dataActive.profiles[userId].rank.rankId,
-    rankGrade: getRankGrade(dataActive.profiles[userId].rank.rankId),
+    nameTag: dataActive.user.username,
+    rank: dataActive.rank.rankShort,
+    rankId: dataActive.rank.rankId,
+    rankGrade: getRankGrade(dataActive.rank.rankId),
+    ribbonMedalCount: 0,
+    coordArray: [],
   });
 
-  for (let award in dataActive.profiles[userId].awards) {
-    let awardName = dataActive.profiles[userId].awards[award].awardName;
-    let awardPriority = getAwardPriority(awardName);
+  for (let award in dataActive.awards) {
+    let awardName = dataActive.awards[award].awardName;
+    let awardDetails = getawardDetails(awardName);
 
     let hasValorDevice = awardName.includes("with Valor Device"); // Check for Valor Device
 
@@ -41,30 +44,64 @@ async function GetCanvasObject() {
     } else if (hasValorDevice) {
       awardCounts.push({
         awardName: baseAwardName,
-        count: 1,
-        awardPriority: getAwardPriority(baseAwardName),
-        hasValorDevice:
+        count: 0,
+        awardDetails: getawardDetails(
+          baseAwardName,
           hasValorDevice &&
-          (baseAwardName == "Army Commendation Medal" ||
-            baseAwardName == "Bronze Star"),
+            (baseAwardName == "Army Commendation Medal" ||
+              baseAwardName == "Bronze Star")
+        ),
       });
     } else {
       awardCounts.push({
         awardName: baseAwardName,
-        count: 1,
-        awardPriority: awardPriority,
+        count: 0,
+        awardDetails: awardDetails,
       });
     }
   }
 
-  awardCounts.sort((a, b) => {
-    const aPriority =
-      typeof a.awardPriority == "string" ? 999 : a.awardPriority;
-    const bPriority =
-      typeof b.awardPriority == "string" ? 999 : b.awardPriority;
+  //Generate coord array
 
-    return aPriority - bPriority; // ascending order
-  });
+  let ribbonMedalCount = 0;
+
+  for (let i = 1; i < awardCounts.length; i++) {
+    if (awardCounts[i].awardDetails.awardPriority != "N/A") {
+      ribbonMedalCount++;
+    }
+  }
+
+  awardCounts[0].ribbonMedalCount = ribbonMedalCount;
+  awardCounts[0].coordArray = GetCoordArray(ribbonMedalCount);
+
+  console.log(awardCounts[0]);
+
+  // Ensure there are at least two elements to sort
+  if (awardCounts.length > 1) {
+    // Extract the first element
+    const firstElement = awardCounts.shift();
+
+    // Sort the remaining elements
+    awardCounts.sort((a, b) => {
+      const getPriority = (item) => {
+        if (item && item.awardDetails && item.awardDetails.awardPriority) {
+          const priority = item.awardDetails.awardPriority;
+          return typeof priority === "string" ? Infinity : priority;
+        }
+        return Infinity;
+      };
+
+      const aPriority = getPriority(a);
+      const bPriority = getPriority(b);
+
+      return aPriority - bPriority;
+    });
+
+    // Put the first element back at the beginning
+    awardCounts.unshift(firstElement);
+  }
+
+  //console.log(awardCounts);
 
   return awardCounts;
 }
@@ -110,103 +147,247 @@ function getRankGrade(rankId) {
   }
 }
 
-function getAwardPriority(award) {
+function getawardDetails(award, hasValorDevice) {
   switch (award) {
     case 'James "Krazee" Foster Lifetime Achievement Medal':
-      return 1;
+      return {
+        awardPriority: 1,
+      };
     case 'Ronnie "Coldblud" Bussey Lifetime Achievement Medal':
-      return 2;
+      return {
+        awardPriority: 2,
+      };
     case "Army Distinguished Service Cross":
-      return 3;
+      return {
+        awardPriority: 3,
+        awardAttachmentType: "oakClusters",
+      };
     case "Defense Distinguished Service Medal":
-      return 4;
+      return {
+        awardPriority: 4,
+        awardAttachmentType: "oakClusters",
+      };
     case "Army Distinguished Service Medal":
-      return 5;
+      return {
+        awardPriority: 5,
+        awardAttachmentType: "oakClusters",
+      };
     case "Silver Star":
-      return 6;
+      return {
+        awardPriority: 6,
+        awardAttachmentType: "oakClusters",
+      };
     case "Defense Superior Service Medal":
-      return 7;
+      return {
+        awardPriority: 7,
+        awardAttachmentType: "oakClusters",
+      };
     case "Legion of Merit":
-      return 8;
+      return {
+        awardPriority: 8,
+        awardAttachmentType: "oakClusters",
+      };
     case "Distinguished Flying Cross":
-      return 9;
-    case "Soldier's Medal":
-      return 10;
+      return {
+        awardPriority: 9,
+        awardAttachmentType: "oakClusters",
+      };
+    case "Soldiers Medal":
+      return {
+        awardPriority: 10,
+        awardAttachmentType: "oakClusters",
+      };
     case "Bronze Star with Valor":
     case "Bronze Star Medal":
     case "Bronze Star":
-      return 11;
+      if (hasValorDevice == true) {
+        return {
+          awardPriority: 11,
+          awardAttachmentType: "oakClustersValor",
+        };
+      } else {
+        return {
+          awardPriority: 11,
+          awardAttachmentType: "oakClusters",
+        };
+      }
     case "Purple Heart":
-      return 12;
+      return {
+        awardPriority: 12,
+        awardAttachmentType: "oakClusters",
+      };
     case "Defense Meritorious Service Medal":
-      return 13;
+      return {
+        awardPriority: 13,
+        awardAttachmentType: "oakClusters",
+      };
     case "Meritorious Service Medal":
-      return 14;
+      return {
+        awardPriority: 14,
+        awardAttachmentType: "oakClusters",
+      };
     case "Army Air Medal":
-      return 15;
+      return {
+        awardPriority: 15,
+        awardAttachmentType: "oakClusters",
+      };
     case "Joint Service Commendation Medal":
-      return 16;
+      return {
+        awardPriority: 16,
+        awardAttachmentType: "oakClusters",
+      };
     case "Army Commendation Medal With Valor":
     case "Army Commendation Medal":
-      return 17;
+      if (hasValorDevice == true) {
+        return {
+          awardPriority: 17,
+          awardAttachmentType: "oakClustersValor",
+        };
+      } else {
+        return {
+          awardPriority: 17,
+          awardAttachmentType: "oakClusters",
+        };
+      }
     case "Joint Service Achievement Medal":
-      return 18;
+      return {
+        awardPriority: 18,
+        awardAttachmentType: "oakClusters",
+      };
     case "Army Achievement Medal":
-      return 19;
+      return {
+        awardPriority: 19,
+        awardAttachmentType: "oakClusters",
+      };
     case "Prisoner of War Medal":
-      return 20;
+      return {
+        awardPriority: 20,
+        awardAttachmentType: "oakClusters",
+      };
     case "Army Good Conduct Medal":
-      return 21;
+      return {
+        awardPriority: 21,
+        awardAttachmentType: "gcNotches",
+      };
     case "Armed Forces Expeditionary Medal":
-      return 22;
+      return {
+        awardPriority: 22,
+        awardAttachmentType: "stars",
+      };
     case "Afghanistan Campaign Medal":
-      return 23;
+      return {
+        awardPriority: 23,
+        awardAttachmentType: "stars",
+      };
     case "Iraq Campaign Medal":
-      return 24;
+      return {
+        awardPriority: 24,
+        awardAttachmentType: "stars",
+      };
     case "Global War on Terrorism Expeditionary Medal":
-      return 25;
+      return {
+        awardPriority: 25,
+        awardAttachmentType: "stars",
+      };
     case "National Defense Service Medal":
-      return 26;
+      return {
+        awardPriority: 26,
+        awardAttachmentType: "stars",
+      };
     case "Armed Forces Service Medal":
-      return 27;
+      return {
+        awardPriority: 27,
+        awardAttachmentType: "oakClusters",
+      };
     case "Humanitarian Service Medal":
-      return 28;
+      return {
+        awardPriority: 28,
+        awardAttachmentType: "oakClusters",
+      };
     case "Donation Ribbon":
-      return 29;
+      return {
+        awardPriority: 29,
+        awardAttachmentType: "oakClusters",
+      };
     case "7th Cavalry Server Upgrade Award":
-      return 30;
+      return {
+        awardPriority: 30,
+        awardAttachmentType: "silverStars",
+      };
     case "StackUp Donation Medal":
-      return 31;
+      return {
+        awardPriority: 31,
+        awardAttachmentType: "gcNotches", //TODO: Implement special count logic
+      };
     case "Outstanding Volunteer Service Medal":
-      return 32;
+      return {
+        awardPriority: 32,
+        awardAttachmentType: "oakClusters",
+      };
     case "NCO Professional Development Ribbon":
-      return 33;
+      return {
+        awardPriority: 33,
+        awardAttachmentType: "ncoNums",
+      };
     case "Honor Graduate Ribbon":
-      return 34;
+      return {
+        awardPriority: 34,
+      };
     case "Army Service Ribbon":
-      return 35;
+      return {
+        awardPriority: 35,
+      };
     case "United Nations Service Medal":
-      return 36;
+      return {
+        awardPriority: 36,
+        awardAttachmentType: "stars",
+      };
     case "Overseas Service Ribbon":
-      return 37;
+      return {
+        awardPriority: 36,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
     case "DCS Service Ribbon":
-      return 38;
+      return {
+        awardPriority: 38,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
     case "Squad Service Ribbon":
-      return 39;
+      return {
+        awardPriority: 39,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
     case "World War II Service Ribbon":
-      return 40;
+      return {
+        awardPriority: 40,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
     case "Hell Let Loose Service Ribbon":
-      return 41;
-    case "Recruiting Service Ribbon":
-      return 42;
+      return {
+        awardPriority: 41,
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
+    case "Recruiting Ribbon":
+      return {
+        awardPriority: 42,
+        awardAttachmentType: "oakClusters",
+      };
     case "D-Day Commemorative Medal":
-      return 43;
+      return {
+        awardPriority: 43,
+      };
     case "Sniper Medal":
-      return 44;
+      return {
+        awardPriority: 44,
+      };
     case "Basic Assault Course Ribbon":
-      return 45;
+      return {
+        awardPriority: 45,
+      };
     default:
-      return "N/A";
+      return {
+        awardPriority: "N/A",
+      };
   }
 }
 
