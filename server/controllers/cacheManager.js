@@ -26,6 +26,7 @@ const updateCombatRosterCache = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + API_TOKEN,
+        "Accept-Encoding": "gzip",
       },
     });
     cachedCombatRoster = response.data;
@@ -44,6 +45,7 @@ const updateReserveRosterCache = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + API_TOKEN,
+        "Accept-Encoding": "gzip",
       },
     });
     cachedReserveRoster = response.data;
