@@ -2,7 +2,7 @@ const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 const CACHE_TIMESTAMP_URL = process.env.CACHE_TIMESTAMP_URL;
 
 const millisecondsToMinutes = (milliseconds) =>
-    Math.round(milliseconds / (1000 * 60));
+  Math.round(milliseconds / (1000 * 60));
 
 export default async function GetApiTimestamp() {
   const response = await fetch(CACHE_TIMESTAMP_URL, {
