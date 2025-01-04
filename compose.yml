@@ -30,8 +30,6 @@ services:
       - ./client/.env
     entrypoint: /bin/sh -c "until wget -q --spider http://server:4000; do echo 'Waiting for server...'; sleep 5; done; npm install && npm run build && npm run start"
     working_dir: /app
-  redis:
-    image: "redis:alpine"
 
 networks:
   mynetwork:
