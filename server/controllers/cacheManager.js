@@ -26,8 +26,10 @@ const updateCombatRosterCache = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + API_TOKEN,
+        'Accept-Encoding': 'gzip',
       },
     });
+    console.log("Request Headers:", response.config.headers);
     cachedCombatRoster = response.data;
     cacheTime["combat"] = Date.now();
     cacheStatus.combat = true;
@@ -44,8 +46,10 @@ const updateReserveRosterCache = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + API_TOKEN,
+        'Accept-Encoding': 'gzip',
       },
     });
+    console.log("Request Headers:", response.config.headers);
     cachedReserveRoster = response.data;
     cacheTime["reserve"] = Date.now();
     cacheStatus.reserve = true;
