@@ -69,6 +69,30 @@ async function GetCanvasObject() {
     if (awardCounts[i].awardDetails.awardPriority != "N/A") {
       ribbonMedalCount++;
     }
+    if (
+      awardCounts[i].awardDetails.awardAttachmentType == "oakClusters" &&
+      awardCounts[i].count > 19
+    ) {
+      awardCounts[i].count = 19;
+    }
+    if (
+      awardCounts[i].awardDetails.awardAttachmentType == "oakClustersValor" &&
+      awardCounts[i].count > 14
+    ) {
+      awardCounts[i].count = 14;
+    }
+    if (
+      awardCounts[i].awardDetails.awardAttachmentType == "silverStars" &&
+      awardCounts[i].count > 5
+    ) {
+      awardCounts[i].count = 5;
+    }
+    if (
+      awardCounts[i].awardDetails.awardAttachmentType == "stars" &&
+      awardCounts[i].count > 10
+    ) {
+      awardCounts[i].count = 10;
+    }
   }
 
   awardCounts[0].ribbonMedalCount = ribbonMedalCount;
@@ -305,7 +329,7 @@ function getawardDetails(award, hasValorDevice) {
     case "Donation Ribbon":
       return {
         awardPriority: 29,
-        awardAttachmentType: "oakClusters",
+        awardAttachmentType: "stars",
       };
     case "7th Cavalry Server Upgrade Award":
       return {
@@ -365,36 +389,41 @@ function getawardDetails(award, hasValorDevice) {
         awardPriority: 41,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Hell Let Loose Service Ribbon":
+    case "World War II Service Ribbon":
       return {
         awardPriority: 42,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Hell Let Loose Console Service Ribbon":
+    case "Hell Let Loose Service Ribbon":
       return {
         awardPriority: 43,
         awardAttachmentType: "oakClusters", //will require extra logic
       };
-    case "Recruiting Ribbon":
+    case "Hell Let Loose Console Service Ribbon":
       return {
         awardPriority: 44,
-        awardAttachmentType: "oakClusters",
+        awardAttachmentType: "oakClusters", //will require extra logic
+      };
+    case "Recruiting Ribbon":
+      return {
+        awardPriority: 45,
+        awardAttachmentType: "stars",
       };
     case "D-Day Commemorative Medal":
       return {
-        awardPriority: 45,
+        awardPriority: 46,
       };
     case "Ranger Selection Ribbon":
       return {
-        awardPriority: 46,
+        awardPriority: 47,
       };
     case "Sniper Medal":
       return {
-        awardPriority: 47,
+        awardPriority: 48,
       };
     case "Basic Assault Course Ribbon":
       return {
-        awardPriority: 48,
+        awardPriority: 49,
       };
     default:
       return {
