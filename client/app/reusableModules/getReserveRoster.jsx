@@ -1,8 +1,8 @@
-const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
-const reserveApiUrl = process.env.REACT_APP_RESERVE_API_URL;
+const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const RESERVE_API_URL = process.env.RESERVE_API_URL;
 
-async function GetReserveRoster() {
-  const response = await fetch(reserveApiUrl, {
+export default async function GetReserveRoster() {
+  const response = await fetch(RESERVE_API_URL, {
     headers: {
       Authorization: CLIENT_TOKEN,
     },
@@ -13,9 +13,5 @@ async function GetReserveRoster() {
     throw new Error("HTTP Error! status: " + response.status);
   }
 
-  const data = await response.json();
-
-  return data;
+  return await response.json();
 }
-
-export default await GetReserveRoster();

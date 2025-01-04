@@ -1,12 +1,8 @@
-const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
-const combatApiUrl = process.env.REACT_APP_COMBAT_API_URL;
-const cacheTimestampUrl = process.env.REACT_APP_CACHE_TIMESTAMP_URL;
-const millisecondsToMinutes = (milliseconds) => {
-  return Math.round(milliseconds / (1000 * 60));
-};
+const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const COMBAT_API_URL = process.env.COMBAT_API_URL;
 
-async function GetCombatRoster() {
-  const response = await fetch(combatApiUrl, {
+export default async function GetCombatRoster() {
+  const response = await fetch(COMBAT_API_URL, {
     headers: {
       Authorization: CLIENT_TOKEN,
     },
@@ -17,9 +13,5 @@ async function GetCombatRoster() {
     throw new Error("HTTP Error! status: " + response.status);
   }
 
-  const data = await response.json();
-
-  return data;
+  return await response.json();
 }
-
-export default await GetCombatRoster();

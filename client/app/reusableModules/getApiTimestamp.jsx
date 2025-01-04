@@ -1,11 +1,11 @@
-const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
-const cacheTimestampUrl = process.env.REACT_APP_CACHE_TIMESTAMP_URL;
-const millisecondsToMinutes = (milliseconds) => {
-  return Math.round(milliseconds / (1000 * 60));
-};
+const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const CACHE_TIMESTAMP_URL = process.env.CACHE_TIMESTAMP_URL;
 
-async function GetApiTimestamp() {
-  const response = await fetch(cacheTimestampUrl, {
+const millisecondsToMinutes = (milliseconds) =>
+  Math.round(milliseconds / (1000 * 60));
+
+export default async function GetApiTimestamp() {
+  const response = await fetch(CACHE_TIMESTAMP_URL, {
     headers: {
       Authorization: CLIENT_TOKEN,
     },
@@ -17,14 +17,11 @@ async function GetApiTimestamp() {
   }
 
   const data = await response.json();
-  let returnObject = [];
 
-  returnObject.push({
-    combat: millisecondsToMinutes(Date.now() - data.cacheTime.combat),
-    reserve: millisecondsToMinutes(Date.now() - data.cacheTime.reserve),
-  });
-
-  return returnObject;
+  return [
+    {
+      combat: millisecondsToMinutes(Date.now() - data.cacheTime.combat),
+      reserve: millisecondsToMinutes(Date.now() - data.cacheTime.reserve),
+    },
+  ];
 }
-
-export default await GetApiTimestamp();
