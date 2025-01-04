@@ -10,7 +10,7 @@ const Statistics = dynamic(
   () => import("../rosterstatistics/modules/statistics"),
   {
     ssr: false,
-  },
+  }
 );
 
 export const metadata = {
