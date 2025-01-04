@@ -11,15 +11,15 @@ export const metadata = {
   title: "Active Duty Roster",
 };
 
-// look into moving this into the API calls
-let milpacArray = [];
-
-milpacArray.push({
-  combat: GetCombatRoster,
-  reserve: GetReserveRoster,
-});
-
 export default async function ActiveDutyRoster() {
+  const [combat, reserve, timestamp] = await Promise.all([
+    GetCombatRoster(),
+    GetReserveRoster(),
+    GetApiTimestamp(),
+  ]);
+
+  const milpacArray = [{ combat, reserve }];
+
   return (
     <div className="MasterContainer">
       <div className="p-nav-primary">
@@ -38,9 +38,9 @@ export default async function ActiveDutyRoster() {
                   </Link>
                 </div>
                 <div className="p-nav-info">
-                  {GetApiTimestamp && GetApiTimestamp[0].combat !== null && (
+                  {timestamp && timestamp[0]?.combat !== null && (
                     <div className="cache-time">
-                      Database is {GetApiTimestamp[0].combat} minutes old
+                      Database is {timestamp[0].combat} minutes old
                     </div>
                   )}
                 </div>
@@ -51,14 +51,14 @@ export default async function ActiveDutyRoster() {
       </div>
       <div className="ListContainer">
         {/* note: bBGroup = Billet Bank Group */}
-        <AdrListEntry bBGroup={"regi"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"oneSeven"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"twoSeven"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"threeSeven"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"acd"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"secOps"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"roo"} milpacArray={milpacArray} />
-        <AdrListEntry bBGroup={"support"} milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="regi" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="oneSeven" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="acd" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="secOps" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="roo" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="support" milpacArray={milpacArray} />
       </div>
     </div>
   );
