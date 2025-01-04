@@ -30,7 +30,7 @@ const Canvas = (props) => {
         "uniformEpaulette"
       ),
       loadImage(
-        "skunkworks/uniformRibbons/ribbons/ribbonSpriteSheetAlt.png",
+        "skunkworks/uniformRibbons/ribbons/ribbonSpriteSheet.png",
         "ribbonSprites"
       ),
     ];
@@ -128,7 +128,7 @@ const Canvas = (props) => {
         // Use Promise.all to wait for ALL ribbons to load
         await Promise.all(
           data
-            .slice(1, 33)
+            .slice(1, data[0].ribbonMedalCount + 1)
             .map((ribbonData, index) =>
               placeRibbon(
                 ribbonData,
@@ -142,7 +142,6 @@ const Canvas = (props) => {
         context.drawImage(images.uniformLapel, 0, 0);
         context.drawImage(images.uniformEpaulette, 0, 0);
       };
-
       drawLayers();
     }
   }, [loading, images, data]);

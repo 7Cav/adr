@@ -1,5 +1,5 @@
-const CLIENT_TOKEN = process.env.REACT_APP_CLIENT_TOKEN;
-const individualApiUrl = process.env.REACT_APP_INDIVIDUAL_API_URL;
+const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const individualApiUrl = process.env.INDIVIDUAL_API_URL;
 
 async function GetIndividual() {
   const response = await fetch(individualApiUrl, {
