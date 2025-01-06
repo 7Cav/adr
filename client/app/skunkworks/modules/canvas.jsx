@@ -9,6 +9,8 @@ const Canvas = (props) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
+    setImages({});
     const loadImage = (src, key) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
