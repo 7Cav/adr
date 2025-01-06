@@ -1,11 +1,13 @@
 const cacheManager = require("../controllers/cacheManager");
 
-module.exports = async (req, res) => {
-  const cachedIndividual = cacheManager.getCachedIndividual();
+module.exports = async (req, res, userName) => {
+  let cachedIndividual = await cacheManager.updateCachedIndividual(userName);
 
-  if (cachedIndividual) {
-    res.send(cachedIndividual);
-  } else {
-    res.status(503).send("Cache is empty");
-  }
+  //return cachedIndividual;
+
+  // if (cachedIndividual) {
+  res.send(cachedIndividual);
+  // } else {
+  //   res.send(null);
+  // }
 };

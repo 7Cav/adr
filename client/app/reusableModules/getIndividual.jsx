@@ -1,8 +1,10 @@
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
-const individualApiUrl = process.env.INDIVIDUAL_API_URL;
+const baseIndividualApiUrl = process.env.INDIVIDUAL_API_URL;
 
-async function GetIndividual() {
-  const response = await fetch(individualApiUrl, {
+export default async function GetIndividual(userName) {
+  const fullIndividualApiUrl = baseIndividualApiUrl + userName;
+
+  const response = await fetch(fullIndividualApiUrl, {
     headers: {
       Authorization: CLIENT_TOKEN,
     },
@@ -13,9 +15,14 @@ async function GetIndividual() {
     throw new Error("HTTP Error! status: " + response.status);
   }
 
-  const data = await response.json();
+  try {
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(`Invalid JSON response: ${error.message}`);
+  }
 
   return data;
 }
 
-export default await GetIndividual();
+//export default await GetIndividual();

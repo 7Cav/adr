@@ -59,9 +59,8 @@ const updateReserveRosterCache = async () => {
   }
 };
 
-const updateCachedIndividual = async () => {
+const updateCachedIndividual = async (userName) => {
   try {
-    let userName = "Vercin.G";
     const response = await axios(
       `https://api.7cav.us/api/v1/milpacs/profile/username/${userName}`,
       {
@@ -76,9 +75,11 @@ const updateCachedIndividual = async () => {
     cachedIndividual = response.data;
     cacheTime["individual"] = Date.now();
     cacheStatus.individual = true;
+    return cachedIndividual;
   } catch (error) {
     console.error("Failed to update individual user cache:", error);
     cacheStatus.individual = false;
+    return null;
   }
 };
 
@@ -98,7 +99,6 @@ const initializeCache = async () => {
     // Initial cache update
     await updateCombatRosterCache();
     await updateReserveRosterCache();
-    await updateCachedIndividual();
 
     // Check if cache is valid
     if (!cacheStatus["combat"] || !cacheStatus["reserve"]) {
@@ -107,7 +107,6 @@ const initializeCache = async () => {
     }
 
     // Schedule the updates
-    scheduleCacheUpdate(updateCachedIndividual);
     scheduleCacheUpdate(updateCombatRosterCache);
     scheduleCacheUpdate(updateReserveRosterCache);
   } catch (error) {
@@ -129,6 +128,7 @@ const getCachedIndividual = () => {
 };
 
 module.exports = {
+  updateCachedIndividual,
   getCachedCombatRoster,
   getCachedReserveRoster,
   getCachedIndividual,
