@@ -2,7 +2,8 @@ import GetIndividual from "../../reusableModules/getIndividual";
 import GetCoordArray from "./getCoordArray";
 
 async function GetCanvasObject() {
-  let dataActive = GetIndividual;
+  let userName = "rogers.s";
+  let dataActive = await GetIndividual(userName);
 
   let awardCounts = [];
 
@@ -40,6 +41,9 @@ async function GetCanvasObject() {
       ) {
         existingAward.hasValorDevice =
           existingAward.hasValorDevice || hasValorDevice; // Set hasValorDevice if applicable
+        if (existingAward.hasValorDevice) {
+          existingAward.awardDetails.awardAttachmentType = "oakClustersValor";
+        }
       }
     } else if (hasValorDevice) {
       awardCounts.push({
@@ -49,7 +53,8 @@ async function GetCanvasObject() {
           baseAwardName,
           hasValorDevice &&
             (baseAwardName == "Army Commendation Medal" ||
-              baseAwardName == "Bronze Star")
+              baseAwardName == "Bronze Star"),
+          award
         ),
       });
     } else {
@@ -76,6 +81,12 @@ async function GetCanvasObject() {
       awardCounts[i].count = 19;
     }
     if (
+      awardCounts[i].awardDetails.awardAttachmentType == "oakClustersService" &&
+      awardCounts[i].count > 6
+    ) {
+      awardCounts[i].count = 6;
+    }
+    if (
       awardCounts[i].awardDetails.awardAttachmentType == "oakClustersValor" &&
       awardCounts[i].count > 14
     ) {
@@ -92,6 +103,26 @@ async function GetCanvasObject() {
       awardCounts[i].count > 10
     ) {
       awardCounts[i].count = 10;
+    }
+
+    // n squared time, baby!
+
+    if (awardCounts[i].awardName == "StackUp Donation Medal") {
+      for (let j in dataActive.awards) {
+        if (awardCounts[i].awardName == dataActive.awards[j].awardName) {
+          switch (dataActive.awards[j].awardDetails) {
+            case "Bronze Knot":
+              awardCounts[i].count = 1;
+              break;
+            case "Silver Knot":
+              awardCounts[i].count = 4;
+              break;
+            case "Gold Knot":
+              awardCounts[i].count = 7;
+              break;
+          }
+        }
+      }
     }
   }
 
@@ -169,7 +200,7 @@ function getRankGrade(rankId) {
   }
 }
 
-function getawardDetails(award, hasValorDevice) {
+function getawardDetails(award, hasValorDevice, index) {
   switch (award) {
     case 'James "Krazee" Foster Lifetime Achievement Medal':
       return {
@@ -251,7 +282,7 @@ function getawardDetails(award, hasValorDevice) {
     case "Army Air Medal":
       return {
         awardPriority: 15,
-        awardAttachmentType: "oakClusters",
+        awardAttachmentType: "ncoNums",
       };
     case "Joint Service Commendation Medal":
       return {
@@ -319,7 +350,7 @@ function getawardDetails(award, hasValorDevice) {
     case "Armed Forces Service Medal":
       return {
         awardPriority: 27,
-        awardAttachmentType: "oakClusters",
+        awardAttachmentType: "stars",
       };
     case "Humanitarian Service Medal":
       return {
@@ -339,7 +370,7 @@ function getawardDetails(award, hasValorDevice) {
     case "StackUp Donation Medal":
       return {
         awardPriority: 31,
-        awardAttachmentType: "gcNotches", //TODO: Implement special count logic
+        awardAttachmentType: "gcNotches",
       };
     case "Outstanding Volunteer Service Medal":
       return {
@@ -372,37 +403,37 @@ function getawardDetails(award, hasValorDevice) {
     case "Overseas Service Ribbon":
       return {
         awardPriority: 38,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
     case "Ready or Not Service Ribbon":
       return {
         awardPriority: 39,
-        awardAttachmentType: "oakClusters", //will requrie extra logic
+        awardAttachmentType: "oakClustersService",
       };
-    case "DCS Service Ribbon":
+    case "DCS World Service Ribbon":
       return {
         awardPriority: 40,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
     case "Squad Service Ribbon":
       return {
         awardPriority: 41,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
-    case "World War II Service Ribbon":
+    case "WWII Service Ribbon":
       return {
         awardPriority: 42,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
     case "Hell Let Loose Service Ribbon":
       return {
         awardPriority: 43,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
     case "Hell Let Loose Console Service Ribbon":
       return {
         awardPriority: 44,
-        awardAttachmentType: "oakClusters", //will require extra logic
+        awardAttachmentType: "oakClustersService",
       };
     case "Recruiting Ribbon":
       return {
@@ -417,7 +448,7 @@ function getawardDetails(award, hasValorDevice) {
       return {
         awardPriority: 47,
       };
-    case "Sniper Medal":
+    case "Sniper Ribbon":
       return {
         awardPriority: 48,
       };
