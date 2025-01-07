@@ -1,4 +1,4 @@
-const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
 const COMBAT_API_URL = process.env.COMBAT_API_URL;
 
 export default async function GetCombatRoster() {

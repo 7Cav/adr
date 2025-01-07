@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-const Canvas = (props) => {
+function Canvas(props) {
   const canvasRef = useRef(null);
   const data = props.data;
 
@@ -143,6 +143,10 @@ const Canvas = (props) => {
 
         context.drawImage(images.uniformLapel, 0, 0);
         context.drawImage(images.uniformEpaulette, 0, 0);
+
+        canvas.toBlob(function (blob) {
+          canvasDownload.href = URL.createObjectURL(blob);
+        });
       };
       drawLayers();
     }
@@ -152,7 +156,20 @@ const Canvas = (props) => {
     return <div>Loading...</div>;
   }
 
-  return <canvas ref={canvasRef} {...props} width={837} height={1025} />;
-};
+  return (
+    <div className="canvasreturn">
+      <a id="canvasDownload" href="#" download>
+        Download Image
+      </a>
+      <div>
+        Note: This tool is in early development and may not accurately follow
+        established Standard Operating Procedures.
+        <br /> Use at your own risk. Please submit all feedback/bugs to S6 via
+        ticket.
+      </div>
+      <canvas ref={canvasRef} {...props} width={837} height={1025} />
+    </div>
+  );
+}
 
 export default Canvas;

@@ -1,8 +1,7 @@
 import GetIndividual from "../../reusableModules/getIndividual";
 import GetCoordArray from "./getCoordArray";
 
-async function GetCanvasObject() {
-  let userName = "rogers.s";
+export default async function GetCanvasObject(userName) {
   let dataActive = await GetIndividual(userName);
 
   let awardCounts = [];
@@ -108,17 +107,28 @@ async function GetCanvasObject() {
     // n squared time, baby!
 
     if (awardCounts[i].awardName == "StackUp Donation Medal") {
+      let highestAchieved = 0;
+
       for (let j in dataActive.awards) {
         if (awardCounts[i].awardName == dataActive.awards[j].awardName) {
           switch (dataActive.awards[j].awardDetails) {
             case "Bronze Knot":
-              awardCounts[i].count = 1;
+              if (highestAchieved == 0) {
+                awardCounts[i].count = 1;
+                highestAchieved = 1;
+              }
               break;
             case "Silver Knot":
-              awardCounts[i].count = 4;
+              if (highestAchieved <= 1) {
+                awardCounts[i].count = 4;
+                highestAchieved = 2;
+              }
               break;
             case "Gold Knot":
-              awardCounts[i].count = 7;
+              if (highestAchieved <= 2) {
+                awardCounts[i].count = 7;
+                highestAchieved = 3;
+              }
               break;
           }
         }
@@ -154,14 +164,12 @@ async function GetCanvasObject() {
     awardCounts.unshift(firstElement);
   }
 
-  console.log(awardCounts);
+  //console.log(awardCounts);
 
   return awardCounts;
 }
 
 function getRankGrade(rankId) {
-  console.log(typeof rankId);
-
   switch (rankId) {
     case "1":
       return "O11";
@@ -462,5 +470,3 @@ function getawardDetails(award, hasValorDevice, index) {
       };
   }
 }
-
-export default await GetCanvasObject();
