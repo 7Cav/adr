@@ -2,7 +2,12 @@ name: Development Deploy
 
 on:
   workflow_dispatch:
-
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        type: string
+        default: 'development'
 jobs:
   deploy:
     runs-on: ubuntu-latest
