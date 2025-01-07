@@ -28,7 +28,7 @@ function Canvas(props) {
         "uniformLapel"
       ),
       loadImage(
-        `skunkworks/uniformOfficer/officerEpaulettes/${data[0].rankGrade}.png`,
+        `skunkworks/uniformEpaulettes/${data[0].rankGrade}.png`,
         "uniformEpaulette"
       ),
       loadImage(
