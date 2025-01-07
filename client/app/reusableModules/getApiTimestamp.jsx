@@ -1,4 +1,4 @@
-const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
 const CACHE_TIMESTAMP_URL = process.env.CACHE_TIMESTAMP_URL;
 
 const millisecondsToMinutes = (milliseconds) =>
