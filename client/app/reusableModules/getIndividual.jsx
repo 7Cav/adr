@@ -1,8 +1,10 @@
-const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
-const baseIndividualApiUrl = process.env.INDIVIDUAL_API_URL;
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
+const baseIndividualApiUrl = process.env.NEXT_PUBLIC_INDIVIDUAL_API_URL;
 
 export default async function GetIndividual(userName) {
-  const fullIndividualApiUrl = baseIndividualApiUrl + userName;
+  const url = new URL(baseIndividualApiUrl);
+  url.searchParams.append("username", userName);
+  const fullIndividualApiUrl = url.toString();
 
   const response = await fetch(fullIndividualApiUrl, {
     headers: {
