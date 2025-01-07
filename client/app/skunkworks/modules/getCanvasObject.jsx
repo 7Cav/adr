@@ -193,6 +193,28 @@ function getRankGrade(rankId) {
       return "O2";
     case "11":
       return "O1";
+    case "12":
+      return "E11";
+    case "13":
+      return "E10";
+    case "14":
+      return "E9";
+    case "15":
+      return "E8";
+    case "16":
+      return "E7";
+    case "17":
+      return "E6";
+    case "18":
+      return "E5";
+    case "19":
+      return "E4";
+    case "20":
+      return "E3";
+    case "21":
+      return "E2";
+    case "22":
+      return "E1";
     case "26":
       return "W5";
     case "27":
@@ -204,7 +226,7 @@ function getRankGrade(rankId) {
     case "30":
       return "W1";
     default:
-      return "Unknown";
+      return "E0";
   }
 }
 

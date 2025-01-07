@@ -6,6 +6,10 @@ export default function GetCoordArray(numAwards) {
   let c3 = 581;
   let c4 = 625;
 
+  let c1Cen = 515;
+  let c2Cen = 559;
+  let c3Cen = 603;
+
   let r1 = 287;
   let r2 = 273;
   let r3 = 259;
@@ -2567,58 +2571,365 @@ export default function GetCoordArray(numAwards) {
         {
           //11
           dx: c2,
-          dy: r3,
+          dy: r4,
         },
         {
           //10
           dx: c3,
-          dy: r3,
+          dy: r4,
         },
         {
           //9
-          dx: c4,
+          dx: c1Cen,
           dy: r3,
         },
         {
           //8
-          dx: c1,
-          dy: r2,
+          dx: c2Cen,
+          dy: r3,
         },
         {
           //7
-          dx: c2,
-          dy: r2,
+          dx: c3Cen,
+          dy: r3,
         },
         {
           //6
-          dx: c3,
+          dx: c1Cen,
           dy: r2,
         },
         {
           //5
-          dx: c4,
+          dx: c2Cen,
           dy: r2,
         },
         {
           //4
-          dx: c1,
-          dy: r1,
+          dx: c3Cen,
+          dy: r2,
         },
         {
           //3
-          dx: c2,
+          dx: c1Cen,
           dy: r1,
         },
         {
           //2
-          dx: c3,
+          dx: c2Cen,
           dy: r1,
         },
         {
           //1
-          dx: c4,
+          dx: c3Cen,
           dy: r1,
         },
       ];
+    case 10:
+      return [
+        {
+          //10
+          dx: c2Cen,
+          dy: r4,
+        },
+        {
+          //9
+          dx: c1Cen,
+          dy: r3,
+        },
+        {
+          //8
+          dx: c2Cen,
+          dy: r3,
+        },
+        {
+          //7
+          dx: c3Cen,
+          dy: r3,
+        },
+        {
+          //6
+          dx: c1Cen,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c2Cen,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 9:
+      return [
+        {
+          //9
+          dx: c1Cen,
+          dy: r3,
+        },
+        {
+          //8
+          dx: c2Cen,
+          dy: r3,
+        },
+        {
+          //7
+          dx: c3Cen,
+          dy: r3,
+        },
+        {
+          //6
+          dx: c1Cen,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c2Cen,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 8:
+      return [
+        {
+          //8
+          dx: c2,
+          dy: r3,
+        },
+        {
+          //7
+          dx: c3,
+          dy: r3,
+        },
+        {
+          //6
+          dx: c1Cen,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c2Cen,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 7:
+      return [
+        {
+          //7
+          dx: c2Cen,
+          dy: r3,
+        },
+        {
+          //6
+          dx: c1Cen,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c2Cen,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 6:
+      return [
+        {
+          //6
+          dx: c1Cen,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c2Cen,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 5:
+      return [
+        {
+          //5
+          dx: c2,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c3,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 4:
+      return [
+        {
+          //4
+          dx: c3Cen,
+          dy: r2,
+        },
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 3:
+      return [
+        {
+          //3
+          dx: c1Cen,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c2Cen,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3Cen,
+          dy: r1,
+        },
+      ];
+    case 2:
+      return [
+        {
+          //2
+          dx: c2,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c3,
+          dy: r1,
+        },
+      ];
+    case 1:
+      return [
+        {
+          //1
+          dx: c3,
+          dy: r1,
+        },
+      ];
+    default:
+      return [];
   }
 }
