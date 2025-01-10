@@ -103,10 +103,35 @@ export default async function GetCanvasObject(userName) {
     ) {
       awardCounts[i].count = 10;
     }
-
-    // n squared time, baby!
-
+    if (awardCounts[i].awardDetails.awardAttachmentType == "starsDonation") {
+      if (awardCounts[i].count >= 6 && awardCounts[i].count < 10) {
+        awardCounts[i].count = 5;
+      }
+      if (awardCounts[i].count >= 10 && awardCounts[i].count < 15) {
+        awardCounts[i].count = 6;
+      }
+      if (awardCounts[i].count >= 15 && awardCounts[i].count < 20) {
+        awardCounts[i].count = 7;
+      }
+      if (awardCounts[i].count >= 20 && awardCounts[i].count < 25) {
+        awardCounts[i].count = 8;
+      }
+      if (awardCounts[i].count >= 25 && awardCounts[i].count < 50) {
+        awardCounts[i].count = 9;
+      }
+      if (awardCounts[i].count >= 50 && awardCounts[i].count < 75) {
+        awardCounts[i].count = 10;
+      }
+      if (awardCounts[i].count >= 75 && awardCounts[i].count < 100) {
+        awardCounts[i].count = 11;
+      }
+      if (awardCounts[i].count >= 100) {
+        awardCounts[i].count = 12;
+      }
+    }
     if (awardCounts[i].awardName == "StackUp Donation Medal") {
+      // n squared time, baby!
+
       let highestAchieved = 0;
 
       for (let j in dataActive.awards) {
@@ -390,7 +415,7 @@ function getawardDetails(award, hasValorDevice, index) {
     case "Donation Ribbon":
       return {
         awardPriority: 29,
-        awardAttachmentType: "stars",
+        awardAttachmentType: "starsDonation",
       };
     case "7th Cavalry Server Upgrade Award":
       return {
@@ -468,7 +493,7 @@ function getawardDetails(award, hasValorDevice, index) {
     case "Recruiting Ribbon":
       return {
         awardPriority: 45,
-        awardAttachmentType: "stars",
+        awardAttachmentType: "starsDonation",
       };
     case "D-Day Commemorative Medal":
       return {
