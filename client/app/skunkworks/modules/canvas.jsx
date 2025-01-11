@@ -141,8 +141,8 @@ function Canvas(props) {
             )
         );
 
-        context.drawImage(images.uniformLapel, 0, 0);
-        context.drawImage(images.uniformEpaulette, 0, 0);
+        //context.drawImage(images.uniformLapel, 0, 0);
+        //context.drawImage(images.uniformEpaulette, 0, 0);
 
         canvas.toBlob(function (blob) {
           canvasDownload.href = URL.createObjectURL(blob);
