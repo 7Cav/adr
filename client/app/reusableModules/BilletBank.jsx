@@ -564,7 +564,19 @@ const threeSeven = {
 
 //ACD
 
-const acdCommand = ["552", "627", "645", "11", "12"];
+const acdCommand = [
+  "1006",
+  "1007",
+  "1008",
+  "1009",
+  "1010",
+  "1005",
+  "552",
+  "627",
+  "645",
+  "11",
+  "12",
+];
 const alpha4 = [
   "555",
   "556",
@@ -690,6 +702,22 @@ const charlie4 = [
   "948",
   "950",
   "951",
+  "952",
+  "953",
+  "954",
+  "955",
+  "956",
+  "957",
+  "958",
+  "968",
+  "969",
+  "970",
+  "971",
+  "972",
+  "973",
+  "974",
+  "975",
+  "976",
 ];
 //const starterPlatoon = ["780", "781", "759"];
 //const starterPlatoon2 = ["782", "786", "787"];
@@ -699,7 +727,7 @@ const futureC = ["753"];
 const acd = {
   positionIds: [
     acdCommand,
-    //alpha4,
+    alpha4,
     bravo4,
     charlie4,
     //starterPlatoon,
@@ -708,16 +736,16 @@ const acd = {
     futureC,
   ],
   positionTitles: [
-    "ACD Headquarters",
-    //"Alpha Company",
-    "Bravo Company",
-    "Charlie Company",
+    "Reserve and Development Command Headquarters",
+    "Alpha Company/ACD",
+    "Bravo Company/ACD",
+    "Charlie Company/ACD",
     //"Star Citizen Starter Platoon",
     //"Star Wars RPG Starter Platoon",
     //"Counter Strike Starter Platoon",
     "Future Concepts Center",
   ],
-  collapsibleTitle: "Auxillary Combat Division",
+  collapsibleTitle: "Reserve and Development Command",
 };
 
 //IMO - OLD CODE KEPT HERE FOR POSTERITY SAKE
@@ -747,6 +775,19 @@ const rrd = [
   "734",
   "736",
   "738",
+  "733",
+  "734",
+  "735",
+  "736",
+  "737",
+  "934",
+  "960",
+  "961",
+  "962",
+  "963",
+  "964",
+  "965",
+  "966",
 ];
 const rtc = ["98", "99", "100", "101", "102", "103"];
 const s5 = [
@@ -1001,6 +1042,7 @@ const billetBank = {
   alpha4,
   bravo4,
   charlie4,
+  futureC,
   //starterPlatoon,
   //starterPlatoon2,
   //starterPlatoon3,
