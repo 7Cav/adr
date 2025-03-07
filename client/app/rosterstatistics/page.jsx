@@ -64,6 +64,7 @@ export default async function RosterStatistics() {
               lists.alpha4,
               lists.bravo4,
               lists.charlie4,
+              lists.futureC,
               //lists.starterPlatoon,
               //lists.starterPlatoon2,
               //lists.starterPlatoon3,
@@ -137,7 +138,7 @@ export default async function RosterStatistics() {
             milpacArray={milpacArray}
           />
         </div>
-
+        {/* 
         <div className="threeSevenBreakdown">
           <div className="Subtitle">Third Battalion</div>
           <Statistics
@@ -156,29 +157,25 @@ export default async function RosterStatistics() {
             ]}
             milpacArray={milpacArray}
           />
-        </div>
+        </div> */}
 
         <div className="ACDStrength">
-          <div className="Subtitle">Auxillary Combat Division</div>
+          <div className="Subtitle">Reserve and Development Command</div>
           <Statistics
             billetIDs={[
               lists.acdCommand,
-              //lists.alpha4,
+              lists.alpha4,
               lists.bravo4,
               lists.charlie4,
-              //lists.starterPlatoon,
-              //lists.starterPlatoon2,
-              //lists.starterPlatoon3,
+              lists.futureC,
             ]}
-            centerLabel="Total ACD Strength"
+            centerLabel="Total R&DC Strength"
             labelArray={[
-              "ACD Headquarters",
-              //"Alpha Company",
-              "Bravo Company",
-              "Charlie Company",
-              //"Star Citizen SP",
-              //"Star Wars RPG SP",
-              //"Counter Strike 2 SP",
+              "R&DC Headquarters",
+              "Alpha Company/ACD",
+              "Bravo Company/ACD",
+              "Charlie Company/ACD",
+              "Future Concepts Center",
             ]}
             milpacArray={milpacArray}
           />

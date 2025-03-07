@@ -54,7 +54,7 @@ export default async function ActiveDutyRoster() {
         <AdrListEntry bBGroup="regi" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="oneSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} />
+        {/*<AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} /> */}
         <AdrListEntry bBGroup="acd" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="secOps" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="roo" milpacArray={milpacArray} />
