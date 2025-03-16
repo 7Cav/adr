@@ -1,6 +1,6 @@
 import GetIndividual from "../reusableModules/getIndividual";
 import { AwardRegistry } from "./AwardRegistry";
-import { Award, Ribbon, Medal } from "./AwardClasses";
+import { Award, Ribbon, Medal, MedalWithValor } from "./AwardClasses";
 
 export default async function test() {
   const userName = "Vercin.G";
@@ -31,22 +31,30 @@ export default async function test() {
       if (hasValorDevice == true) {
         existingAward.hasValorDevice = true;
       }
-      existingAward.ribbonAttachmentCount++;
+      existingAward.ribbonAttachmentCount++; //TODO: Add a method to ribbon that allows me to properly increment this so that it does not exceed the maxAwardCount.
     } else {
-      const awardDetails = AwardRegistryInstance.getAwardDetails(
-        key /*,hasvalordevice*/
-      );
+      const awardDetails = AwardRegistryInstance.getAwardDetails(key);
 
       //If there is an entry in the registry for the award, Make the relevent object,
       //If not add generic award object
 
       if (AwardRegistryInstance.isInRegistry(key)) {
-        if (awardDetails.awardType == "Ribbon") {
-          const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
-          awardMap.set(key, newRibbon);
-        } else if (awardDetails.awardType == "Medal") {
-          const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
-          awardMap.set(key, newMedal);
+        switch (awardDetails.awardType) {
+          case "Ribbon":
+            const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
+            awardMap.set(key, newRibbon);
+            break;
+          case "Medal":
+            const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
+            awardMap.set(key, newMedal);
+            break;
+          case "MedalWithValor":
+            const newMedalWithValor = new MedalWithValor(
+              data.awards[i],
+              AwardRegistryInstance
+            );
+            awardMap.set(key, newMedalWithValor);
+            break;
         }
       } else {
         const newAward = new Award(data.awards[i]);
