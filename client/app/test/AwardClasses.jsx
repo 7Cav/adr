@@ -10,7 +10,6 @@ export class Award {
 
 export class Ribbon extends Award {
   static totalRibbonCount = 0;
-  hasValorDevice = null;
   maxAwardcount = null;
   ribbonAttachmentType = null;
   ribbonAttachmentCount = 0;
@@ -20,11 +19,11 @@ export class Ribbon extends Award {
 
     const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
 
-    if (!(registryDetails.awardAttachmentType === undefined)) {
+    if (!(registryDetails.awardAttachmentType == undefined)) {
       this.ribbonAttachmentType = registryDetails.awardAttachmentType;
     }
-
     this.awardPriority = registryDetails.awardPriority;
+    this.maxAwardcount = AwardRegistry.getMaxAwardCount(this.awardTitle);
 
     Ribbon.totalRibbonCount++;
   }
@@ -35,10 +34,19 @@ export class Medal extends Ribbon {
 
   constructor(data, AwardRegistry) {
     super(data, AwardRegistry);
+    Medal.totalMedalCount++;
+  }
+}
+
+export class MedalWithValor extends Medal {
+  hasValorDevice = false;
+
+  constructor(data, AwardRegistry) {
+    super(data, AwardRegistry);
+
     if (this.awardTitle.includes("with Valor Device")) {
       this.overrideAwardTitle(data.awardName);
     }
-    Medal.totalMedalCount++;
   }
 
   overrideAwardTitle(awardName) {
