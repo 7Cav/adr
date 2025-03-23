@@ -6,6 +6,7 @@ export class AwardRegistry {
 
   // prettier-ignore
   initalizeAwards() {
+    //____MAINLINE MEDALS AND RIBBONS____
     this.awards.set(`James "Krazee" Foster Lifetime Achievement Medal`, {awardPriority: 1, awardType: "Medal"});
     this.awards.set(`Ronnie "Coldblud" Bussey Lifetime Achievement Medal`, {awardPriority: 2, awardType: "Medal"});
     this.awards.set("Army Distinguished Service Cross", {awardPriority: 3, awardAttachmentType: "oakClusters", awardType: "Medal"});
@@ -34,9 +35,9 @@ export class AwardRegistry {
     this.awards.set("National Defense Service Medal", {awardPriority: 26, awardAttachmentType: "stars", awardType: "Medal"});
     this.awards.set("Armed Forces Service Medal", {awardPriority: 27, awardAttachmentType: "stars", awardType: "Medal"});
     this.awards.set("Humanitarian Service Medal", {awardPriority: 28, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Donation Ribbon", {awardPriority: 29, awardAttachmentType: "starsDonation", awardType: "Ribbon"});
+    this.awards.set("Donation Ribbon", {awardPriority: 29, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // Requires Special Case
     this.awards.set("7th Cavalry Server Upgrade Award", {awardPriority: 30, awardAttachmentType: "silverStars", awardType: "Medal"});
-    this.awards.set("StackUp Donation Medal", {awardPriority: 31, awardAttachmentType: "gcNotches", awardType: "Medal"}); // This will likely need to be its own case
+    this.awards.set("StackUp Donation Medal", {awardPriority: 31, awardAttachmentType: "gcNotches", awardType: "MedalStackUp"}); // Requires Special Case
     this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, awardAttachmentType: "oakClusters", awardType: "Medal"});
     this.awards.set("NCO Professional Development Ribbon", {awardPriority: 33, awardAttachmentType: "ncoNums", awardType: "Ribbon"});
     this.awards.set("Honor Graduate Ribbon", {awardPriority: 34, awardType: "Ribbon"});
@@ -50,11 +51,14 @@ export class AwardRegistry {
     this.awards.set("WWII Service Ribbon", {awardPriority: 42, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
     this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
     this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Recruiting Ribbon", {awardPriority: 45, awardAttachmentType: "starsDonation", awardType: "Ribbon"});
+    this.awards.set("Recruiting Ribbon", {awardPriority: 45, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
     this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, awardType: "Medal"});
     this.awards.set("Ranger Selection Ribbon", {awardPriority: 47, awardType: "Ribbon"});
     this.awards.set("Sniper Ribbon", {awardPriority: 48, awardType: "Ribbon"});
     this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
+    //____ UNIT CITATIONS ____
+
+    //____ WEAPON QUALS ____
   }
 
   isInRegistry(awardName) {
@@ -83,6 +87,8 @@ export class AwardRegistry {
         return 10;
       case "starsDonation": //Requires advanced logic
         return 12;
+      case "gcNotches":
+        return 9;
       default:
         return 1;
     }

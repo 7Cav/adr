@@ -1,9 +1,16 @@
 import GetIndividual from "../reusableModules/getIndividual";
 import { AwardRegistry } from "./AwardRegistry";
-import { Award, Ribbon, Medal, MedalWithValor } from "./AwardClasses";
+import {
+  Award,
+  Ribbon,
+  Medal,
+  MedalWithValor,
+  MedalStackUp,
+  RibbonDonationLogic,
+} from "./AwardClasses";
 
 export default async function test() {
-  const userName = "Vercin.G";
+  const userName = "Tester.B";
   const data = await GetIndividual(userName);
 
   const awardMap = new Map();
@@ -28,25 +35,54 @@ export default async function test() {
 
     if (awardMap.has(key)) {
       const existingAward = awardMap.get(key);
-      if (hasValorDevice == true) {
-        existingAward.hasValorDevice = true;
+
+      if (!existingAward instanceof Ribbon) {
+        continue;
       }
-      existingAward.ribbonAttachmentCount++; //TODO: Add a method to ribbon that allows me to properly increment this so that it does not exceed the maxAwardCount.
+
+      if (existingAward instanceof MedalWithValor) {
+        if (hasValorDevice == true) {
+          existingAward.hasValorDevice = true;
+        }
+      }
+
+      if (existingAward instanceof MedalStackUp) {
+        existingAward.updateStackUpMedal(data.awards[i].awardDetails);
+      }
+
+      if (existingAward instanceof Ribbon) {
+        existingAward.incrementAwardCount();
+      }
     } else {
       const awardDetails = AwardRegistryInstance.getAwardDetails(key);
 
       //If there is an entry in the registry for the award, Make the relevent object,
       //If not add generic award object
 
+      //This can probably be written better, but thats a later problem
       if (AwardRegistryInstance.isInRegistry(key)) {
         switch (awardDetails.awardType) {
           case "Ribbon":
             const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newRibbon);
             break;
+          case "RibbonDonationLogic":
+            const newRibbonDonation = new RibbonDonationLogic(
+              data.awards[i],
+              AwardRegistryInstance
+            );
+            awardMap.set(key, newRibbonDonation);
+            break;
           case "Medal":
             const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newMedal);
+            break;
+          case "MedalStackUp":
+            const newStackUp = new MedalStackUp(
+              data.awards[i],
+              AwardRegistryInstance
+            );
+            awardMap.set(key, newStackUp);
             break;
           case "MedalWithValor":
             const newMedalWithValor = new MedalWithValor(
