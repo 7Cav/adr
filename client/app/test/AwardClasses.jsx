@@ -1,6 +1,6 @@
 export class Award {
   awardTitle = null;
-  //awardDetail = null; May not be needed if exclusive to badges
+  //awardDetail = null;
   awardPriority = null;
 
   constructor(data) {
@@ -12,7 +12,8 @@ export class Ribbon extends Award {
   static totalRibbonCount = 0;
   maxAwardcount = null;
   ribbonAttachmentType = null;
-  ribbonAttachmentCount = 0;
+  ribbonDisplayedAttachmentCount = 0;
+  ribbonTrueAttachmentCount = 0;
 
   constructor(data, AwardRegistry) {
     super(data);
@@ -26,6 +27,17 @@ export class Ribbon extends Award {
     this.maxAwardcount = AwardRegistry.getMaxAwardCount(this.awardTitle);
 
     Ribbon.totalRibbonCount++;
+  }
+
+  incrementAwardCount() {
+    this.ribbonTrueAttachmentCount++;
+    this.calculateNewDisplayCount();
+  }
+
+  calculateNewDisplayCount() {
+    if (this.ribbonTrueAttachmentCount <= this.maxAwardcount) {
+      this.ribbonDisplayedAttachmentCount++;
+    }
   }
 }
 
@@ -56,10 +68,93 @@ export class MedalWithValor extends Medal {
   }
 }
 
+export class RibbonDonationLogic extends Ribbon {
+  constructor(data, AwardRegistry) {
+    super(data, AwardRegistry);
+  }
+
+  incrementAwardCount() {
+    this.ribbonTrueAttachmentCount++;
+    this.calculateNewDisplayCount();
+  }
+
+  //prettier-ignore
+  calculateNewDisplayCount() {
+    if (this.ribbonTrueAttachmentCount < 6) {
+      this.ribbonDisplayedAttachmentCount++;
+    }
+    if ( this.ribbonTrueAttachmentCount >= 6 && this.ribbonTrueAttachmentCount < 10) {
+      this.ribbonDisplayedAttachmentCount = 5;
+    }
+    if (this.ribbonTrueAttachmentCount >= 10 && this.ribbonTrueAttachmentCount < 15) {
+      this.ribbonDisplayedAttachmentCount = 6;
+    }
+    if (this.ribbonTrueAttachmentCount >= 15 && this.ribbonTrueAttachmentCount < 20) {
+      this.ribbonDisplayedAttachmentCount = 7;
+    }
+    if (this.ribbonTrueAttachmentCount >= 20 && this.ribbonTrueAttachmentCount < 25) {
+      this.ribbonDisplayedAttachmentCount = 8;
+    }
+    if (this.ribbonTrueAttachmentCount >= 25 && this.ribbonTrueAttachmentCount < 50) {
+      this.ribbonDisplayedAttachmentCount = 9;
+    }
+    if (this.ribbonTrueAttachmentCount >= 50 && this.ribbonTrueAttachmentCount < 75) {
+      this.ribbonDisplayedAttachmentCount = 10;
+    }
+    if ( this.ribbonTrueAttachmentCount >= 75 && this.ribbonTrueAttachmentCount < 100) {
+      this.ribbonDisplayedAttachmentCount = 11;
+    }
+    if (this.ribbonTrueAttachmentCount >= 100) {
+      this.ribbonDisplayedAttachmentCount = 12;
+    }
+  }
+}
+
+export class MedalStackUp extends Medal {
+  highestTierAchieved = 0;
+
+  constructor(data, AwardRegistry) {
+    super(data, AwardRegistry);
+
+    this.updateStackUpMedal(data.awardDetails);
+    this.ribbonTrueAttachmentCount = null;
+  }
+
+  incrementAwardCount() {
+    return;
+  }
+
+  updateStackUpMedal(detail) {
+    switch (detail) {
+      case "Gold Knot":
+        this.highestTierAchieved = 3;
+        this.ribbonDisplayedAttachmentCount = 7;
+        break;
+      case "Silver Knot":
+        if (this.highestTierAchieved <= 1) {
+          this.ribbonDisplayedAttachmentCount = 4;
+          this.highestTierAchieved = 2;
+        }
+        break;
+      case "Bronze Knot":
+        if (this.highestTierAchieved <= 0) {
+          this.ribbonDisplayedAttachmentCount = 1;
+          this.highestTierAchieved = 1;
+        }
+        break;
+      default:
+        if (this.highestTierAchieved == 0) {
+          this.ribbonDisplayedAttachmentCount = 0;
+        }
+        break;
+    }
+  }
+}
+
 export class Badge extends Award {
   // Do things
 }
 
-export class unitCitation extends Ribbon {
+export class unitCitation extends Award {
   // Do moar things
 }
