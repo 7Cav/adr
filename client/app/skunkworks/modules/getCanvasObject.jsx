@@ -334,7 +334,7 @@ function getawardDetails(award, hasValorDevice, index) {
         awardPriority: 14,
         awardAttachmentType: "oakClusters",
       };
-    case "Army Air Medal":
+    case "Air Medal":
       return {
         awardPriority: 15,
         awardAttachmentType: "ncoNums",
