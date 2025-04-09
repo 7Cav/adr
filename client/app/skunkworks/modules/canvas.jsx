@@ -164,8 +164,8 @@ function Canvas(props) {
       <div>
         Note: This tool is in early development and may not accurately follow
         established Standard Operating Procedures.
-        <br /> Use at your own risk. Please submit all feedback/bugs to S6 via
-        ticket.
+        <br /> Use at your own risk. Please submit all feedback/bugs to your 
+        Uniforms Lead.
       </div>
       <canvas ref={canvasRef} {...props} width={837} height={1025} />
     </div>
