@@ -110,13 +110,13 @@ export class RibbonDonationLogic extends Ribbon {
   }
 }
 
-export class MedalStackUp extends Medal {
+export class MedalTiered extends Medal {
   highestTierAchieved = 0;
 
   constructor(data, AwardRegistry) {
     super(data, AwardRegistry);
 
-    this.updateStackUpMedal(data.awardDetails);
+    this.updateTieredMedal(data.awardDetails);
     this.ribbonTrueAttachmentCount = null;
   }
 
@@ -124,29 +124,53 @@ export class MedalStackUp extends Medal {
     return;
   }
 
-  updateStackUpMedal(detail) {
-    switch (detail) {
-      case "Gold Knot":
-        this.highestTierAchieved = 3;
-        this.ribbonDisplayedAttachmentCount = 7;
-        break;
-      case "Silver Knot":
-        if (this.highestTierAchieved <= 1) {
-          this.ribbonDisplayedAttachmentCount = 4;
+  updateTieredMedal(detail) {
+    //Stackup logic
+    if (this.ribbonAttachmentType == "gcNotches") {
+      switch (detail) {
+        case "Gold Knot":
+          this.highestTierAchieved = 3;
+          this.ribbonDisplayedAttachmentCount = 7;
+          break;
+        case "Silver Knot":
+          if (this.highestTierAchieved <= 1) {
+            this.ribbonDisplayedAttachmentCount = 4;
+            this.highestTierAchieved = 2;
+          }
+          break;
+        case "Bronze Knot":
+          if (this.highestTierAchieved <= 0) {
+            this.ribbonDisplayedAttachmentCount = 1;
+            this.highestTierAchieved = 1;
+          }
+          break;
+        default:
+          if (this.highestTierAchieved == 0) {
+            this.ribbonDisplayedAttachmentCount = 0;
+          }
+          break;
+      }
+    }
+
+    //Server upgrade ribbon logic
+    if (this.ribbonAttachmentType == "stars") {
+      switch (detail) {
+        case "Gold Star":
           this.highestTierAchieved = 2;
-        }
-        break;
-      case "Bronze Knot":
-        if (this.highestTierAchieved <= 0) {
-          this.ribbonDisplayedAttachmentCount = 1;
-          this.highestTierAchieved = 1;
-        }
-        break;
-      default:
-        if (this.highestTierAchieved == 0) {
-          this.ribbonDisplayedAttachmentCount = 0;
-        }
-        break;
+          this.ribbonDisplayedAttachmentCount = 10;
+          break;
+        case "Silver Star":
+          if (this.highestTierAchieved <= 1) {
+            this.ribbonDisplayedAttachmentCount = 5;
+            this.highestTierAchieved = 1;
+          }
+          break;
+        default:
+          if (this.highestTierAchieved == 0) {
+            this.ribbonDisplayedAttachmentCount = 0;
+          }
+          break;
+      }
     }
   }
 }
