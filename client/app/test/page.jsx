@@ -5,12 +5,12 @@ import {
   Ribbon,
   Medal,
   MedalWithValor,
-  MedalStackUp,
+  MedalTiered,
   RibbonDonationLogic,
 } from "./AwardClasses";
 
 export default async function test() {
-  const userName = "Tester.B";
+  const userName = "Preacher.A";
   const data = await GetIndividual(userName);
 
   const awardMap = new Map();
@@ -46,8 +46,8 @@ export default async function test() {
         }
       }
 
-      if (existingAward instanceof MedalStackUp) {
-        existingAward.updateStackUpMedal(data.awards[i].awardDetails);
+      if (existingAward instanceof MedalTiered) {
+        existingAward.updateTieredMedal(data.awards[i].awardDetails);
       }
 
       if (existingAward instanceof Ribbon) {
@@ -77,12 +77,12 @@ export default async function test() {
             const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newMedal);
             break;
-          case "MedalStackUp":
-            const newStackUp = new MedalStackUp(
+          case "MedalTiered":
+            const newTiered = new MedalTiered(
               data.awards[i],
               AwardRegistryInstance
             );
-            awardMap.set(key, newStackUp);
+            awardMap.set(key, newTiered);
             break;
           case "MedalWithValor":
             const newMedalWithValor = new MedalWithValor(
