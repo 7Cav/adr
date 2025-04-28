@@ -8,6 +8,7 @@ import {
   MedalTiered,
   RibbonDonationLogic,
 } from "./AwardClasses";
+import GetUserInfo from "./GetUserInfo";
 
 export default async function test() {
   const userName = "Preacher.A";
@@ -101,7 +102,18 @@ export default async function test() {
 
   //Create an output array from the Map and return it.
 
-  const arr = Array.from(awardMap.values());
+  //console.log(Ribbon.totalRibbonCount);
+
+  const userInfo = GetUserInfo(data, Ribbon.totalRibbonCount);
+
+  const arr = [];
+
+  arr.push(userInfo);
+
+  const arr2 = Array.from(awardMap.values());
+
+  arr.push(arr2);
+
   console.log(arr);
 
   return <h1>Hello There!</h1>;
