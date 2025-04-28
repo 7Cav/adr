@@ -1,6 +1,6 @@
-import GetCoordArray from "../skunkworks/modules/getCoordArray";
+import GetCoordArray from "./getCoordArray";
 
-export default async function GetUserInfo(dataActive, ribbonCount) {
+export default function GetUserInfo(dataActive, ribbonCount) {
   const returnObject = {
     nameTag: dataActive.user.username,
     rank: dataActive.rank.rankShort,
@@ -9,7 +9,7 @@ export default async function GetUserInfo(dataActive, ribbonCount) {
     ribbonCount: ribbonCount,
     coordArray: [],
   };
-  returnObject.coordArray = GetCoordArray;
+  returnObject.coordArray = GetCoordArray(ribbonCount);
 
   return returnObject;
 }

@@ -1,5 +1,5 @@
 import GetIndividual from "../reusableModules/getIndividual";
-import { AwardRegistry } from "./AwardRegistry";
+import { AwardRegistry } from "../skunkworks/modules/AwardRegistry";
 import {
   Award,
   Ribbon,
@@ -7,8 +7,8 @@ import {
   MedalWithValor,
   MedalTiered,
   RibbonDonationLogic,
-} from "./AwardClasses";
-import GetUserInfo from "./GetUserInfo";
+} from "../skunkworks/modules/AwardClasses";
+import GetUserInfo from "../skunkworks/modules/GetUserInfo";
 
 export default async function test() {
   const userName = "Preacher.A";
@@ -102,19 +102,13 @@ export default async function test() {
 
   //Create an output array from the Map and return it.
 
-  //console.log(Ribbon.totalRibbonCount);
-
   const userInfo = GetUserInfo(data, Ribbon.totalRibbonCount);
 
   const arr = [];
-
   arr.push(userInfo);
 
   const arr2 = Array.from(awardMap.values());
-
   arr.push(arr2);
 
-  console.log(arr);
-
-  return <h1>Hello There!</h1>;
+  return arr;
 }
