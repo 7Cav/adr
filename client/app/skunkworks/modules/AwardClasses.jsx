@@ -9,7 +9,6 @@ export class Award {
 }
 
 export class Ribbon extends Award {
-  static totalRibbonCount = 0;
   maxAwardcount = null;
   ribbonAttachmentType = null;
   ribbonDisplayedAttachmentCount = 0;
@@ -65,6 +64,7 @@ export class MedalWithValor extends Medal {
     const baseAwardName = awardName.replace(" with Valor Device", "");
     this.awardTitle = baseAwardName;
     this.hasValorDevice = true;
+    this.ribbonAttachmentType = "oakClustersValor";
   }
 }
 

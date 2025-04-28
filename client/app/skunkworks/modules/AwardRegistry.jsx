@@ -23,7 +23,7 @@ export class AwardRegistry {
     this.awards.set("Meritorious Service Medal", {awardPriority: 14, awardAttachmentType: "oakClusters", awardType: "Medal"});
     this.awards.set("Air Medal", {awardPriority: 15, awardAttachmentType: "ncoNums", awardType: "Medal"});
     this.awards.set("Joint Service Commendation Medal", {awardPriority: 16, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Army Commendation Medal", {awardPriority: 17, awardAttachmentType: "oakClusters", awardType: "AwardWithValor"});
+    this.awards.set("Army Commendation Medal", {awardPriority: 17, awardAttachmentType: "oakClusters", awardType: "MedalWithValor"});
     this.awards.set("Joint Service Achievement Medal", {awardPriority: 18, awardAttachmentType: "oakClusters", awardType: "Medal"});
     this.awards.set("Army Achievement Medal",{awardPriority: 19, awardAttachmentType: "oakClusters", awardType: "Medal"});
     this.awards.set("Prisoner of War Medal", {awardPriority: 20, awardAttachmentType: "oakClusters", awardType: "Medal"});

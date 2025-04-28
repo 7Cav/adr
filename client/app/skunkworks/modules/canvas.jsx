@@ -1,5 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import {
+  Award,
+  Ribbon,
+  Medal,
+  MedalWithValor,
+  MedalTiered,
+  RibbonDonationLogic,
+} from "./AwardClasses";
 
 function Canvas(props) {
   const canvasRef = useRef(null);
@@ -58,7 +66,7 @@ function Canvas(props) {
       const ribbonHeight = 14;
       const desiredX = coordData.dx;
       const desiredY = coordData.dy;
-      const ribbonSelection = data.awardDetails.awardPriority;
+      const ribbonSelection = data.awardPriority;
 
       const drawRibbon = () => {
         // Function to draw the base ribbon
@@ -76,11 +84,11 @@ function Canvas(props) {
       };
 
       if (
-        data.count !== 0 ||
-        data.awardDetails.awardAttachmentType == "oakClustersValor"
+        data.ribbonDisplayedAttachmentCount !== 0 ||
+        (data instanceof MedalWithValor && data.hasValorDevice == true)
       ) {
-        const attachmentType = data.awardDetails.awardAttachmentType;
-        const attachmentCount = data.count.toString();
+        const attachmentType = data.ribbonAttachmentType;
+        const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
         const ribbonAttachment = new Image();
 
         ribbonAttachment.onload = () => {
@@ -127,10 +135,12 @@ function Canvas(props) {
       const drawLayers = async () => {
         context.drawImage(images.uniformBase, 0, 0);
 
+        //console.log(data[1].slice(0, data[0].ribbonMedalCount));
+
         // Use Promise.all to wait for ALL ribbons to load
         await Promise.all(
-          data
-            .slice(1, data[0].ribbonMedalCount + 1)
+          data[1]
+            .slice(0, data[0].ribbonMedalCount)
             .map((ribbonData, index) =>
               placeRibbon(
                 ribbonData,
