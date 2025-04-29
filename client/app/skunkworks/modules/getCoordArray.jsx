@@ -2871,7 +2871,7 @@ export default function GetCoordArray(numAwards) {
       return [
         {
           //4
-          dx: c2Cen,
+          dx: c3Cen,
           dy: r2,
         },
         {
