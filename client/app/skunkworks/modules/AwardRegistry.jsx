@@ -104,6 +104,8 @@ export class AwardRegistry {
         return 12;
       case "gcNotches":
         return 9;
+      case "ncoNums":
+        return 6;
       default:
         return 1;
     }
