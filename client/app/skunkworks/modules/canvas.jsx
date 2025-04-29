@@ -197,7 +197,7 @@ function Canvas(props) {
         context.drawImage(images.uniformBase, 0, 0);
 
         await Promise.all([
-          data[1]
+          ...data[1]
             .slice(0, data[0].ribbonMedalCount)
             .map((ribbonData, index) =>
               placeRibbon(
@@ -207,7 +207,7 @@ function Canvas(props) {
                 context
               )
             ),
-          data[2]
+          ...data[2]
             .slice(0, data[0].unitCitationCount)
             .map((ribbonData, index) =>
               placeCitation(
@@ -219,9 +219,6 @@ function Canvas(props) {
             ),
         ]);
 
-        //context.drawImage(images.uniformLapel, 0, 0);
-        //context.drawImage(images.uniformEpaulette, 0, 0);
-
         canvas.toBlob(function (blob) {
           canvasDownload.href = URL.createObjectURL(blob);
         });
@@ -229,6 +226,9 @@ function Canvas(props) {
       drawLayers();
     }
   }, [loading, images, data]);
+
+  //context.drawImage(images.uniformLapel, 0, 0);
+  //context.drawImage(images.uniformEpaulette, 0, 0);
 
   if (loading) {
     return <div>Loading...</div>;
