@@ -185,7 +185,8 @@ function Canvas(props) {
       images.uniformBase &&
       images.uniformLapel &&
       images.uniformEpaulette &&
-      images.ribbonSprites
+      images.ribbonSprites &&
+      images.citationSprites
     ) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
@@ -195,10 +196,7 @@ function Canvas(props) {
       const drawLayers = async () => {
         context.drawImage(images.uniformBase, 0, 0);
 
-        //console.log(data[1].slice(0, data[0].ribbonMedalCount));
-
-        // Use Promise.all to wait for ALL ribbons to load
-        await Promise.all(
+        await Promise.all([
           data[1]
             .slice(0, data[0].ribbonMedalCount)
             .map((ribbonData, index) =>
@@ -218,8 +216,8 @@ function Canvas(props) {
                 data[0].unitCitationCoordArray[index],
                 context
               )
-            )
-        );
+            ),
+        ]);
 
         //context.drawImage(images.uniformLapel, 0, 0);
         //context.drawImage(images.uniformEpaulette, 0, 0);
