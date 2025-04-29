@@ -1,5 +1,5 @@
-import { AwardRegistry } from "./AwardRegistry";
-import GetIndividual from "../../reusableModules/getIndividual";
+import GetIndividual from "../reusableModules/getIndividual";
+import { AwardRegistry } from "../skunkworks/modules/AwardRegistry";
 import {
   Award,
   Ribbon,
@@ -7,16 +7,12 @@ import {
   MedalWithValor,
   MedalTiered,
   RibbonDonationLogic,
-  UnitCitation,
-} from "./AwardClasses";
-import GetUserInfo from "./GetUserInfo";
+} from "../skunkworks/modules/AwardClasses";
+import GetUserInfo from "../skunkworks/modules/GetUserInfo";
 
-export default async function GetCanvasObject(userName) {
+export default async function test() {
+  const userName = "Preacher.A";
   const data = await GetIndividual(userName);
-
-  let awardCounts = [];
-  let totalRibbonCount = 0;
-  let totalUnitCitationCount = 0;
 
   const awardMap = new Map();
   const AwardRegistryInstance = new AwardRegistry();
@@ -48,7 +44,6 @@ export default async function GetCanvasObject(userName) {
       if (existingAward instanceof MedalWithValor) {
         if (hasValorDevice == true) {
           existingAward.hasValorDevice = true;
-          existingAward.ribbonAttachmentType = "oakClustersValor";
         }
       }
 
@@ -56,10 +51,7 @@ export default async function GetCanvasObject(userName) {
         existingAward.updateTieredMedal(data.awards[i].awardDetails);
       }
 
-      if (
-        existingAward instanceof Ribbon ||
-        existingAward instanceof UnitCitation
-      ) {
+      if (existingAward instanceof Ribbon) {
         existingAward.incrementAwardCount();
       }
     } else {
@@ -74,7 +66,6 @@ export default async function GetCanvasObject(userName) {
           case "Ribbon":
             const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newRibbon);
-            totalRibbonCount++;
             break;
           case "RibbonDonationLogic":
             const newRibbonDonation = new RibbonDonationLogic(
@@ -82,12 +73,10 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newRibbonDonation);
-            totalRibbonCount++;
             break;
           case "Medal":
             const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newMedal);
-            totalRibbonCount++;
             break;
           case "MedalTiered":
             const newTiered = new MedalTiered(
@@ -95,7 +84,6 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newTiered);
-            totalRibbonCount++;
             break;
           case "MedalWithValor":
             const newMedalWithValor = new MedalWithValor(
@@ -103,52 +91,24 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newMedalWithValor);
-            totalRibbonCount++;
-            break;
-          case "UnitCitation":
-            const newUnitCitation = new UnitCitation(
-              data.awards[i],
-              AwardRegistryInstance
-            );
-            awardMap.set(key, newUnitCitation);
-            totalUnitCitationCount++;
             break;
         }
       } else {
-        // const newAward = new Award(data.awards[i]);
-        // awardMap.set(key, newAward);
+        const newAward = new Award(data.awards[i]);
+        awardMap.set(key, newAward);
       }
     }
   }
 
   //Create an output array from the Map and return it.
 
-  const userInfo = GetUserInfo(data, totalRibbonCount, totalUnitCitationCount);
+  const userInfo = GetUserInfo(data, Ribbon.totalRibbonCount);
 
   const arr = [];
   arr.push(userInfo);
 
-  let ribbons = [];
-  //let medals = [];
-  let unitCitations = [];
-
-  for (const award of awardMap.values()) {
-    if (award instanceof Ribbon) {
-      ribbons.push(award);
-    }
-    // if (award instanceof Medal) {
-    //   medals.push(award);
-    // }
-    if (award instanceof UnitCitation) {
-      unitCitations.push(award);
-    }
-  }
-
-  arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
-  arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
-  //arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
-
-  console.log(arr);
+  const arr2 = Array.from(awardMap.values());
+  arr.push(arr2);
 
   return arr;
 }

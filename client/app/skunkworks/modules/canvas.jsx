@@ -1,5 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import {
+  Award,
+  Ribbon,
+  Medal,
+  MedalWithValor,
+  MedalTiered,
+  RibbonDonationLogic,
+} from "./AwardClasses";
 
 function Canvas(props) {
   const canvasRef = useRef(null);
@@ -35,6 +43,10 @@ function Canvas(props) {
         "skunkworks/uniformRibbons/ribbons/ribbonSpriteSheet.png",
         "ribbonSprites"
       ),
+      loadImage(
+        "skunkworks/uniformRibbons/ribbons/UnitCitationSprite.png",
+        "citationSprites"
+      ),
     ];
 
     Promise.all(imagePromises)
@@ -58,7 +70,7 @@ function Canvas(props) {
       const ribbonHeight = 14;
       const desiredX = coordData.dx;
       const desiredY = coordData.dy;
-      const ribbonSelection = data.awardDetails.awardPriority;
+      const ribbonSelection = data.awardPriority;
 
       const drawRibbon = () => {
         // Function to draw the base ribbon
@@ -76,11 +88,67 @@ function Canvas(props) {
       };
 
       if (
-        data.count !== 0 ||
-        data.awardDetails.awardAttachmentType == "oakClustersValor"
+        data.ribbonDisplayedAttachmentCount !== 0 ||
+        (data instanceof MedalWithValor && data.hasValorDevice == true)
       ) {
-        const attachmentType = data.awardDetails.awardAttachmentType;
-        const attachmentCount = data.count.toString();
+        const attachmentType = data.ribbonAttachmentType;
+        const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
+        const ribbonAttachment = new Image();
+
+        ribbonAttachment.onload = () => {
+          drawRibbon(); //Draw the ribbon first
+          context.drawImage(
+            ribbonAttachment,
+            0,
+            0,
+            ribbonWidth,
+            ribbonHeight,
+            desiredX,
+            desiredY,
+            ribbonWidth,
+            ribbonHeight
+          );
+          resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
+        };
+        ribbonAttachment.onerror = () => {
+          console.error("Error loading ribbon attachment");
+          drawRibbon(); //Draw the ribbon even if attachment fails
+          resolve();
+        };
+        ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
+      } else {
+        drawRibbon(); //Draw the ribbon if no attachment
+        resolve(); // Resolve immediately if no attachment
+      }
+    });
+  };
+
+  const placeCitation = (data, ribbonSprites, coordData, context) => {
+    return new Promise((resolve) => {
+      const ribbonWidth = 43;
+      const ribbonHeight = 17;
+      const desiredX = coordData.dx;
+      const desiredY = coordData.dy;
+      const ribbonSelection = data.awardPriority;
+
+      const drawRibbon = () => {
+        // Function to draw the base ribbon
+        context.drawImage(
+          ribbonSprites,
+          0,
+          ribbonSelection * ribbonHeight,
+          ribbonWidth,
+          ribbonHeight,
+          desiredX,
+          desiredY,
+          ribbonWidth,
+          ribbonHeight
+        );
+      };
+
+      if (data.ribbonDisplayedAttachmentCount !== 0) {
+        const attachmentType = data.ribbonAttachmentType;
+        const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
         const ribbonAttachment = new Image();
 
         ribbonAttachment.onload = () => {
@@ -127,15 +195,27 @@ function Canvas(props) {
       const drawLayers = async () => {
         context.drawImage(images.uniformBase, 0, 0);
 
+        //console.log(data[1].slice(0, data[0].ribbonMedalCount));
+
         // Use Promise.all to wait for ALL ribbons to load
         await Promise.all(
-          data
-            .slice(1, data[0].ribbonMedalCount + 1)
+          data[1]
+            .slice(0, data[0].ribbonMedalCount)
             .map((ribbonData, index) =>
               placeRibbon(
                 ribbonData,
                 images.ribbonSprites,
-                data[0].coordArray[index],
+                data[0].ribbonCoordArray[index],
+                context
+              )
+            ),
+          data[2]
+            .slice(0, data[0].unitCitationCount)
+            .map((ribbonData, index) =>
+              placeCitation(
+                ribbonData,
+                images.citationSprites,
+                data[0].unitCitationCoordArray[index],
                 context
               )
             )
@@ -164,8 +244,8 @@ function Canvas(props) {
       <div>
         Note: This tool is in early development and may not accurately follow
         established Standard Operating Procedures.
-        <br /> Use at your own risk. Please submit all feedback/bugs to your 
-        Uniforms Lead.
+        <br /> Use at your own risk. Please submit all feedback/bugs to S6 via
+        ticket.
       </div>
       <canvas ref={canvasRef} {...props} width={837} height={1025} />
     </div>
