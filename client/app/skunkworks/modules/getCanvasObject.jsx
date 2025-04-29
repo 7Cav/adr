@@ -7,6 +7,7 @@ import {
   MedalWithValor,
   MedalTiered,
   RibbonDonationLogic,
+  UnitCitation,
 } from "./AwardClasses";
 import GetUserInfo from "./GetUserInfo";
 
@@ -15,6 +16,7 @@ export default async function GetCanvasObject(userName) {
 
   let awardCounts = [];
   let totalRibbonCount = 0;
+  let totalUnitCitationCount = 0;
 
   const awardMap = new Map();
   const AwardRegistryInstance = new AwardRegistry();
@@ -54,7 +56,10 @@ export default async function GetCanvasObject(userName) {
         existingAward.updateTieredMedal(data.awards[i].awardDetails);
       }
 
-      if (existingAward instanceof Ribbon) {
+      if (
+        existingAward instanceof Ribbon ||
+        existingAward instanceof UnitCitation
+      ) {
         existingAward.incrementAwardCount();
       }
     } else {
@@ -69,6 +74,7 @@ export default async function GetCanvasObject(userName) {
           case "Ribbon":
             const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newRibbon);
+            totalRibbonCount++;
             break;
           case "RibbonDonationLogic":
             const newRibbonDonation = new RibbonDonationLogic(
@@ -76,10 +82,12 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newRibbonDonation);
+            totalRibbonCount++;
             break;
           case "Medal":
             const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newMedal);
+            totalRibbonCount++;
             break;
           case "MedalTiered":
             const newTiered = new MedalTiered(
@@ -87,6 +95,7 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newTiered);
+            totalRibbonCount++;
             break;
           case "MedalWithValor":
             const newMedalWithValor = new MedalWithValor(
@@ -94,9 +103,17 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set(key, newMedalWithValor);
+            totalRibbonCount++;
+            break;
+          case "UnitCitation":
+            const newUnitCitation = new UnitCitation(
+              data.awards[i],
+              AwardRegistryInstance
+            );
+            awardMap.set(key, newUnitCitation);
+            totalUnitCitationCount++;
             break;
         }
-        totalRibbonCount++;
       } else {
         // const newAward = new Award(data.awards[i]);
         // awardMap.set(key, newAward);
@@ -106,24 +123,30 @@ export default async function GetCanvasObject(userName) {
 
   //Create an output array from the Map and return it.
 
-  const userInfo = GetUserInfo(data, totalRibbonCount);
+  const userInfo = GetUserInfo(data, totalRibbonCount, totalUnitCitationCount);
 
   const arr = [];
   arr.push(userInfo);
 
-  const arr2 = Array.from(awardMap.values());
+  let ribbons = [];
+  //let medals = [];
+  let unitCitations = [];
 
-  arr2.sort((a, b) => {
-    if (a.awardPriority > b.awardPriority) {
-      return 1;
+  for (const award of awardMap.values()) {
+    if (award instanceof Ribbon) {
+      ribbons.push(award);
     }
-    if (a.awardPriority < b.awardPriority) {
-      return -1;
+    // if (award instanceof Medal) {
+    //   medals.push(award);
+    // }
+    if (award instanceof UnitCitation) {
+      unitCitations.push(award);
     }
-    return 0;
-  });
+  }
 
-  arr.push(arr2);
+  arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
+  arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
+  //arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
 
   console.log(arr);
 
