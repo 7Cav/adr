@@ -44,7 +44,7 @@ function Canvas(props) {
         "ribbonSprites"
       ),
       loadImage(
-        "skunkworks/uniformRibbons/ribbons/UnitCitationSprite.png",
+        "skunkworks/uniformRibbons/ribbons/unitCitationSprite.png",
         "citationSprites"
       ),
     ];
