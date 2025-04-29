@@ -179,6 +179,36 @@ export class Badge extends Award {
   // Do things
 }
 
-export class unitCitation extends Award {
-  // Do moar things
+export class UnitCitation extends Award {
+  //Why am i using extends Award even though it is the same as ribbon? Its because im grouping them seperately
+
+  maxAwardcount = null;
+  ribbonAttachmentType = null;
+  ribbonDisplayedAttachmentCount = 0;
+  ribbonTrueAttachmentCount = 0;
+
+  constructor(data, AwardRegistry) {
+    super(data);
+
+    const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
+
+    if (!(registryDetails.awardAttachmentType == undefined)) {
+      this.ribbonAttachmentType = registryDetails.awardAttachmentType;
+    }
+    this.awardPriority = registryDetails.awardPriority;
+    this.maxAwardcount = AwardRegistry.getMaxAwardCount(this.awardTitle);
+
+    Ribbon.totalRibbonCount++;
+  }
+
+  incrementAwardCount() {
+    this.ribbonTrueAttachmentCount++;
+    this.calculateNewDisplayCount();
+  }
+
+  calculateNewDisplayCount() {
+    if (this.ribbonTrueAttachmentCount <= this.maxAwardcount) {
+      this.ribbonDisplayedAttachmentCount++;
+    }
+  }
 }

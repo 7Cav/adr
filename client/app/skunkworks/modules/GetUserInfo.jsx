@@ -1,15 +1,19 @@
 import GetCoordArray from "./getCoordArray";
+import GetCitationCoordArray from "./getCitationCoordArray";
 
-export default function GetUserInfo(dataActive, ribbonCount) {
+export default function GetUserInfo(dataActive, ribbonCount, citationCount) {
   const returnObject = {
     nameTag: dataActive.user.username,
     rank: dataActive.rank.rankShort,
     rankId: dataActive.rank.rankId,
     rankGrade: getRankGrade(dataActive.rank.rankId),
     ribbonCount: ribbonCount,
-    coordArray: [],
+    unitCitationCount: citationCount,
+    ribbonCoordArray: [],
+    unitCitationCoordArray: [],
   };
-  returnObject.coordArray = GetCoordArray(ribbonCount);
+  returnObject.ribbonCoordArray = GetCoordArray(ribbonCount);
+  returnObject.unitCitationCoordArray = GetCitationCoordArray(citationCount);
 
   return returnObject;
 }

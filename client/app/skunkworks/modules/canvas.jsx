@@ -43,6 +43,10 @@ function Canvas(props) {
         "skunkworks/uniformRibbons/ribbons/ribbonSpriteSheet.png",
         "ribbonSprites"
       ),
+      loadImage(
+        "skunkworks/uniformRibbons/ribbons/UnitCitationSprite.png",
+        "citationSprites"
+      ),
     ];
 
     Promise.all(imagePromises)
@@ -119,6 +123,62 @@ function Canvas(props) {
     });
   };
 
+  const placeCitation = (data, ribbonSprites, coordData, context) => {
+    return new Promise((resolve) => {
+      const ribbonWidth = 43;
+      const ribbonHeight = 17;
+      const desiredX = coordData.dx;
+      const desiredY = coordData.dy;
+      const ribbonSelection = data.awardPriority;
+
+      const drawRibbon = () => {
+        // Function to draw the base ribbon
+        context.drawImage(
+          ribbonSprites,
+          0,
+          ribbonSelection * ribbonHeight,
+          ribbonWidth,
+          ribbonHeight,
+          desiredX,
+          desiredY,
+          ribbonWidth,
+          ribbonHeight
+        );
+      };
+
+      if (data.ribbonDisplayedAttachmentCount !== 0) {
+        const attachmentType = data.ribbonAttachmentType;
+        const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
+        const ribbonAttachment = new Image();
+
+        ribbonAttachment.onload = () => {
+          drawRibbon(); //Draw the ribbon first
+          context.drawImage(
+            ribbonAttachment,
+            0,
+            0,
+            ribbonWidth,
+            ribbonHeight,
+            desiredX,
+            desiredY,
+            ribbonWidth,
+            ribbonHeight
+          );
+          resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
+        };
+        ribbonAttachment.onerror = () => {
+          console.error("Error loading ribbon attachment");
+          drawRibbon(); //Draw the ribbon even if attachment fails
+          resolve();
+        };
+        ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
+      } else {
+        drawRibbon(); //Draw the ribbon if no attachment
+        resolve(); // Resolve immediately if no attachment
+      }
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -145,7 +205,17 @@ function Canvas(props) {
               placeRibbon(
                 ribbonData,
                 images.ribbonSprites,
-                data[0].coordArray[index],
+                data[0].ribbonCoordArray[index],
+                context
+              )
+            ),
+          data[2]
+            .slice(0, data[0].unitCitationCount)
+            .map((ribbonData, index) =>
+              placeCitation(
+                ribbonData,
+                images.citationSprites,
+                data[0].unitCitationCoordArray[index],
                 context
               )
             )

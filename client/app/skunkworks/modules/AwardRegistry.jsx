@@ -6,7 +6,9 @@ export class AwardRegistry {
 
   // prettier-ignore
   initalizeAwards() {
+
     //____MAINLINE MEDALS AND RIBBONS____
+
     this.awards.set(`James "Krazee" Foster Lifetime Achievement Medal`, {awardPriority: 1, awardType: "Medal"});
     this.awards.set(`Ronnie "Coldblud" Bussey Lifetime Achievement Medal`, {awardPriority: 2, awardType: "Medal"});
     this.awards.set("Army Distinguished Service Cross", {awardPriority: 3, awardAttachmentType: "oakClusters", awardType: "Medal"});
@@ -56,7 +58,16 @@ export class AwardRegistry {
     this.awards.set("Ranger Selection Ribbon", {awardPriority: 47, awardType: "Ribbon"});
     this.awards.set("Sniper Ribbon", {awardPriority: 48, awardType: "Ribbon"});
     this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
+    
     //____ UNIT CITATIONS ____
+    
+    this.awards.set("Army & Air Force Presidential Unit Citation", {awardPriority: 0, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
+    this.awards.set("Army Valorous Unit Citation", {awardPriority: 1, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
+    this.awards.set("Joint Meritorious Unit Citation", {awardPriority: 2, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
+    this.awards.set("Army Meritorious Unit Citation", {awardPriority: 3, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
+    this.awards.set("Army Superior Unit Citation", {awardPriority: 4, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
+    this.awards.set("7th Cavalry Black Ops Unit Citation", {awardPriority: 5, awardAttachmentType: "unitCitationStars", awardType: "UnitCitation"});
+
 
     //____ WEAPON QUALS ____
   }
@@ -77,6 +88,10 @@ export class AwardRegistry {
     switch (this.getAwardDetails(awardName).awardAttachmentType) {
       case "oakClusters":
         return 19;
+      case "unitCitationClusters":
+        return 10;
+      case "unitCitationStars":
+        return 5;
       case "oakClustersService":
         return 6;
       case "oakClustersValor":
