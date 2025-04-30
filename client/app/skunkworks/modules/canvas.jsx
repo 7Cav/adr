@@ -29,7 +29,7 @@ function Canvas(props) {
       });
     };
 
-    const imagePromises = [
+    let imagePromises = [
       loadImage("/skunkworks/uniformBase/uniformBase.png", "uniformBase"),
       loadImage(
         "/skunkworks/uniformBase/uniformRightLapel.png",
@@ -48,6 +48,15 @@ function Canvas(props) {
         "citationSprites"
       ),
     ];
+
+    if (data[4] != null) {
+      imagePromises.push(
+        loadImage(
+          `skunkworks/uniformBadges/combatBadges/${data[4].imageNum}.png`,
+          "uniformCombatBadge"
+        )
+      );
+    }
 
     Promise.all(imagePromises)
       .then((loadedImages) => {
@@ -179,6 +188,26 @@ function Canvas(props) {
     });
   };
 
+  const placeInfantryBadge = (image, coordData, context) => {
+    return new Promise((resolve) => {
+      if (image == undefined) {
+        resolve();
+      }
+
+      const desiredX = coordData.dx;
+      const desiredY = coordData.dy;
+
+      console.log(desiredX, desiredY);
+
+      const drawBadge = () => {
+        // Function to draw the base ribbon
+        context.drawImage(image, desiredX, desiredY);
+      };
+      drawBadge();
+      resolve();
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -217,8 +246,13 @@ function Canvas(props) {
                 context
               )
             ),
+          placeInfantryBadge(
+            // Include the infantry badge promise here
+            images.uniformCombatBadge,
+            data[0].combatBadgeCoords,
+            context
+          ),
         ]);
-
         context.drawImage(images.uniformLapel, 0, 0);
         context.drawImage(images.uniformEpaulette, 0, 0);
 
