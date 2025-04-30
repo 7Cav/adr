@@ -219,6 +219,9 @@ function Canvas(props) {
             ),
         ]);
 
+        context.drawImage(images.uniformLapel, 0, 0);
+        context.drawImage(images.uniformEpaulette, 0, 0);
+
         canvas.toBlob(function (blob) {
           canvasDownload.href = URL.createObjectURL(blob);
         });
@@ -242,8 +245,8 @@ function Canvas(props) {
       <div>
         Note: This tool is in early development and may not accurately follow
         established Standard Operating Procedures.
-        <br /> Use at your own risk. Please submit all feedback/bugs to S6 via
-        ticket.
+        <br /> Use at your own risk. Please submit all feedback/bugs to the S1
+        Uniforms Lead.
       </div>
       <canvas ref={canvasRef} {...props} width={837} height={1025} />
     </div>
