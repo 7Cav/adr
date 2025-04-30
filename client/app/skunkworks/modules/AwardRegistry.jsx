@@ -72,7 +72,7 @@ export class AwardRegistry {
 
     this.awards.set("Flight Medic Badge", {awardPriority: 6, awardType: "BadgeCombat"});  // (3/1/b/1-7) (4/1/b/1-7)
     this.awards.set("Master Army Aviator Badge", {awardPriority: 8, awardType: "BadgeCombat"}); // (A/1-7) (A/ACD)
-    this.awards.set("Senior Aviator Badge", {awardPriority: 7, awardType: "BadgeCombat"})
+    this.awards.set("Senior Army Aviator Badge", {awardPriority: 7, awardType: "BadgeCombat"})
     this.awards.set("Army Aviator Badge", {awardPriority: 6, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 4th Award", {awardPriority: 5, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 2nd Award", {awardPriority: 4, awardType: "BadgeCombat"})

@@ -1,5 +1,6 @@
 import GetCoordArray from "./getCoordArray";
 import GetCitationCoordArray from "./getCitationCoordArray";
+import GetCombatBadgeCoords from "./getCombatBadgeCoords";
 
 export default function GetUserInfo(dataActive, ribbonCount, citationCount) {
   const returnObject = {
@@ -11,9 +12,11 @@ export default function GetUserInfo(dataActive, ribbonCount, citationCount) {
     unitCitationCount: citationCount,
     ribbonCoordArray: [],
     unitCitationCoordArray: [],
+    combatBadgeCoords: [],
   };
   returnObject.ribbonCoordArray = GetCoordArray(ribbonCount);
   returnObject.unitCitationCoordArray = GetCitationCoordArray(citationCount);
+  returnObject.combatBadgeCoords = GetCombatBadgeCoords(ribbonCount);
 
   return returnObject;
 }
