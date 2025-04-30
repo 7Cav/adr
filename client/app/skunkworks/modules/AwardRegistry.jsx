@@ -66,7 +66,19 @@ export class AwardRegistry {
     this.awards.set("Joint Meritorious Unit Citation", {awardPriority: 2, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
     this.awards.set("Army Meritorious Unit Citation", {awardPriority: 3, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
     this.awards.set("Army Superior Unit Citation", {awardPriority: 4, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
-    this.awards.set("7th Cavalry Black Ops Unit Citation", {awardPriority: 5, awardAttachmentType: "unitCitationStars", awardType: "UnitCitation"});
+    this.awards.set("7th Cavalry Black Ops Unit Citation", {awardPriority: 5, awardAttachmentType: "unitCitationSStars", awardType: "UnitCitation"});
+
+    // ____ COMBAT BADGES ____
+
+    this.awards.set("Flight Medic Badge", {awardPriority: 6, awardType: "BadgeCombat"});  // (3/1/b/1-7) (4/1/b/1-7)
+    this.awards.set("Master Army Aviator Badge", {awardPriority: 8, awardType: "BadgeCombat"}); // (A/1-7) (A/ACD)
+    this.awards.set("Senior Aviator Badge", {awardPriority: 7, awardType: "BadgeCombat"})
+    this.awards.set("Army Aviator Badge", {awardPriority: 6, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge 4th Award", {awardPriority: 5, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge 2nd Award", {awardPriority: 4, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge 3rd Award", {awardPriority: 3, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge", {awardPriority: 2, awardType: "BadgeCombat"})
+    this.awards.set("Expert Infantry Badge", {awardPriority: 1, awardType: "BadgeCombat"}) // et. al.
 
 
     //____ WEAPON QUALS ____
@@ -81,6 +93,10 @@ export class AwardRegistry {
       awardName = awardName.replace(" with Valor Device", "");
     }
 
+    if (this.awards.get(awardName) == undefined) {
+      return 0;
+    }
+
     return this.awards.get(awardName);
   }
 
@@ -90,7 +106,7 @@ export class AwardRegistry {
         return 19;
       case "unitCitationClusters":
         return 10;
-      case "unitCitationStars":
+      case "unitCitationSStars":
         return 5;
       case "oakClustersService":
         return 6;

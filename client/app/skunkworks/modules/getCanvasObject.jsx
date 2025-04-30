@@ -8,6 +8,7 @@ import {
   MedalTiered,
   RibbonDonationLogic,
   UnitCitation,
+  BadgeCombat,
 } from "./AwardClasses";
 import GetUserInfo from "./GetUserInfo";
 
@@ -27,6 +28,8 @@ export default async function GetCanvasObject(userName) {
 
     let key;
     let hasValorDevice = false;
+    let useCombatBadgeLogic = false;
+    let combatBadgeKey;
 
     if (data.awards[i].awardName.includes("with Valor Device")) {
       key = data.awards[i].awardName.replace(" with Valor Device", "");
@@ -35,11 +38,27 @@ export default async function GetCanvasObject(userName) {
       key = data.awards[i].awardName;
     }
 
+    const awardType = AwardRegistryInstance.getAwardDetails(key).awardType;
+
+    if (awardType == "BadgeCombat") {
+      useCombatBadgeLogic = true;
+      combatBadgeKey = "BadgeCombat";
+    }
+
     //If there is already an award with the key, add the valor device to the existing obj if true and increment AttachmentCount
     //Otherwise, create the award, and add it (and the key) to the Map.
 
-    if (awardMap.has(key)) {
-      const existingAward = awardMap.get(key);
+    if (
+      awardMap.has(key) ||
+      (useCombatBadgeLogic == true && awardMap.has(combatBadgeKey))
+    ) {
+      let existingAward;
+
+      if (useCombatBadgeLogic == true) {
+        existingAward = awardMap.get(combatBadgeKey);
+      } else {
+        existingAward = awardMap.get(key);
+      }
 
       if (!existingAward instanceof Ribbon) {
         continue;
@@ -54,6 +73,10 @@ export default async function GetCanvasObject(userName) {
 
       if (existingAward instanceof MedalTiered) {
         existingAward.updateTieredMedal(data.awards[i].awardDetails);
+      }
+
+      if (existingAward instanceof BadgeCombat) {
+        existingAward.updateBadgeCombat(data.awards[i], AwardRegistryInstance);
       }
 
       if (
@@ -113,6 +136,14 @@ export default async function GetCanvasObject(userName) {
             awardMap.set(key, newUnitCitation);
             totalUnitCitationCount++;
             break;
+          case "BadgeCombat":
+            const newBadgeCombat = new BadgeCombat(
+              data.awards[i],
+              data.primary.positionTitle,
+              AwardRegistryInstance
+            );
+            awardMap.set("BadgeCombat", newBadgeCombat);
+            break;
         }
       } else {
         // const newAward = new Award(data.awards[i]);
@@ -120,7 +151,6 @@ export default async function GetCanvasObject(userName) {
       }
     }
   }
-
   //Create an output array from the Map and return it.
 
   const userInfo = GetUserInfo(data, totalRibbonCount, totalUnitCitationCount);
@@ -129,24 +159,29 @@ export default async function GetCanvasObject(userName) {
   arr.push(userInfo);
 
   let ribbons = [];
-  //let medals = [];
+  let medals = [];
   let unitCitations = [];
+  let combatBadge = null;
 
   for (const award of awardMap.values()) {
     if (award instanceof Ribbon) {
       ribbons.push(award);
     }
-    // if (award instanceof Medal) {
-    //   medals.push(award);
-    // }
+    if (award instanceof Medal) {
+      medals.push(award);
+    }
     if (award instanceof UnitCitation) {
       unitCitations.push(award);
+    }
+    if (award instanceof BadgeCombat) {
+      combatBadge = award;
     }
   }
 
   arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
-  //arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
+  arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
+  arr.push(combatBadge);
 
   console.log(arr);
 

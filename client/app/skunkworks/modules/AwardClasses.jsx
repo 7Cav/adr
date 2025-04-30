@@ -179,6 +179,87 @@ export class Badge extends Award {
   // Do things
 }
 
+export class BadgeCombat extends Badge {
+  isMedical = false;
+  isAviation = false;
+  imageNum = 0;
+  maxAllowed;
+
+  constructor(awardData, userPosition, AwardRegistry) {
+    super(awardData, AwardRegistry);
+
+    const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
+    this.awardPriority = registryDetails.awardPriority;
+    this.imageNum = this.awardPriority;
+
+    if (userPosition.includes("A/1-7") || userPosition.includes("A/ACD")) {
+      this.isAviation = true;
+    }
+
+    if (userPosition.includes("1/B/1-7")) {
+      this.isMedical = true;
+    }
+
+    this.setMaxAllowed();
+  }
+
+  setMaxAllowed() {
+    if (this.isMedical == true) {
+      this.maxAllowed = 6;
+      return;
+    }
+
+    if (this.isAviation == true) {
+      this.maxAllowed = 8;
+      return;
+    }
+
+    this.maxAllowed = 5;
+    return;
+  }
+
+  getImageNum(num) {
+    // 1 - 5 EIB thru CIB4
+    // 6 FMB
+    // 7 - 10 wings
+
+    if (this.isAviation) {
+      switch (num) {
+        case 6:
+          return 7;
+        case 7:
+          return 8;
+        case 8:
+          return 9;
+      }
+    }
+
+    if (this.isMedical && num == 6) {
+      return 6;
+    }
+
+    return num;
+  }
+
+  updateBadgeCombat(newAwardData, AwardRegistry) {
+    const registryDetails = AwardRegistry.getAwardDetails(
+      newAwardData.awardName
+    );
+    const newAwardPriority = registryDetails.awardPriority;
+
+    if (
+      newAwardPriority > this.awardPriority &&
+      newAwardPriority <= this.maxAllowed
+    ) {
+      this.awardTitle = newAwardData.awardName;
+      this.awardPriority = newAwardPriority;
+      this.imageNum = this.getImageNum(newAwardPriority);
+    } else {
+      return;
+    }
+  }
+}
+
 export class UnitCitation extends Award {
   //Why am i using extends Award even though it is the same as ribbon? Its because im grouping them seperately
 
