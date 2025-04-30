@@ -197,8 +197,6 @@ function Canvas(props) {
       const desiredX = coordData.dx;
       const desiredY = coordData.dy;
 
-      console.log(desiredX, desiredY);
-
       const drawBadge = () => {
         // Function to draw the base ribbon
         context.drawImage(image, desiredX, desiredY);
