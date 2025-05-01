@@ -190,7 +190,6 @@ export class BadgeCombat extends Badge {
 
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
-    this.imageNum = this.awardPriority;
 
     if (userPosition.includes("A/1-7") || userPosition.includes("A/ACD")) {
       this.isAviation = true;
@@ -200,6 +199,7 @@ export class BadgeCombat extends Badge {
       this.isMedical = true;
     }
 
+    this.imageNum = this.getImageNum(this.awardPriority);
     this.setMaxAllowed();
   }
 
