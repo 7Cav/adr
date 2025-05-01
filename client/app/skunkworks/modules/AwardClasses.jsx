@@ -251,6 +251,20 @@ export class BadgeCombat extends Badge {
       newAwardPriority > this.awardPriority &&
       newAwardPriority <= this.maxAllowed
     ) {
+      if (
+        newAwardData.awardName == "Flight Medic Badge" &&
+        this.isMedical == false
+      ) {
+        return;
+      }
+
+      if (
+        newAwardData.awardName.includes("Aviator") &&
+        this.isAviation == false
+      ) {
+        return;
+      }
+
       this.awardTitle = newAwardData.awardName;
       this.awardPriority = newAwardPriority;
       this.imageNum = this.getImageNum(newAwardPriority);
