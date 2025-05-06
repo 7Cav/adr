@@ -75,8 +75,8 @@ export class AwardRegistry {
     this.awards.set("Senior Army Aviator Badge", {awardPriority: 7, awardType: "BadgeCombat"})
     this.awards.set("Army Aviator Badge", {awardPriority: 6, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 4th Award", {awardPriority: 5, awardType: "BadgeCombat"})
-    this.awards.set("Combat Infantry Badge 2nd Award", {awardPriority: 4, awardType: "BadgeCombat"})
-    this.awards.set("Combat Infantry Badge 3rd Award", {awardPriority: 3, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge 2nd Award", {awardPriority: 3, awardType: "BadgeCombat"})
+    this.awards.set("Combat Infantry Badge 3rd Award", {awardPriority: 4, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge", {awardPriority: 2, awardType: "BadgeCombat"})
     this.awards.set("Expert Infantry Badge", {awardPriority: 1, awardType: "BadgeCombat"}) // et. al.
 
