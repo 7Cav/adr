@@ -218,72 +218,73 @@ function Canvas(props) {
 
   const placeMedal = (data, medalSprites, context, xCoord, yCoord) => {
     return new Promise((resolve) => {
-      if (data.awardPriority === 0 || data.awardPriority === 1) {
-        const img = new Image();
-        img.onload = () => {
-          console.log(img.src, data.awardPriority, context);
-          context.drawImage(img, 0, 0);
-          resolve(); // Resolve AFTER loading and drawing
-        };
-        img.onerror = () => {
-          console.error(
-            `Error loading special award image: skunkworks/uniformSpecialMedals/${data.awardPriority}.png`
-          );
-          resolve(); // Resolve even on error
-        };
-        img.src = `skunkworks/uniformSpecialMedals/${data.awardPriority}.png`;
-      } else {
-        const ribbonWidth = 70;
-        const ribbonHeight = 120;
-        const ribbonSelection = data.medalPriority;
+      const ribbonWidth = 70;
+      const ribbonHeight = 120;
+      const ribbonSelection = data.medalPriority;
 
-        const drawMedal = () => {
-          // Function to draw the base ribbon
+      const drawMedal = () => {
+        // Function to draw the base ribbon
+        context.drawImage(
+          medalSprites,
+          0,
+          (ribbonSelection - 2) * ribbonHeight,
+          ribbonWidth,
+          ribbonHeight,
+          xCoord,
+          yCoord,
+          ribbonWidth,
+          ribbonHeight
+        );
+      };
+
+      if (data.ribbonDisplayedAttachmentCount !== 0) {
+        const attachmentType = data.ribbonAttachmentType;
+        const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
+        const ribbonAttachment = new Image();
+
+        ribbonAttachment.onload = () => {
+          drawMedal(); //Draw the ribbon first
           context.drawImage(
-            medalSprites,
+            ribbonAttachment,
             0,
-            (ribbonSelection - 2) * ribbonHeight,
+            0,
             ribbonWidth,
             ribbonHeight,
-            xCoord,
-            yCoord,
+            xCoord + 8,
+            yCoord + 5,
             ribbonWidth,
             ribbonHeight
           );
+          resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
         };
-
-        if (data.ribbonDisplayedAttachmentCount !== 0) {
-          const attachmentType = data.ribbonAttachmentType;
-          const attachmentCount =
-            data.ribbonDisplayedAttachmentCount.toString();
-          const ribbonAttachment = new Image();
-
-          ribbonAttachment.onload = () => {
-            drawMedal(); //Draw the ribbon first
-            context.drawImage(
-              ribbonAttachment,
-              0,
-              0,
-              ribbonWidth,
-              ribbonHeight,
-              xCoord + 8,
-              yCoord + 5,
-              ribbonWidth,
-              ribbonHeight
-            );
-            resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
-          };
-          ribbonAttachment.onerror = () => {
-            console.error("Error loading ribbon attachment");
-            drawMedal(); //Draw the ribbon even if attachment fails
-            resolve();
-          };
-          ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
-        } else {
-          drawMedal(); //Draw the ribbon if no attachment
-          resolve(); // Resolve immediately if no attachment
-        }
+        ribbonAttachment.onerror = () => {
+          console.error("Error loading ribbon attachment");
+          drawMedal(); //Draw the ribbon even if attachment fails
+          resolve();
+        };
+        ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
+      } else {
+        drawMedal(); //Draw the ribbon if no attachment
+        resolve(); // Resolve immediately if no attachment
       }
+    });
+  };
+
+  const drawSpecialMedal = (data, context) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        console.log(img.src, data.awardPriority, context);
+        context.drawImage(img, 0, 0);
+        resolve(); // Resolve AFTER loading and drawing
+      };
+      img.onerror = () => {
+        console.error(
+          `Error loading special award image: skunkworks/uniformSpecialMedals/${data.awardPriority}.png`
+        );
+        resolve(); // Resolve even on error
+      };
+      img.src = `skunkworks/uniformSpecialMedals/${data.awardPriority}.png`;
     });
   };
 
@@ -419,12 +420,14 @@ function Canvas(props) {
         const row1Medals = [];
         const row2Medals = [];
         const row3Medals = [];
+        const specialMedals = [];
         const medalCoordsRow1 = [];
         const medalCoordsRow2 = [];
         const medalCoordsRow3 = [];
 
         data[3].forEach((medal, index) => {
           if (medal.awardPriority == 0 || medal.awardPriority == 1) {
+            specialMedals.push(medal);
             return;
           }
           const medalY = medalCoords[index].y;
@@ -441,6 +444,11 @@ function Canvas(props) {
           }
         });
         // Draw medals in reverse row order (row 3, then 2, then 1)
+        await Promise.all([
+          ...specialMedals.map((medalData) =>
+            drawSpecialMedal(medalData, context)
+          ),
+        ]);
         await Promise.all([
           ...row1Medals.map((medalData, index) =>
             placeMedal(
