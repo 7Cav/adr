@@ -251,8 +251,38 @@ function Canvas(props) {
             ribbonHeight
           );
         };
-        drawMedal();
-        resolve();
+
+        if (data.ribbonDisplayedAttachmentCount !== 0) {
+          const attachmentType = data.ribbonAttachmentType;
+          const attachmentCount =
+            data.ribbonDisplayedAttachmentCount.toString();
+          const ribbonAttachment = new Image();
+
+          ribbonAttachment.onload = () => {
+            drawMedal(); //Draw the ribbon first
+            context.drawImage(
+              ribbonAttachment,
+              0,
+              0,
+              ribbonWidth,
+              ribbonHeight,
+              xCoord + 8,
+              yCoord + 5,
+              ribbonWidth,
+              ribbonHeight
+            );
+            resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
+          };
+          ribbonAttachment.onerror = () => {
+            console.error("Error loading ribbon attachment");
+            drawMedal(); //Draw the ribbon even if attachment fails
+            resolve();
+          };
+          ribbonAttachment.src = `skunkworks/uniformRibbons/attachments/${attachmentType}/${attachmentCount}.png`;
+        } else {
+          drawMedal(); //Draw the ribbon if no attachment
+          resolve(); // Resolve immediately if no attachment
+        }
       }
     });
   };
@@ -385,17 +415,63 @@ function Canvas(props) {
           medalCoords.push({ x: _offsetX, y: _offsetY });
         });
 
-        console.log(medalCoords);
+        // Separate medals into rows
+        const row1Medals = [];
+        const row2Medals = [];
+        const row3Medals = [];
+        const medalCoordsRow1 = [];
+        const medalCoordsRow2 = [];
+        const medalCoordsRow3 = [];
 
-        //Draw the medals
+        data[3].forEach((medal, index) => {
+          if (medal.awardPriority == 0 || medal.awardPriority == 1) {
+            return;
+          }
+          const medalY = medalCoords[index].y;
+
+          if (medalY === offsetY) {
+            row1Medals.push(medal);
+            medalCoordsRow1.push(medalCoords[index]);
+          } else if (medalY === offsetY + rowSpacing) {
+            row2Medals.push(medal);
+            medalCoordsRow2.push(medalCoords[index]);
+          } else {
+            row3Medals.push(medal);
+            medalCoordsRow3.push(medalCoords[index]);
+          }
+        });
+        // Draw medals in reverse row order (row 3, then 2, then 1)
         await Promise.all([
-          ...data[3].slice(0, data[3].length).map((medalData, index) =>
+          ...row1Medals.map((medalData, index) =>
             placeMedal(
               medalData,
               images.medalSprites,
               context,
-              medalCoords[index].x, // Pass calculated x
-              medalCoords[index].y
+              medalCoordsRow1[index].x,
+              medalCoordsRow1[index].y
+            )
+          ),
+        ]);
+        await Promise.all([
+          ...row2Medals.map((medalData, index) =>
+            placeMedal(
+              medalData,
+              images.medalSprites,
+              context,
+              medalCoordsRow2[index].x,
+              medalCoordsRow2[index].y
+            )
+          ),
+        ]);
+
+        await Promise.all([
+          ...row3Medals.map((medalData, index) =>
+            placeMedal(
+              medalData,
+              images.medalSprites,
+              context,
+              medalCoordsRow3[index].x,
+              medalCoordsRow3[index].y
             )
           ),
         ]);
