@@ -450,13 +450,13 @@ function Canvas(props) {
           ),
         ]);
         await Promise.all([
-          ...row1Medals.map((medalData, index) =>
+          ...row3Medals.map((medalData, index) =>
             placeMedal(
               medalData,
               images.medalSprites,
               context,
-              medalCoordsRow1[index].x,
-              medalCoordsRow1[index].y
+              medalCoordsRow3[index].x,
+              medalCoordsRow3[index].y
             )
           ),
         ]);
@@ -473,13 +473,13 @@ function Canvas(props) {
         ]);
 
         await Promise.all([
-          ...row3Medals.map((medalData, index) =>
+          ...row1Medals.map((medalData, index) =>
             placeMedal(
               medalData,
               images.medalSprites,
               context,
-              medalCoordsRow3[index].x,
-              medalCoordsRow3[index].y
+              medalCoordsRow1[index].x,
+              medalCoordsRow1[index].y
             )
           ),
         ]);
