@@ -9,56 +9,57 @@ export class AwardRegistry {
 
     //____MAINLINE MEDALS AND RIBBONS____
 
-    this.awards.set(`James "Krazee" Foster Lifetime Achievement Medal`, {awardPriority: 1, awardType: "Medal"});
-    this.awards.set(`Ronnie "Coldblud" Bussey Lifetime Achievement Medal`, {awardPriority: 2, awardType: "Medal"});
-    this.awards.set("Army Distinguished Service Cross", {awardPriority: 3, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Defense Distinguished Service Medal", {awardPriority: 4, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Army Distinguished Service Medal", {awardPriority: 5, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Silver Star", {awardPriority: 6, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Defense Superior Service Medal", {awardPriority: 7, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Legion of Merit", {awardPriority: 8, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Distinguished Flying Cross", {awardPriority: 9, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Soldiers Medal", {awardPriority: 10, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Bronze Star", {awardPriority: 11, awardAttachmentType: "oakClusters", awardType: "MedalWithValor"});
-    this.awards.set("Purple Heart", {awardPriority: 12, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Defense Meritorious Service Medal", {awardPriority: 13, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Meritorious Service Medal", {awardPriority: 14, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Air Medal", {awardPriority: 15, awardAttachmentType: "ncoNums", awardType: "Medal"});
-    this.awards.set("Joint Service Commendation Medal", {awardPriority: 16, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Army Commendation Medal", {awardPriority: 17, awardAttachmentType: "oakClusters", awardType: "MedalWithValor"});
-    this.awards.set("Joint Service Achievement Medal", {awardPriority: 18, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Army Achievement Medal",{awardPriority: 19, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Prisoner of War Medal", {awardPriority: 20, awardAttachmentType: "oakClusters", awardType: "Medal"});
-    this.awards.set("Army Good Conduct Medal", {awardPriority: 21, awardAttachmentType: "gcNotches", awardType: "Medal"});
-    this.awards.set("Armed Forces Expeditionary Medal", {awardPriority: 22, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Afghanistan Campaign Medal", {awardPriority: 23, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Iraq Campaign Medal", {awardPriority: 24, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Global War on Terrorism Expeditionary Medal", {awardPriority: 25, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("National Defense Service Medal", {awardPriority: 26, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Armed Forces Service Medal", {awardPriority: 27, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Humanitarian Service Medal", {awardPriority: 28, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set(`7th Cavalry Lifetime Dedication Award`, {awardPriority: 0, medalPriority: 0, awardType: "Medal"});
+    this.awards.set(`James "Krazee" Foster Lifetime Achievement Medal`, {awardPriority: 1, medalPriority: 1, awardType: "Medal"});
+    this.awards.set(`Ronnie "Coldblud" Bussey Lifetime Achievement Medal`, {awardPriority: 2, medalPriority: 2, awardType: "Medal"});
+    this.awards.set("Army Distinguished Service Cross", {awardPriority: 3, medalPriority: 3, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Defense Distinguished Service Medal", {awardPriority: 4, medalPriority: 4, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Army Distinguished Service Medal", {awardPriority: 5, medalPriority: 5, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Silver Star", {awardPriority: 6, medalPriority: 6, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Defense Superior Service Medal", {awardPriority: 7, medalPriority: 7, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Legion of Merit", {awardPriority: 8, medalPriority: 8, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Distinguished Flying Cross", {awardPriority: 9, medalPriority: 9, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Soldiers Medal", {awardPriority: 10, medalPriority: 10, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Bronze Star", {awardPriority: 11, medalPriority: 11, awardAttachmentType: "oakClusters", awardType: "MedalWithValor"});
+    this.awards.set("Purple Heart", {awardPriority: 12, medalPriority: 12, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Defense Meritorious Service Medal", {awardPriority: 13, medalPriority: 13, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Meritorious Service Medal", {awardPriority: 14, medalPriority: 14, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Air Medal", {awardPriority: 15, medalPriority: 15, awardAttachmentType: "ncoNums", awardType: "Medal"});
+    this.awards.set("Joint Service Commendation Medal", {awardPriority: 16, medalPriority: 16, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Army Commendation Medal", {awardPriority: 17, medalPriority: 17, awardAttachmentType: "oakClusters", awardType: "MedalWithValor"});
+    this.awards.set("Joint Service Achievement Medal", {awardPriority: 18, medalPriority: 18, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Army Achievement Medal",{awardPriority: 19, medalPriority: 19, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Prisoner of War Medal", {awardPriority: 20, medalPriority: 20, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Army Good Conduct Medal", {awardPriority: 21, medalPriority: 21, awardAttachmentType: "gcNotches", awardType: "Medal"});
+    this.awards.set("Armed Forces Expeditionary Medal", {awardPriority: 22, medalPriority: 22, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Afghanistan Campaign Medal", {awardPriority: 23, medalPriority: 23, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Iraq Campaign Medal", {awardPriority: 24, medalPriority: 24, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Global War on Terrorism Expeditionary Medal", {awardPriority: 25, medalPriority: 25, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("National Defense Service Medal", {awardPriority: 26, medalPriority: 26, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Armed Forces Service Medal", {awardPriority: 27, medalPriority: 27, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Humanitarian Service Medal", {awardPriority: 28, medalPriority: 28, awardAttachmentType: "stars", awardType: "Medal"});
     this.awards.set("Donation Ribbon", {awardPriority: 29, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // Requires Special Case
-    this.awards.set("7th Cavalry Server Upgrade Award", {awardPriority: 30, awardAttachmentType: "stars", awardType: "MedalTiered"}); // Fuck you, whoever put this into SOP
-    this.awards.set("StackUp Donation Medal", {awardPriority: 31, awardAttachmentType: "gcNotches", awardType: "MedalTiered"}); // and again
-    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("7th Cavalry Server Upgrade Award", {awardPriority: 30, medalPriority: 29, awardAttachmentType: "stars", awardType: "MedalTiered"}); // Fuck you, whoever put this into SOP
+    this.awards.set("StackUp Donation Medal", {awardPriority: 31, medalPriority: 30, awardAttachmentType: "gcNotches", awardType: "MedalTiered"}); // and again
+    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, medalPriority: 31, awardAttachmentType: "oakClusters", awardType: "Medal"});
     this.awards.set("NCO Professional Development Ribbon", {awardPriority: 33, awardAttachmentType: "ncoNums", awardType: "Ribbon"});
     this.awards.set("Honor Graduate Ribbon", {awardPriority: 34, awardType: "Ribbon"});
     this.awards.set("Army Service Ribbon", {awardPriority: 35, awardType: "Ribbon"});
-    this.awards.set("Cavalry Centurion Medal", {awardPriority: 36, awardAttachmentType: "silverStars", awardType: "Medal"});
-    this.awards.set("United Nations Service Medal", {awardPriority: 37, awardAttachmentType: "stars", awardType: "Medal"});
-    this.awards.set("Overseas Service Ribbon", {awardPriority: 38, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Ready or Not Service Ribbon",{awardPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("DCS World Service Ribbon", {awardPriority: 40, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Squad Service Ribbon", {awardPriority: 41, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
+    this.awards.set("Cavalry Centurion Medal", {awardPriority: 36, medalPriority: 32, awardAttachmentType: "silverStars", awardType: "Medal"});
+    this.awards.set("United Nations Service Medal", {awardPriority: 37, medalPriority: 33, awardAttachmentType: "stars", awardType: "Medal"});
+    this.awards.set("Overseas Service Ribbon", {awardPriority: 38, medalPriority: 34, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Ready or Not Service Ribbon",{awardPriority: 39, medalPriority: 35, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("DCS World Service Ribbon", {awardPriority: 40, medalPriority: 36, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Squad Service Ribbon", {awardPriority: 41, medalPriority: 37, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("WWII Service Ribbon", {awardPriority: 42, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
+    this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, medalPriority: 38, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, medalPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Recruiting Ribbon", {awardPriority: 45, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
-    this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, awardType: "Medal"});
+    this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, medalPriority: 40, awardType: "Medal"});
     this.awards.set("Ranger Selection Ribbon", {awardPriority: 47, awardType: "Ribbon"});
-    this.awards.set("Sniper Ribbon", {awardPriority: 48, awardType: "Ribbon"});
+    this.awards.set("Sniper Ribbon", {awardPriority: 48, medalPriority: 41, awardType: "medal"});
     this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
-    
+
     //____ UNIT CITATIONS ____
     
     this.awards.set("Army & Air Force Presidential Unit Citation", {awardPriority: 0, awardAttachmentType: "unitCitationClusters", awardType: "UnitCitation"});
