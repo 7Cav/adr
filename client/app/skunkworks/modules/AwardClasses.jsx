@@ -41,10 +41,12 @@ export class Ribbon extends Award {
 }
 
 export class Medal extends Ribbon {
-  static totalMedalCount = 0;
+  medalPriority;
 
   constructor(data, AwardRegistry) {
     super(data, AwardRegistry);
+    const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
+    this.medalPriority = registryDetails.medalPriority;
     Medal.totalMedalCount++;
   }
 }
@@ -191,7 +193,10 @@ export class BadgeCombat extends Badge {
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
 
-    if (userPosition.includes("A/1-7") || userPosition.includes("A/ACD")) {
+    if (
+      (userPosition.includes("A/1-7") && !userPosition.includes("3/1/A/1-7")) ||
+      userPosition.includes("A/ACD")
+    ) {
       this.isAviation = true;
     }
 

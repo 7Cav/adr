@@ -47,6 +47,10 @@ function Canvas(props) {
         "skunkworks/uniformRibbons/ribbons/unitCitationSprite.png",
         "citationSprites"
       ),
+      loadImage(
+        "skunkworks/uniformMedals/medalSpriteSheet.png",
+        "medalSprites"
+      ),
     ];
 
     if (data[4] != null) {
@@ -80,6 +84,11 @@ function Canvas(props) {
       const desiredX = coordData.dx;
       const desiredY = coordData.dy;
       const ribbonSelection = data.awardPriority;
+
+      if (data.awardPriority == 0) {
+        resolve();
+        return;
+      }
 
       const drawRibbon = () => {
         // Function to draw the base ribbon
@@ -192,6 +201,7 @@ function Canvas(props) {
     return new Promise((resolve) => {
       if (image == undefined) {
         resolve();
+        return;
       }
 
       const desiredX = coordData.dx;
@@ -206,6 +216,54 @@ function Canvas(props) {
     });
   };
 
+  const placeMedal = (data, medalSprites, context, xCoord, yCoord) => {
+    return new Promise((resolve) => {
+      if (data.awardPriority === 0 || data.awardPriority === 1) {
+        const img = new Image();
+        img.onload = () => {
+          console.log(img.src, data.awardPriority, context);
+          context.drawImage(img, 0, 0);
+          resolve(); // Resolve AFTER loading and drawing
+        };
+        img.onerror = () => {
+          console.error(
+            `Error loading special award image: skunkworks/uniformSpecialMedals/${data.awardPriority}.png`
+          );
+          resolve(); // Resolve even on error
+        };
+        img.src = `skunkworks/uniformSpecialMedals/${data.awardPriority}.png`;
+      } else {
+        const ribbonWidth = 70;
+        const ribbonHeight = 120;
+        const ribbonSelection = data.medalPriority;
+
+        const drawMedal = () => {
+          // Function to draw the base ribbon
+          context.drawImage(
+            medalSprites,
+            0,
+            (ribbonSelection - 2) * ribbonHeight,
+            ribbonWidth,
+            ribbonHeight,
+            xCoord,
+            yCoord,
+            ribbonWidth,
+            ribbonHeight
+          );
+        };
+        drawMedal();
+        resolve();
+      }
+    });
+  };
+
+  const drawGeneric = (image, context) => {
+    return new Promise((resolve) => {
+      context.drawImage(image, 0, 0);
+      resolve();
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -213,7 +271,8 @@ function Canvas(props) {
       images.uniformLapel &&
       images.uniformEpaulette &&
       images.ribbonSprites &&
-      images.citationSprites
+      images.citationSprites &&
+      images.medalSprites
     ) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
@@ -223,6 +282,7 @@ function Canvas(props) {
       const drawLayers = async () => {
         context.drawImage(images.uniformBase, 0, 0);
 
+        // First, draw all ribbons, unit citations and the infantry badge.
         await Promise.all([
           ...data[1]
             .slice(0, data[0].ribbonMedalCount)
@@ -251,8 +311,94 @@ function Canvas(props) {
             context
           ),
         ]);
-        context.drawImage(images.uniformLapel, 0, 0);
-        context.drawImage(images.uniformEpaulette, 0, 0);
+
+        //Draw the lapel and the epaulette
+        await Promise.all([
+          drawGeneric(images.uniformLapel, context),
+          drawGeneric(images.uniformEpaulette, context),
+        ]);
+
+        //Calculate medal coords
+
+        const medalCoords = [];
+        const canvasWidth = canvas.width;
+        const borderWidth = 25;
+        const widthInner = canvasWidth - 2 * borderWidth;
+        const offsetX = borderWidth;
+        const offsetY = 745;
+        const medalWidth = 70;
+        const medalHeight = 120;
+        let medalsPerRow = 12;
+        const medalSpacing = -5;
+        let x = 0;
+        let y = 0;
+        let indexOffset = 0;
+        let secondRowOffset = medalWidth / 2 + medalSpacing / 2;
+        let rowSpacing = medalHeight; // Initial row spacing
+
+        data[3].forEach((medalData, index) => {
+          if (medalData.awardPriority == 0 || medalData.awardPriority == 1) {
+            medalCoords.push({ x: 0, y: 0 });
+            indexOffset++;
+            return;
+          }
+
+          if (data[3].length > 25) {
+            rowSpacing = 70;
+          }
+
+          let currentIndex = index - indexOffset;
+          x = currentIndex % medalsPerRow;
+          y = Math.floor(currentIndex / medalsPerRow);
+
+          // Apply the offset to x for the second row
+          if (y === 1 && data[3].length - indexOffset > 25) {
+            x = (currentIndex - medalsPerRow) % (medalsPerRow - 1);
+          }
+          // Calculate x for the third row
+          if (y === 2) {
+            x =
+              (currentIndex - medalsPerRow - (medalsPerRow - 1)) % medalsPerRow;
+          }
+
+          let _offsetX = Math.floor(
+            offsetX + 4 + x * (medalWidth + medalSpacing)
+          );
+          let _offsetY = offsetY + y * rowSpacing;
+
+          if (y % 2 !== 0 && data[3].length - indexOffset > 24) {
+            _offsetX += secondRowOffset;
+          }
+
+          if (y == 2) {
+            _offsetX += medalWidth;
+          }
+
+          console.log(currentIndex == 23, data[3].length - indexOffset >= 25);
+
+          if (currentIndex == 23 && data[3].length - indexOffset >= 25) {
+            // Force x-coordinate to be the same as entry 0
+            _offsetX = medalCoords[1 + indexOffset].x + 5;
+            _offsetY = 885;
+          }
+
+          medalCoords.push({ x: _offsetX, y: _offsetY });
+        });
+
+        console.log(medalCoords);
+
+        //Draw the medals
+        await Promise.all([
+          ...data[3].slice(0, data[3].length).map((medalData, index) =>
+            placeMedal(
+              medalData,
+              images.medalSprites,
+              context,
+              medalCoords[index].x, // Pass calculated x
+              medalCoords[index].y
+            )
+          ),
+        ]);
 
         canvas.toBlob(function (blob) {
           canvasDownload.href = URL.createObjectURL(blob);
@@ -261,9 +407,6 @@ function Canvas(props) {
       drawLayers();
     }
   }, [loading, images, data]);
-
-  //context.drawImage(images.uniformLapel, 0, 0);
-  //context.drawImage(images.uniformEpaulette, 0, 0);
 
   if (loading) {
     return <div>Loading...</div>;
