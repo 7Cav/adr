@@ -51,14 +51,24 @@ export class AwardRegistry {
     this.awards.set("Ready or Not Service Ribbon",{awardPriority: 39, medalPriority: 35, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("DCS World Service Ribbon", {awardPriority: 40, medalPriority: 36, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Squad Service Ribbon", {awardPriority: 41, medalPriority: 37, awardAttachmentType: "oakClustersService", awardType: "Medal"});
-    this.awards.set("WWII Service Ribbon", {awardPriority: 42, awardAttachmentType: "oakClustersService", awardType: "Ribbon"});
-    this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, medalPriority: 38, awardAttachmentType: "oakClustersService", awardType: "Medal"});
-    this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, medalPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("WWII Service Ribbon", {awardPriority: 42, medalPriority: 38, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, medalPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, medalPriority: 40, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Recruiting Ribbon", {awardPriority: 45, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
-    this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, medalPriority: 40, awardType: "Medal"});
+    this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, medalPriority: 41, awardType: "Medal"});
     this.awards.set("Ranger Selection Ribbon", {awardPriority: 47, awardType: "Ribbon"});
-    this.awards.set("Sniper Ribbon", {awardPriority: 48, medalPriority: 41, awardType: "medal"});
+    this.awards.set("Sniper Ribbon", {awardPriority: 48, medalPriority: 42, awardType: "Medal"});
     this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
+
+    // ___ DISCONTINUED RIBBONS/MEDALS ___
+    // These ones are a bit of an unknown precidence wise. Indeed we have some discon awards above, however precidence is known
+    // Anything here is shown as is, and there is no inherent precicence for these. 
+
+    this.awards.set("Cadre Course Ribbon", {awardPriority: 50, awardType: "Ribbon"});
+    this.awards.set("Womens Army Corp Service Medal", {awardPriority: 51, medalPriority:43, awardType: "Medal"})
+    this.awards.set("D Day Participation Ribbon", {awardPriority: 52, awardType: "Ribbon"})
+    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 53, medalPriority:44, awardType: "Medal"})
+    
 
     //____ UNIT CITATIONS ____
     
