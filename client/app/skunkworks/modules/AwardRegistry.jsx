@@ -67,7 +67,7 @@ export class AwardRegistry {
     this.awards.set("Cadre Course Ribbon", {awardPriority: 50, awardType: "Ribbon"});
     this.awards.set("Womens Army Corp Service Medal", {awardPriority: 51, medalPriority:43, awardType: "Medal"})
     this.awards.set("D Day Participation Ribbon", {awardPriority: 52, awardType: "Ribbon"})
-    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 53, medalPriority:44, awardType: "Medal"})
+    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 53, medalPriority:44, awardAttachmentType: "oakClusters", awardType: "Medal"})
     
 
     //____ UNIT CITATIONS ____
