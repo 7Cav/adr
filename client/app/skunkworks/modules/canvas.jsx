@@ -250,8 +250,8 @@ function Canvas(props) {
             0,
             ribbonWidth,
             ribbonHeight,
-            xCoord + 8,
-            yCoord + 5,
+            xCoord + 13,
+            yCoord + 7,
             ribbonWidth,
             ribbonHeight
           );
