@@ -295,6 +295,104 @@ function Canvas(props) {
     });
   };
 
+  const placeServiceStripes = (userData, context) => {
+    return new Promise((resolve) => {
+      let stripeWidth;
+      let stripeHeight;
+
+      if (userData.yearsInServiceCoordArray[0] == "officer") {
+        stripeWidth = 50;
+        stripeHeight = 9;
+      } else {
+        stripeWidth = 40;
+        stripeHeight = 50;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        for (let i = 1; i <= userData.yearsInService; i++) {
+          context.drawImage(
+            img,
+            0,
+            0,
+            stripeWidth,
+            stripeHeight,
+            userData.yearsInServiceCoordArray[i].dx,
+            userData.yearsInServiceCoordArray[i].dy,
+            stripeWidth,
+            stripeHeight
+          );
+        }
+        resolve();
+      };
+
+      img.onerror = () => {
+        console.error(
+          `Error loading service stripe image: skunkworks/uniformService/${userData.yearsInServiceCoordArray[0]}/serviceStripe.png`
+        );
+        resolve(); // Resolve even on error
+      };
+      img.src = `skunkworks/uniformService/${userData.yearsInServiceCoordArray[0]}/serviceStripe.png`;
+    });
+  };
+
+  const placeNameTag = (userData, context) => {
+    return new Promise((resolve) => {
+      let tagWidth;
+      let tagHeight;
+      let selector;
+      let dx;
+      let fontSize = 18;
+      const dy = 313;
+
+      if (userData.nameTag.length < 8) {
+        tagWidth = 101;
+        tagHeight = 40;
+        selector = "short";
+        dx = 203;
+      } else {
+        tagWidth = 131;
+        tagHeight = 40;
+        selector = "long";
+        dx = 188;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        context.drawImage(
+          img,
+          0,
+          0,
+          tagWidth,
+          tagHeight,
+          dx,
+          dy,
+          tagWidth,
+          tagHeight
+        );
+        if (userData.nameTag.length > 10) {
+          fontSize = 18 - (userData.nameTag.length - 10) * 2;
+        }
+
+        context.font = `normal condensed bold ${fontSize}px 'Arial Narrow'`;
+        console.log(fontSize, context.font);
+        context.fillStyle = "#ffffff";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(userData.nameTag, dx + tagWidth / 2, dy + 18);
+        resolve();
+      };
+
+      img.onerror = () => {
+        console.error(
+          `Error loading name tag: skunkworks/uniformNameTag/${selector}.png`
+        );
+        resolve(); // Resolve even on error
+      };
+      img.src = `skunkworks/uniformNameTag/${selector}.png`;
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -349,7 +447,16 @@ function Canvas(props) {
           drawGeneric(images.uniformEpaulette, context),
         ]);
 
+        //Draw Service Stripes
+        if (data[0].yearsInService) {
+          await Promise.all([placeServiceStripes(data[0], context)]);
+        }
+
+        //Draw Name Tag, 8 or more requires long boi
+        await Promise.all([placeNameTag(data[0], context)]);
+
         //Calculate medal coords
+        //TODO MOVE THIS WHOLE THING OUT OF THIS DAMN CANVAS FUNCTION
 
         const medalCoords = [];
         const canvasWidth = canvas.width;

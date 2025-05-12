@@ -18,6 +18,7 @@ export default async function GetCanvasObject(userName) {
   let awardCounts = [];
   let totalRibbonCount = 0;
   let totalUnitCitationCount = 0;
+  let yearsInService = 0;
 
   const awardMap = new Map();
   const AwardRegistryInstance = new AwardRegistry();
@@ -47,6 +48,10 @@ export default async function GetCanvasObject(userName) {
 
     //If there is already an award with the key, add the valor device to the existing obj if true and increment AttachmentCount
     //Otherwise, create the award, and add it (and the key) to the Map.
+
+    if (key == "Army Good Conduct Medal") {
+      yearsInService++;
+    }
 
     if (
       awardMap.has(key) ||
@@ -153,7 +158,12 @@ export default async function GetCanvasObject(userName) {
   }
   //Create an output array from the Map and return it.
 
-  const userInfo = GetUserInfo(data, totalRibbonCount, totalUnitCitationCount);
+  const userInfo = GetUserInfo(
+    data,
+    totalRibbonCount,
+    totalUnitCitationCount,
+    yearsInService
+  );
 
   const arr = [];
   arr.push(userInfo);
