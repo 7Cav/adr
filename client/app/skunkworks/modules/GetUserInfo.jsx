@@ -1,15 +1,23 @@
 import GetCoordArray from "./getCoordArray";
 import GetCitationCoordArray from "./getCitationCoordArray";
 import GetCombatBadgeCoords from "./getCombatBadgeCoords";
+import GetYearsInServiceCoordArray from "./getYearsInServiceCoordArray";
 
-export default function GetUserInfo(dataActive, ribbonCount, citationCount) {
+export default function GetUserInfo(
+  dataActive,
+  ribbonCount,
+  citationCount,
+  yearsInService
+) {
   const returnObject = {
-    nameTag: dataActive.user.username,
+    nameTag: generateNameTag(dataActive.user.username),
     rank: dataActive.rank.rankShort,
     rankId: dataActive.rank.rankId,
     rankGrade: getRankGrade(dataActive.rank.rankId),
     ribbonCount: ribbonCount,
     unitCitationCount: citationCount,
+    yearsInService: yearsInService,
+    yearsInServiceCoordArray: [],
     ribbonCoordArray: [],
     unitCitationCoordArray: [],
     combatBadgeCoords: [],
@@ -17,8 +25,18 @@ export default function GetUserInfo(dataActive, ribbonCount, citationCount) {
   returnObject.ribbonCoordArray = GetCoordArray(ribbonCount);
   returnObject.unitCitationCoordArray = GetCitationCoordArray(citationCount);
   returnObject.combatBadgeCoords = GetCombatBadgeCoords(ribbonCount);
+  returnObject.yearsInServiceCoordArray = GetYearsInServiceCoordArray(
+    yearsInService,
+    getRankGrade(dataActive.rank.rankId)
+  );
 
   return returnObject;
+}
+
+function generateNameTag(username) {
+  const periodIndex = username.indexOf(".");
+  const nameTag = username.substring(0, periodIndex);
+  return nameTag.toUpperCase();
 }
 
 function getRankGrade(rankId) {
