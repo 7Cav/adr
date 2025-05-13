@@ -396,6 +396,78 @@ function Canvas(props) {
     });
   };
 
+  const placeWeaponQual = (data, selector, context) => {
+    return new Promise((resolve) => {
+      // first, draw the root
+
+      const rootWidth = 71;
+      const rootHeight = 85;
+      const plateWidth = 68;
+      const plateHeight = 36;
+      let dx;
+      let dy = 576 - (data.length - 1) * (plateHeight - 10);
+
+      if (selector == "expert") {
+        dx = 25;
+      } else if (selector == "sharpshooter") {
+        dx = 97;
+      } else {
+        dx = 170;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        context.drawImage(
+          img,
+          0,
+          0,
+          rootWidth,
+          rootHeight,
+          dx,
+          dy,
+          rootWidth,
+          rootHeight
+        );
+
+        let dyPlate = dy + (rootHeight - 10);
+
+        for (let i = 0; i < data.length; i++) {
+          const img2 = new Image();
+          img2.onload = () => {
+            context.drawImage(
+              img2,
+              0,
+              0,
+              plateWidth,
+              plateHeight,
+              dx,
+              dyPlate,
+              plateWidth,
+              plateHeight
+            );
+            dyPlate += plateHeight - 10;
+          };
+          img2.onerror = () => {
+            console.error(
+              `Error loading weapon qual plate: skunkworks/uniformWeaponQuals/plates/${data[i]}.png`
+            );
+          };
+          img2.src = `skunkworks/uniformWeaponQuals/plates/${data[i]}.png`;
+        }
+
+        resolve();
+      };
+
+      img.onerror = () => {
+        console.error(
+          `Error loading weapon qual root: skunkworks/uniformWeaponQuals/root/${selector}.png`
+        );
+        resolve(); // Resolve even on error
+      };
+      img.src = `skunkworks/uniformWeaponQuals/root/${selector}.png`;
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -455,8 +527,28 @@ function Canvas(props) {
           await Promise.all([placeServiceStripes(data[0], context)]);
         }
 
-        //Draw Name Tag, 8 or more requires long boi
+        //Draw Name Tag, 8 or more chars requires long boi
         await Promise.all([placeNameTag(data[0], context)]);
+
+        //Draw Weapon Quals
+
+        if (data[5].expertQuals.length > 0) {
+          await Promise.all([
+            placeWeaponQual(data[5].expertQuals, "expert", context),
+          ]);
+        }
+
+        if (data[5].sharpshooterQuals.length > 0) {
+          await Promise.all([
+            placeWeaponQual(data[5].sharpshooterQuals, "sharpshooter", context),
+          ]);
+        }
+
+        if (data[5].marksmanQuals.length > 0) {
+          await Promise.all([
+            placeWeaponQual(data[5].marksmanQuals, "marksman", context),
+          ]);
+        }
 
         //Calculate medal coords
         //TODO MOVE THIS WHOLE THING OUT OF THIS DAMN CANVAS FUNCTION

@@ -9,6 +9,7 @@ import {
   RibbonDonationLogic,
   UnitCitation,
   BadgeCombat,
+  WeaponQual,
 } from "./AwardClasses";
 import GetUserInfo from "./GetUserInfo";
 
@@ -44,6 +45,11 @@ export default async function GetCanvasObject(userName) {
     if (awardType == "BadgeCombat") {
       useCombatBadgeLogic = true;
       combatBadgeKey = "BadgeCombat";
+    }
+
+    if (awardType == "WeaponQual") {
+      useCombatBadgeLogic = true;
+      combatBadgeKey = "WeaponQual";
     }
 
     //If there is already an award with the key, add the valor device to the existing obj if true and increment AttachmentCount
@@ -82,6 +88,10 @@ export default async function GetCanvasObject(userName) {
 
       if (existingAward instanceof BadgeCombat) {
         existingAward.updateBadgeCombat(data.awards[i], AwardRegistryInstance);
+      }
+
+      if (existingAward instanceof WeaponQual) {
+        existingAward.addAward(data.awards[i], AwardRegistryInstance);
       }
 
       if (
@@ -149,6 +159,12 @@ export default async function GetCanvasObject(userName) {
             );
             awardMap.set("BadgeCombat", newBadgeCombat);
             break;
+          case "WeaponQual":
+            const newWeaponQual = new WeaponQual(
+              data.awards[i],
+              AwardRegistryInstance
+            );
+            awardMap.set("WeaponQual", newWeaponQual);
         }
       } else {
         // const newAward = new Award(data.awards[i]);
@@ -172,6 +188,7 @@ export default async function GetCanvasObject(userName) {
   let medals = [];
   let unitCitations = [];
   let combatBadge = null;
+  let weaponQual = null;
 
   for (const award of awardMap.values()) {
     if (award instanceof Ribbon) {
@@ -186,12 +203,16 @@ export default async function GetCanvasObject(userName) {
     if (award instanceof BadgeCombat) {
       combatBadge = award;
     }
+    if (award instanceof WeaponQual) {
+      weaponQual = award;
+    }
   }
 
   arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(combatBadge);
+  arr.push(weaponQual);
 
   console.log(arr);
 

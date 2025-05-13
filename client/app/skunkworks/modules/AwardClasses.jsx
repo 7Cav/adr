@@ -312,3 +312,34 @@ export class UnitCitation extends Award {
     }
   }
 }
+
+export class WeaponQual extends Award {
+  expertQuals = [];
+  sharpshooterQuals = [];
+  marksmanQuals = [];
+
+  constructor(data, AwardRegistry) {
+    super(data);
+    this.awardTitle = "Weapon Qualifications";
+    this.addAward(data, AwardRegistry);
+  }
+
+  addAward(data, AwardRegistry) {
+    const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
+
+    if (data.awardName.includes("Expert")) {
+      this.expertQuals.push(registryDetails.awardTag);
+      this.expertQuals.sort();
+    }
+
+    if (data.awardName.includes("Sharpshooter")) {
+      this.sharpshooterQuals.push(registryDetails.awardTag);
+      this.expertQuals.sort();
+    }
+
+    if (data.awardName.includes("Marksman")) {
+      this.marksmanQuals.push(registryDetails.awardTag);
+      this.expertQuals.sort();
+    }
+  }
+}
