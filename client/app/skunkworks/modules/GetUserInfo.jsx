@@ -2,12 +2,14 @@ import GetCoordArray from "./getCoordArray";
 import GetCitationCoordArray from "./getCitationCoordArray";
 import GetCombatBadgeCoords from "./getCombatBadgeCoords";
 import GetYearsInServiceCoordArray from "./getYearsInServiceCoordArray";
+import GetTabCoordArray from "./getTabCoordArray";
 
 export default function GetUserInfo(
   dataActive,
   ribbonCount,
   citationCount,
-  yearsInService
+  yearsInService,
+  tabCount
 ) {
   const returnObject = {
     nameTag: generateNameTag(dataActive.user.username),
@@ -17,10 +19,12 @@ export default function GetUserInfo(
     ribbonCount: ribbonCount,
     unitCitationCount: citationCount,
     yearsInService: yearsInService,
+    tabCount: tabCount,
     yearsInServiceCoordArray: [],
     ribbonCoordArray: [],
     unitCitationCoordArray: [],
     combatBadgeCoords: [],
+    tabCoordArray: [],
   };
   returnObject.ribbonCoordArray = GetCoordArray(ribbonCount);
   returnObject.unitCitationCoordArray = GetCitationCoordArray(citationCount);
@@ -29,6 +33,7 @@ export default function GetUserInfo(
     yearsInService,
     getRankGrade(dataActive.rank.rankId)
   );
+  returnObject.tabCoordArray = GetTabCoordArray(tabCount);
 
   return returnObject;
 }

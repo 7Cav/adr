@@ -10,6 +10,7 @@ import {
   UnitCitation,
   BadgeCombat,
   WeaponQual,
+  Tab,
 } from "./AwardClasses";
 import GetUserInfo from "./GetUserInfo";
 
@@ -20,6 +21,7 @@ export default async function GetCanvasObject(userName) {
   let totalRibbonCount = 0;
   let totalUnitCitationCount = 0;
   let yearsInService = 0;
+  let tabCount = 0;
 
   const awardMap = new Map();
   const AwardRegistryInstance = new AwardRegistry();
@@ -165,6 +167,12 @@ export default async function GetCanvasObject(userName) {
               AwardRegistryInstance
             );
             awardMap.set("WeaponQual", newWeaponQual);
+            break;
+          case "Tab":
+            const newTab = new Tab(data.awards[i], AwardRegistryInstance);
+            tabCount++;
+            awardMap.set(key, newTab);
+            break;
         }
       } else {
         // const newAward = new Award(data.awards[i]);
@@ -178,7 +186,8 @@ export default async function GetCanvasObject(userName) {
     data,
     totalRibbonCount,
     totalUnitCitationCount,
-    yearsInService
+    yearsInService,
+    tabCount
   );
 
   const arr = [];
@@ -189,6 +198,7 @@ export default async function GetCanvasObject(userName) {
   let unitCitations = [];
   let combatBadge = null;
   let weaponQual = null;
+  let tabs = [];
 
   for (const award of awardMap.values()) {
     if (award instanceof Ribbon) {
@@ -206,6 +216,9 @@ export default async function GetCanvasObject(userName) {
     if (award instanceof WeaponQual) {
       weaponQual = award;
     }
+    if (award instanceof Tab) {
+      tabs.push(award);
+    }
   }
 
   arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
@@ -213,6 +226,7 @@ export default async function GetCanvasObject(userName) {
   arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(combatBadge);
   arr.push(weaponQual);
+  arr.push(tabs);
 
   console.log(arr);
 

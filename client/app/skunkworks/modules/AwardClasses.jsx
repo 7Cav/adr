@@ -343,3 +343,11 @@ export class WeaponQual extends Award {
     }
   }
 }
+
+export class Tab extends Award {
+  constructor(data, AwardRegistry) {
+    super(data);
+    const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
+    this.awardPriority = registryDetails.awardPriority;
+  }
+}
