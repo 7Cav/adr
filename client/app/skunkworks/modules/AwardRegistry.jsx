@@ -121,6 +121,12 @@ export class AwardRegistry {
     this.awards.set("Tank Weapons Sharpshooter", {awardTag: "tankWeapons", awardType: "WeaponQual"});
     this.awards.set("Tank Weapons Marksman", {awardTag: "tankWeapons", awardType: "WeaponQual"});
     
+    //____ TABS ____
+
+    this.awards.set("Ranger Tab", {awardPriority: 0, awardType: "Tab"});
+    this.awards.set("Sapper Tab", {awardPriority: 1, awardType: "Tab"});
+    this.awards.set("Special Forces Tab", {awardPriority: 2, awardType: "Tab"});
+    this.awards.set("Long-Range Reconnaissance Patrol Tab", {awardPriority: 3, awardType: "Tab"});
 
   }
 

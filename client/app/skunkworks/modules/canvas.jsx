@@ -51,6 +51,7 @@ function Canvas(props) {
         "skunkworks/uniformMedals/medalSpriteSheet.png",
         "medalSprites"
       ),
+      loadImage("skunkworks/uniformTabs/tabSpriteSheet.png", "tabSprites"),
     ];
 
     if (data[4] != null) {
@@ -277,7 +278,6 @@ function Canvas(props) {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        console.log(img.src, data.awardPriority, context);
         context.drawImage(img, 0, 0);
         resolve(); // Resolve AFTER loading and drawing
       };
@@ -378,7 +378,6 @@ function Canvas(props) {
         }
 
         context.font = `normal condensed bold ${fontSize}px 'Arial Narrow'`;
-        console.log(fontSize, context.font);
         context.fillStyle = "#ffffff";
         context.textAlign = "center";
         context.textBaseline = "middle";
@@ -398,8 +397,6 @@ function Canvas(props) {
 
   const placeWeaponQual = (data, selector, context) => {
     return new Promise((resolve) => {
-      // first, draw the root
-
       const rootWidth = 71;
       const rootHeight = 85;
       const plateWidth = 68;
@@ -468,6 +465,34 @@ function Canvas(props) {
     });
   };
 
+  const placeTab = (data, tabSprites, coordData, context) => {
+    return new Promise((resolve) => {
+      const tabWidth = 75;
+      const tabHeight = 34;
+      const desiredX = coordData.dx;
+      const desiredY = coordData.dy;
+      const tabSelection = data.awardPriority;
+
+      const drawTab = () => {
+        // Function to draw the base ribbon
+        context.drawImage(
+          tabSprites,
+          0,
+          tabSelection * tabHeight,
+          tabWidth,
+          tabHeight,
+          desiredX,
+          desiredY,
+          tabWidth,
+          tabHeight
+        );
+      };
+
+      drawTab();
+      resolve();
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -476,7 +501,8 @@ function Canvas(props) {
       images.uniformEpaulette &&
       images.ribbonSprites &&
       images.citationSprites &&
-      images.medalSprites
+      images.medalSprites &&
+      images.tabSprites
     ) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
@@ -550,6 +576,21 @@ function Canvas(props) {
           ]);
         }
 
+        // Draw tabs
+
+        if (data[6].length > 0) {
+          await Promise.all([
+            ...data[6].map((tabData, index) =>
+              placeTab(
+                tabData,
+                images.tabSprites,
+                data[0].tabCoordArray[index],
+                context
+              )
+            ),
+          ]);
+        }
+
         //Calculate medal coords
         //TODO MOVE THIS WHOLE THING OUT OF THIS DAMN CANVAS FUNCTION
 
@@ -606,8 +647,6 @@ function Canvas(props) {
           if (y == 2) {
             _offsetX += medalWidth;
           }
-
-          console.log(currentIndex == 23, data[3].length - indexOffset >= 25);
 
           if (currentIndex == 23 && data[3].length - indexOffset >= 25) {
             // Force x-coordinate to be the same as entry 0
