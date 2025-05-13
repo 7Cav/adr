@@ -237,7 +237,10 @@ function Canvas(props) {
         );
       };
 
-      if (data.ribbonDisplayedAttachmentCount !== 0) {
+      if (
+        data.ribbonDisplayedAttachmentCount !== 0 ||
+        (data instanceof MedalWithValor && data.hasValorDevice == true)
+      ) {
         const attachmentType = data.ribbonAttachmentType;
         const attachmentCount = data.ribbonDisplayedAttachmentCount.toString();
         const ribbonAttachment = new Image();
