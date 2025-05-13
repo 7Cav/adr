@@ -91,8 +91,37 @@ export class AwardRegistry {
     this.awards.set("Combat Infantry Badge", {awardPriority: 2, awardType: "BadgeCombat"})
     this.awards.set("Expert Infantry Badge", {awardPriority: 1, awardType: "BadgeCombat"}) // et. al.
 
-
     //____ WEAPON QUALS ____
+
+    this.awards.set("Rifle Expert", {awardTag: "rifle", awardType: "WeaponQual"});
+    this.awards.set("Rifle Sharpshooter", {awardTag: "rifle", awardType: "WeaponQual"});
+    this.awards.set("Rifle Marksman", {awardTag: "rifle", awardType: "WeaponQual"});
+    this.awards.set("Grenade Expert", {awardTag: "grenade", awardType: "WeaponQual"});
+    this.awards.set("Grenade Sharpshooter", {awardTag: "grenade", awardType: "WeaponQual"});
+    this.awards.set("Grenade Marksman", {awardTag: "grenade", awardType: "WeaponQual"});
+    this.awards.set("Pistol Expert", {awardTag: "pistol", awardType: "WeaponQual"});
+    this.awards.set("Pistol Sharpshooter", {awardTag: "pistol", awardType: "WeaponQual"});
+    this.awards.set("Pistol Marksman", {awardTag: "pistol", awardType: "WeaponQual"});
+    this.awards.set("M-203 Expert", {awardTag: "m203", awardType: "WeaponQual"});
+    this.awards.set("M-203 Sharpshooter", {awardTag: "m203", awardType: "WeaponQual"});
+    this.awards.set("M-203 Marksman", {awardTag: "m203", awardType: "WeaponQual"});
+    this.awards.set("Machine Gun Expert", {awardTag: "machineGun", awardType: "WeaponQual"});
+    this.awards.set("Machine Gun Sharpshooter", {awardTag: "machineGun", awardType: "WeaponQual"});
+    this.awards.set("Machine Gun Marksman", {awardTag: "machineGun", awardType: "WeaponQual"});
+    this.awards.set("Recoilless Rifle Expert", {awardTag: "recoilless", awardType: "WeaponQual"});
+    this.awards.set("Recoilless Rifle Sharpshooter", {awardTag: "recoilless", awardType: "WeaponQual"});
+    this.awards.set("Recoilless Rifle Marksman", {awardTag: "recoilless", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Rifle Expert", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Rifle Sharpshooter", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Rifle Marksman", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Hydra-70 Expert", {awardTag: "hydra70", awardType: "WeaponQual"});
+    this.awards.set("Hydra-70 Rifle Sharpshooter", {awardTag: "hydra70", awardType: "WeaponQual"});
+    this.awards.set("Hydra-70 Rifle Marksman", {awardTag: "hydra70", awardType: "WeaponQual"});
+    this.awards.set("Tank Weapons Expert", {awardTag: "tankWeapons", awardType: "WeaponQual"});
+    this.awards.set("Tank Weapons Sharpshooter", {awardTag: "tankWeapons", awardType: "WeaponQual"});
+    this.awards.set("Tank Weapons Marksman", {awardTag: "tankWeapons", awardType: "WeaponQual"});
+    
+
   }
 
   isInRegistry(awardName) {
