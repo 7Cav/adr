@@ -395,25 +395,18 @@ function Canvas(props) {
     });
   };
 
-  const placeWeaponQual = (data, selector, context) => {
+  const placeWeaponQual = (data, xPosition, selector, context) => {
     return new Promise((resolve) => {
       const rootWidth = 71;
       const rootHeight = 85;
       const plateWidth = 68;
       const plateHeight = 36;
-      let dx;
-      let dy = 576 - (data.length - 1) * (plateHeight - 10);
-
-      if (selector == "expert") {
-        dx = 25;
-      } else if (selector == "sharpshooter") {
-        dx = 97;
-      } else {
-        dx = 170;
-      }
+      let dx = xPosition;
 
       const img = new Image();
       img.onload = () => {
+        // Draw the root image
+        const rootY = 576 - (data.length - 1) * (plateHeight - 10);
         context.drawImage(
           img,
           0,
@@ -421,38 +414,46 @@ function Canvas(props) {
           rootWidth,
           rootHeight,
           dx,
-          dy,
+          rootY,
           rootWidth,
           rootHeight
         );
 
-        let dyPlate = dy + (rootHeight - 10);
+        let plateY = rootY + rootHeight - 10;
+        const platePromises = [];
 
         for (let i = 0; i < data.length; i++) {
           const img2 = new Image();
-          img2.onload = () => {
-            context.drawImage(
-              img2,
-              0,
-              0,
-              plateWidth,
-              plateHeight,
-              dx,
-              dyPlate,
-              plateWidth,
-              plateHeight
-            );
-            dyPlate += plateHeight - 10;
-          };
-          img2.onerror = () => {
-            console.error(
-              `Error loading weapon qual plate: skunkworks/uniformWeaponQuals/plates/${data[i]}.png`
-            );
-          };
-          img2.src = `skunkworks/uniformWeaponQuals/plates/${data[i]}.png`;
+          const platePromise = new Promise((resolvePlate) => {
+            img2.onload = () => {
+              context.drawImage(
+                img2,
+                0,
+                0,
+                plateWidth,
+                plateHeight,
+                dx,
+                plateY,
+                plateWidth,
+                plateHeight
+              );
+              plateY += plateHeight - 10;
+              resolvePlate();
+            };
+            img2.onerror = () => {
+              console.error(
+                `Error loading weapon qual plate: skunkworks/uniformWeaponQuals/plates/${data[i]}.png`
+              );
+              resolvePlate();
+            };
+            img2.src = `skunkworks/uniformWeaponQuals/plates/${data[i]}.png`;
+          });
+          platePromises.push(platePromise);
         }
 
-        resolve();
+        Promise.all(platePromises).then(() => {
+          resolve();
+        });
       };
 
       img.onerror = () => {
@@ -558,22 +559,32 @@ function Canvas(props) {
 
         //Draw Weapon Quals
 
-        if (data[5].expertQuals.length > 0) {
-          await Promise.all([
-            placeWeaponQual(data[5].expertQuals, "expert", context),
-          ]);
+        const activeQuals = [];
+        if (data[5].expertQuals.length > 0)
+          activeQuals.push({ type: "expert", data: data[5].expertQuals });
+        if (data[5].sharpshooterQuals.length > 0)
+          activeQuals.push({
+            type: "sharpshooter",
+            data: data[5].sharpshooterQuals,
+          });
+        if (data[5].marksmanQuals.length > 0)
+          activeQuals.push({ type: "marksman", data: data[5].marksmanQuals });
+
+        const numActive = activeQuals.length;
+
+        const xPositions = [];
+        if (numActive === 1) {
+          xPositions.push(25);
+        } else if (numActive === 2) {
+          xPositions.push(25, 97);
+        } else if (numActive === 3) {
+          xPositions.push(25, 97, 170);
         }
 
-        if (data[5].sharpshooterQuals.length > 0) {
-          await Promise.all([
-            placeWeaponQual(data[5].sharpshooterQuals, "sharpshooter", context),
-          ]);
-        }
-
-        if (data[5].marksmanQuals.length > 0) {
-          await Promise.all([
-            placeWeaponQual(data[5].marksmanQuals, "marksman", context),
-          ]);
+        // Draw each active qualification
+        for (let i = 0; i < numActive; i++) {
+          const qual = activeQuals[i];
+          await placeWeaponQual(qual.data, xPositions[i], qual.type, context);
         }
 
         // Draw tabs

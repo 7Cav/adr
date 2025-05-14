@@ -318,10 +318,36 @@ export class WeaponQual extends Award {
   sharpshooterQuals = [];
   marksmanQuals = [];
 
+  weaponOrder = [
+    "rifle",
+    "grenade",
+    "tankWeapons",
+    "m203",
+    "machineGun",
+    "recoillessRifle",
+    "pistol",
+    "aeroweapons",
+    //"carbine",
+    //"autoRifle",
+    "hydra70",
+  ];
+
   constructor(data, AwardRegistry) {
     super(data);
     this.awardTitle = "Weapon Qualifications";
     this.addAward(data, AwardRegistry);
+  }
+
+  sortQuals(qualArray) {
+    qualArray.sort((a, b) => {
+      const indexA = this.weaponOrder.indexOf(a);
+      const indexB = this.weaponOrder.indexOf(b);
+
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+
+      return indexA - indexB;
+    });
   }
 
   addAward(data, AwardRegistry) {
@@ -329,17 +355,17 @@ export class WeaponQual extends Award {
 
     if (data.awardName.includes("Expert")) {
       this.expertQuals.push(registryDetails.awardTag);
-      this.expertQuals.sort();
+      this.sortQuals(this.expertQuals);
     }
 
     if (data.awardName.includes("Sharpshooter")) {
       this.sharpshooterQuals.push(registryDetails.awardTag);
-      this.expertQuals.sort();
+      this.sortQuals(this.sharpshooterQuals);
     }
 
     if (data.awardName.includes("Marksman")) {
       this.marksmanQuals.push(registryDetails.awardTag);
-      this.expertQuals.sort();
+      this.sortQuals(this.marksmanQuals);
     }
   }
 }
