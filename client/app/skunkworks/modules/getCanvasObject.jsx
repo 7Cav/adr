@@ -221,6 +221,10 @@ export default async function GetCanvasObject(userName) {
     }
   }
 
+  if (weaponQual == null) {
+    weaponQual = 0;
+  }
+
   arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
