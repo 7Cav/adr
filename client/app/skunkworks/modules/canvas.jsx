@@ -559,32 +559,34 @@ function Canvas(props) {
 
         //Draw Weapon Quals
 
-        const activeQuals = [];
-        if (data[5].expertQuals.length > 0)
-          activeQuals.push({ type: "expert", data: data[5].expertQuals });
-        if (data[5].sharpshooterQuals.length > 0)
-          activeQuals.push({
-            type: "sharpshooter",
-            data: data[5].sharpshooterQuals,
-          });
-        if (data[5].marksmanQuals.length > 0)
-          activeQuals.push({ type: "marksman", data: data[5].marksmanQuals });
+        if (data[5] !== 0) {
+          const activeQuals = [];
+          if (data[5].expertQuals.length > 0)
+            activeQuals.push({ type: "expert", data: data[5].expertQuals });
+          if (data[5].sharpshooterQuals.length > 0)
+            activeQuals.push({
+              type: "sharpshooter",
+              data: data[5].sharpshooterQuals,
+            });
+          if (data[5].marksmanQuals.length > 0)
+            activeQuals.push({ type: "marksman", data: data[5].marksmanQuals });
 
-        const numActive = activeQuals.length;
+          const numActive = activeQuals.length;
 
-        const xPositions = [];
-        if (numActive === 1) {
-          xPositions.push(25);
-        } else if (numActive === 2) {
-          xPositions.push(25, 97);
-        } else if (numActive === 3) {
-          xPositions.push(25, 97, 170);
-        }
+          const xPositions = [];
+          if (numActive === 1) {
+            xPositions.push(25);
+          } else if (numActive === 2) {
+            xPositions.push(25, 97);
+          } else if (numActive === 3) {
+            xPositions.push(25, 97, 170);
+          }
 
-        // Draw each active qualification
-        for (let i = 0; i < numActive; i++) {
-          const qual = activeQuals[i];
-          await placeWeaponQual(qual.data, xPositions[i], qual.type, context);
+          // Draw each active qualification
+          for (let i = 0; i < numActive; i++) {
+            const qual = activeQuals[i];
+            await placeWeaponQual(qual.data, xPositions[i], qual.type, context);
+          }
         }
 
         // Draw tabs
