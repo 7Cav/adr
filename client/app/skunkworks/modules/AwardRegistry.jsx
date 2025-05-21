@@ -60,7 +60,7 @@ export class AwardRegistry {
     this.awards.set("Sniper Ribbon", {awardPriority: 48, medalPriority: 42, awardType: "Medal"});
     this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
 
-    // ___ DISCONTINUED RIBBONS/MEDALS ___
+    // ___ DISCONTINUED RIBBONS/MEDALS WITHOUT PRECIDENCE ___
     // These ones are a bit of an unknown precidence wise. Indeed we have some discon awards above, however precidence is known
     // Anything here is shown as is, and there is no inherent precicence for these. 
 
@@ -115,8 +115,8 @@ export class AwardRegistry {
     this.awards.set("Aeroweapons Rifle Sharpshooter", {awardTag: "aeroweapons", awardType: "WeaponQual"});
     this.awards.set("Aeroweapons Rifle Marksman", {awardTag: "aeroweapons", awardType: "WeaponQual"});
     this.awards.set("Hydra-70 Expert", {awardTag: "hydra70", awardType: "WeaponQual"});
-    this.awards.set("Hydra-70 Rifle Sharpshooter", {awardTag: "hydra70", awardType: "WeaponQual"});
-    this.awards.set("Hydra-70 Rifle Marksman", {awardTag: "hydra70", awardType: "WeaponQual"});
+    this.awards.set("Hydra-70 Sharpshooter", {awardTag: "hydra70", awardType: "WeaponQual"});
+    this.awards.set("Hydra-70 Marksman", {awardTag: "hydra70", awardType: "WeaponQual"});
     this.awards.set("Tank Weapons Expert", {awardTag: "tankWeapons", awardType: "WeaponQual"});
     this.awards.set("Tank Weapons Sharpshooter", {awardTag: "tankWeapons", awardType: "WeaponQual"});
     this.awards.set("Tank Weapons Marksman", {awardTag: "tankWeapons", awardType: "WeaponQual"});
