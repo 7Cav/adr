@@ -111,9 +111,9 @@ export class AwardRegistry {
     this.awards.set("Recoilless Rifle Expert", {awardTag: "recoilless", awardType: "WeaponQual"});
     this.awards.set("Recoilless Rifle Sharpshooter", {awardTag: "recoilless", awardType: "WeaponQual"});
     this.awards.set("Recoilless Rifle Marksman", {awardTag: "recoilless", awardType: "WeaponQual"});
-    this.awards.set("Aeroweapons Rifle Expert", {awardTag: "aeroweapons", awardType: "WeaponQual"});
-    this.awards.set("Aeroweapons Rifle Sharpshooter", {awardTag: "aeroweapons", awardType: "WeaponQual"});
-    this.awards.set("Aeroweapons Rifle Marksman", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Expert", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Sharpshooter", {awardTag: "aeroweapons", awardType: "WeaponQual"});
+    this.awards.set("Aeroweapons Marksman", {awardTag: "aeroweapons", awardType: "WeaponQual"});
     this.awards.set("Hydra-70 Expert", {awardTag: "hydra70", awardType: "WeaponQual"});
     this.awards.set("Hydra-70 Sharpshooter", {awardTag: "hydra70", awardType: "WeaponQual"});
     this.awards.set("Hydra-70 Marksman", {awardTag: "hydra70", awardType: "WeaponQual"});

@@ -397,6 +397,7 @@ function Canvas(props) {
 
   const placeWeaponQual = (data, xPosition, selector, context) => {
     return new Promise((resolve) => {
+      console.log(data);
       const rootWidth = 71;
       const rootHeight = 85;
       const plateWidth = 68;
@@ -582,11 +583,18 @@ function Canvas(props) {
             xPositions.push(25, 97, 170);
           }
 
-          // Draw each active qualification
-          for (let i = 0; i < numActive; i++) {
-            const qual = activeQuals[i];
-            await placeWeaponQual(qual.data, xPositions[i], qual.type, context);
-          }
+          //Draw each active qualification
+
+          await Promise.all([
+            ...activeQuals.map((activeQuals, index) =>
+              placeWeaponQual(
+                activeQuals.data,
+                xPositions[index],
+                activeQuals.type,
+                context
+              )
+            ),
+          ]);
         }
 
         // Draw tabs
