@@ -397,7 +397,6 @@ function Canvas(props) {
 
   const placeWeaponQual = (data, xPosition, selector, context) => {
     return new Promise((resolve) => {
-      console.log(data);
       const rootWidth = 71;
       const rootHeight = 85;
       const plateWidth = 68;
@@ -420,10 +419,12 @@ function Canvas(props) {
           rootHeight
         );
 
-        let plateY = rootY + rootHeight - 10;
+        const initialPlateY = rootY + rootHeight - 10;
         const platePromises = [];
 
         for (let i = 0; i < data.length; i++) {
+          const currentPlateY = initialPlateY + i * (plateHeight - 10);
+
           const img2 = new Image();
           const platePromise = new Promise((resolvePlate) => {
             img2.onload = () => {
@@ -434,12 +435,11 @@ function Canvas(props) {
                 plateWidth,
                 plateHeight,
                 dx,
-                plateY,
+                currentPlateY,
                 plateWidth,
                 plateHeight
               );
-              plateY += plateHeight - 10;
-              resolvePlate();
+              resolvePlate(); // Resolve the plate promise when the image is loaded and drawn
             };
             img2.onerror = () => {
               console.error(
@@ -461,7 +461,7 @@ function Canvas(props) {
         console.error(
           `Error loading weapon qual root: skunkworks/uniformWeaponQuals/root/${selector}.png`
         );
-        resolve(); // Resolve even on error
+        resolve();
       };
       img.src = `skunkworks/uniformWeaponQuals/root/${selector}.png`;
     });
