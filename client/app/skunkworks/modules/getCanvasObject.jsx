@@ -233,7 +233,7 @@ export default async function GetCanvasObject(userName) {
   arr.push(tabs);
 
   console.log(arr);
-  console.log(data.mos)
+  console.log(data.mos);
 
   return arr;
 }

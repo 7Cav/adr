@@ -341,6 +341,12 @@ function Canvas(props) {
 
   const placeNameTag = (userData, context) => {
     return new Promise((resolve) => {
+      // Anything above 15 chars must be added manually
+      if (userData.nameTag.length > 15) {
+        resolve();
+        return;
+      }
+
       let tagWidth;
       let tagHeight;
       let selector;
@@ -497,19 +503,16 @@ function Canvas(props) {
 
   const placeCordPins = (imgPath, context) => {
     return new Promise((resolve) => {
-    
       const img = new Image();
       img.onload = () => {
         context.drawImage(img, 0, 0);
         resolve(); // Resolve AFTER loading and drawing
       };
       img.onerror = () => {
-        console.error(
-          `Error Loading Cord Pin`
-        );
+        console.error(`Error Loading Cord Pin`);
         resolve(); // Resolve even on error
       };
-      img.src = imgPath
+      img.src = imgPath;
     });
   };
 
@@ -633,13 +636,23 @@ function Canvas(props) {
         // Draw Cord
 
         if (data[0].shoulderCord != false) {
-          await Promise.all([placeCordPins(`skunkworks/uniformCords/${data[0].shoulderCord}.png`, context)])
+          await Promise.all([
+            placeCordPins(
+              `skunkworks/uniformCords/${data[0].shoulderCord}.png`,
+              context
+            ),
+          ]);
         }
 
         // Draw Neck Pins
 
         if (data[0].neckPins != false) {
-          await Promise.all([placeCordPins(`skunkworks/uniformLapelPins/${data[0].neckPins}.png`, context)])
+          await Promise.all([
+            placeCordPins(
+              `skunkworks/uniformLapelPins/${data[0].neckPins}.png`,
+              context
+            ),
+          ]);
         }
 
         //Calculate medal coords
