@@ -495,6 +495,24 @@ function Canvas(props) {
     });
   };
 
+  const placeCordPins = (imgPath, context) => {
+    return new Promise((resolve) => {
+    
+      const img = new Image();
+      img.onload = () => {
+        context.drawImage(img, 0, 0);
+        resolve(); // Resolve AFTER loading and drawing
+      };
+      img.onerror = () => {
+        console.error(
+          `Error Loading Cord Pin`
+        );
+        resolve(); // Resolve even on error
+      };
+      img.src = imgPath
+    });
+  };
+
   useEffect(() => {
     if (
       !loading &&
@@ -610,6 +628,18 @@ function Canvas(props) {
               )
             ),
           ]);
+        }
+
+        // Draw Cord
+
+        if (data[0].shoulderCord != false) {
+          await Promise.all([placeCordPins(`skunkworks/uniformCords/${data[0].shoulderCord}.png`, context)])
+        }
+
+        // Draw Neck Pins
+
+        if (data[0].neckPins != false) {
+          await Promise.all([placeCordPins(`skunkworks/uniformLapelPins/${data[0].neckPins}.png`, context)])
         }
 
         //Calculate medal coords
