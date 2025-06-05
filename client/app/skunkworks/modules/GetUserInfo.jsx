@@ -108,94 +108,91 @@ function getRankGrade(rankId) {
 }
 
 function setShoulderCord(mos) {
-
   switch (mos) {
     case "68W":
     case "67A":
-      return "Medical"
+      return "Medical";
     case "11B":
     case "11A":
-      return "Infantry"
+      return "Infantry";
     case "11C":
     case "13A":
     case "13B":
-      return "Artillery"
+      return "Artillery";
     case "12A":
     case "12B":
-      return "Engineer"
+      return "Engineer";
     case "01A":
-      return "Aide"
+      return "Aide";
     case "31A":
     case "31B":
-      return "MP"
+      return "MP";
     case "19K":
     case "19A":
     case "19D":
-      return "Armor"
+      return "Armor";
     default:
-      return false
+      return false;
   }
-
 }
 
 function setNeckPins(mos) {
-
   switch (mos) {
-
     case "153A":
     case "155A":
     case "15A":
-      return "AivationOfficer"
+      return "AivationOfficer";
     case "15T":
-      return "AviationNCO"
+      return "AviationNCO";
     case "67A":
-      return "MedicalOfficer"
+      return "MedicalOfficer";
     case "68W":
-      return "MedicalNCO"
+      return "MedicalNCO";
     case "12A":
-      return "EngineerOfficer"
+      return "EngineerOfficer";
     case "12B":
-      return "EngineerNCO"
+      return "EngineerNCO";
     case "01A":
-      return "Aide"
+      return "Aide";
     case "00Z":
-      return "CSM"
+      return "CSM";
     case "255N":
     case "25A":
-      return "IMOOfficer"
+      return "IMOOfficer";
     case "25U":
-      return "IMONCO"
+      return "IMONCO";
     case "42B":
     case "57A":
     case "46A":
-      return "S1S3S5"
+      return "S1S3S5";
     case "35B":
-      return "S2Officer"
-    case"35A":
-      return "S2NCO"
+      return "S2Officer";
+    case "35A":
+      return "S2NCO";
     case "31A":
-      return "MPOfficer"
+      return "MPOfficer";
     case "31B":
-      return "MPNCO"
+      return "MPNCO";
     case "19A":
-      return "ArmorOfficer"
+      return "ArmorOfficer";
     case "19K":
     case "19D":
-      return "ArmorNCO"
+      return "ArmorNCO";
     case "27A":
-      return "JAGOfficer"
+      return "JAGOfficer";
     case "27D":
-      return "JAGNCO"
+      return "JAGNCO";
     case "11A":
     case "13A":
     case "47A":
+    case "51A":
     case "79A":
     case "79Z":
     case "50A":
     case "26Z":
     case "47Q":
-    case "47C":      
-      return "InfantryOfficer"
+    case "47C":
+      return "InfantryOfficer";
     case "11B":
     case "11C":
     case "42A":
@@ -204,14 +201,12 @@ function setNeckPins(mos) {
     case "47A":
     case "79R":
     case "79X":
-    case "51A":
     case "51S":
     case "49A":
     case "26B":
-    case "47T":      
-      return "InfantryNCO"
+    case "47T":
+      return "InfantryNCO";
     default:
-      return false
+      return false;
   }
-
 }
