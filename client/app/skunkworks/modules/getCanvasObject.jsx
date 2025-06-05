@@ -156,7 +156,7 @@ export default async function GetCanvasObject(userName) {
           case "BadgeCombat":
             const newBadgeCombat = new BadgeCombat(
               data.awards[i],
-              data.primary.positionTitle,
+              data.mos,
               AwardRegistryInstance
             );
             awardMap.set("BadgeCombat", newBadgeCombat);
