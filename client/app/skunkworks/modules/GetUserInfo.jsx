@@ -25,6 +25,8 @@ export default function GetUserInfo(
     unitCitationCoordArray: [],
     combatBadgeCoords: [],
     tabCoordArray: [],
+    shoulderCord: setShoulderCord(dataActive.mos),
+    neckPins: setNeckPins(dataActive.mos),
   };
   returnObject.ribbonCoordArray = GetCoordArray(ribbonCount);
   returnObject.unitCitationCoordArray = GetCitationCoordArray(citationCount);
@@ -103,4 +105,113 @@ function getRankGrade(rankId) {
     default:
       return "E0";
   }
+}
+
+function setShoulderCord(mos) {
+
+  switch (mos) {
+    case "68W":
+    case "67A":
+      return "Medical"
+    case "11B":
+    case "11A":
+      return "Infantry"
+    case "11C":
+    case "13A":
+    case "13B":
+      return "Artillery"
+    case "12A":
+    case "12B":
+      return "Engineer"
+    case "01A":
+      return "Aide"
+    case "31A":
+    case "31B":
+      return "MP"
+    case "19K":
+    case "19A":
+    case "19D":
+      return "Armor"
+    default:
+      return false
+  }
+
+}
+
+function setNeckPins(mos) {
+
+  switch (mos) {
+
+    case "153A":
+    case "155A":
+    case "15A":
+      return "AivationOfficer"
+    case "15T":
+      return "AviationNCO"
+    case "67A":
+      return "MedicalOfficer"
+    case "68W":
+      return "MedicalNCO"
+    case "12A":
+      return "EngineerOfficer"
+    case "12B":
+      return "EngineerNCO"
+    case "01A":
+      return "Aide"
+    case "00Z":
+      return "CSM"
+    case "255N":
+    case "25A":
+      return "IMOOfficer"
+    case "25U":
+      return "IMONCO"
+    case "42B":
+    case "57A":
+    case "46A":
+      return "S1S3S5"
+    case "35A":
+      return "S2Officer"
+    case"35F":
+      return "S2NCO"
+    case "31A":
+      return "MPOfficer"
+    case "31B":
+      return "MPNCO"
+    case "19A":
+      return "ArmorOfficer"
+    case "19K":
+    case "19D":
+      return "ArmorNCO"
+    case "27A":
+      return "JAGOfficer"
+    case "27D":
+      return "JAGNCO"
+    case "11A":
+    case "13A":
+    case "47A":
+    case "79A":
+    case "79Z":
+    case "50A":
+    case "26Z":
+    case "47Q":
+    case "47C":      
+      return "InfantryOfficer"
+    case "11B":
+    case "11C":
+    case "42A":
+    case "57B":
+    case "46S":
+    case "47A":
+    case "79R":
+    case "79X":
+    case "51A":
+    case "51S":
+    case "49A":
+    case "26B":
+    case "47T":      
+      return "InfantryNCO"
+    default:
+      return false
+  }
+
 }

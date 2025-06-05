@@ -187,20 +187,17 @@ export class BadgeCombat extends Badge {
   imageNum = 0;
   maxAllowed;
 
-  constructor(awardData, userPosition, AwardRegistry) {
+  constructor(awardData, userMos, AwardRegistry) {
     super(awardData, AwardRegistry);
 
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
 
-    if (
-      (userPosition.includes("A/1-7") && !userPosition.includes("3/1/A/1-7")) ||
-      userPosition.includes("A/ACD")
-    ) {
+    if (userMos == "153A" || userMos == "155A" || userMos == "15A") {
       this.isAviation = true;
     }
 
-    if (userPosition.includes("1/B/1-7")) {
+    if (userMos == "68W" || userMos == "67A") {
       this.isMedical = true;
     }
 
