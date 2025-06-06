@@ -141,7 +141,7 @@ function setNeckPins(mos) {
     case "153A":
     case "155A":
     case "15A":
-      return "AivationOfficer";
+      return "AviationOfficer";
     case "15T":
       return "AviationNCO";
     case "67A":
