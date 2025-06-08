@@ -28,16 +28,6 @@ export default function GetCoordArray(numAwards) {
     case 33:
       return [
         {
-          //33
-          dx: c3,
-          dy: r13,
-        },
-        {
-          //32
-          dx: c4,
-          dy: r13,
-        },
-        {
           //31
           dx: c3,
           dy: r12,
@@ -191,6 +181,16 @@ export default function GetCoordArray(numAwards) {
           //1
           dx: c4,
           dy: r1,
+        },
+        {
+          // -1 (On the pinboard)
+          dx: 706,
+          dy: 571,
+        },
+        {
+          // -2
+          dx: 750,
+          dy: 571,
         },
       ];
     case 32:
