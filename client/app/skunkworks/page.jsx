@@ -50,11 +50,13 @@ export default function Skunkworks() {
   return (
     <div className="masterbox">
       <div className="logobox">
-        <div className="logo">
-          <SkunkworksLogo width="3em" height="3em" />
-        </div>
+        <Link href={"/"}>
+          <div className="logo">
+            <SkunkworksLogo width="3em" height="3em" />
+          </div>
+        </Link>
         <div className="textbox">
-          7th Cavalry Skunkworks <br /> Ribbon Builder
+          7th Cavalry Skunkworks <br /> Uniform Builder
         </div>
       </div>
       <div className="inputbox">
