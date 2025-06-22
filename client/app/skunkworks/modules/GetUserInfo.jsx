@@ -114,8 +114,8 @@ function setShoulderCord(mos) {
       return "Medical";
     case "11B":
     case "11A":
-      return "Infantry";
     case "11C":
+      return "Infantry";
     case "13A":
     case "13B":
       return "Artillery";
@@ -144,6 +144,10 @@ function setNeckPins(mos) {
       return "AviationOfficer";
     case "15T":
       return "AviationNCO";
+    case "13A":
+      return "ArtilleryOfficer";
+    case "13B":
+      return "ArtilleryNCO";
     case "67A":
       return "MedicalOfficer";
     case "68W":
@@ -166,9 +170,9 @@ function setNeckPins(mos) {
     case "46A":
       return "S1S3S5";
     case "35B":
-      return "S2Officer";
-    case "35A":
       return "S2NCO";
+    case "35A":
+      return "S2Officer";
     case "31A":
       return "MPOfficer";
     case "31B":

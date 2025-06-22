@@ -230,7 +230,7 @@ export default async function GetCanvasObject(userName) {
   arr.push(medals.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(combatBadge);
   arr.push(weaponQual);
-  arr.push(tabs);
+  arr.push(tabs.sort((a, b) => a.awardPriority - b.awardPriority));
 
   console.log(arr);
   console.log(data.mos);

@@ -806,12 +806,6 @@ function Canvas(props) {
       <a id="canvasDownload" href="#" download>
         Download Image
       </a>
-      <div>
-        Note: This tool is in early development and may not accurately follow
-        established Standard Operating Procedures.
-        <br /> Use at your own risk. Please submit all feedback/bugs to the S1
-        Uniforms Lead.
-      </div>
       <canvas ref={canvasRef} {...props} width={837} height={1025} />
     </div>
   );
