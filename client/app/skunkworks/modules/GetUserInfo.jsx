@@ -186,13 +186,14 @@ function setNeckPins(mos) {
       return "JAGOfficer";
     case "27D":
       return "JAGNCO";
+    case "51A":
+    case "50A":
+      return "RDCOfficer";
     case "11A":
     case "13A":
     case "47A":
-    case "51A":
     case "79A":
     case "79Z":
-    case "50A":
     case "26Z":
     case "47Q":
     case "47C":
