@@ -10,7 +10,7 @@ a {
 }
 
 .logobuilder {
-  animation: logoboxanim 28800s infinite linear;
+  animation: logoboxanimbuilder 28800s infinite linear;
 }
 
 .logoboxbuilder {
@@ -19,7 +19,7 @@ a {
   align-items: center;
 }
 
-@keyframes logoboxanim {
+@keyframes logoboxanimbuilder {
   100% {
     transform: rotate(360deg);
   }
