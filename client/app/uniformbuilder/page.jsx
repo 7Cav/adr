@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import GetCanvasObject from "./modules/getCanvasObject";
-import SkunkworksLogo from "../theme/skunkworksLogo";
+import CavColor from "../theme/cavColor";
+import UniformText from "../theme/uniformBuilderText";
 import Canvas from "./modules/canvas";
 import "./page.css";
 import Loading from "../adr/loading";
@@ -52,11 +53,13 @@ export default function Skunkworks() {
       <div className="logobox">
         <Link href={"/"}>
           <div className="logo">
-            <SkunkworksLogo width="3em" height="3em" />
+            <CavColor width="3em" height="3em" />
           </div>
         </Link>
         <div className="textbox">
-          7th Cavalry Skunkworks <br /> Uniform Builder
+          <Link href={"/"}>
+            <UniformText width="16em" height="3em" />
+          </Link>
         </div>
       </div>
       <div className="inputbox">
