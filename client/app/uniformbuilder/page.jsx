@@ -49,20 +49,20 @@ export default function Skunkworks() {
   }, [submittedUserName]); // Effect runs when submittedUserName changes
 
   return (
-    <div className="masterbox">
-      <div className="logobox">
+    <div className="masterboxbuilder">
+      <div className="logoboxbuilder">
         <Link href={"/"}>
-          <div className="logo">
+          <div className="logobuilder">
             <CavColor width="3em" height="3em" />
           </div>
         </Link>
-        <div className="textbox">
+        <div className="textboxbuilder">
           <Link href={"/"}>
             <UniformText width="16em" height="3em" />
           </Link>
         </div>
       </div>
-      <div className="inputbox">
+      <div className="inputboxbuilder">
         <input
           type="text"
           value={userName}
@@ -79,7 +79,7 @@ export default function Skunkworks() {
       {loading && <Loading />}
       {error && <div>Error: {error.message}</div>}
       {canvasData && !loading && !error && (
-        <div className="canvasbox">
+        <div className="canvasboxbuilder">
           <Canvas data={canvasData} />
         </div>
       )}
