@@ -15,6 +15,9 @@ export default function Home() {
         <Link href="/rosterstatistics">
           <button className="button">Roster Statistics</button>
         </Link>
+        <Link href="/uniformbuilder">
+          <button className="button">Uniform Builder</button>
+        </Link>
       </div>
     </div>
   );
