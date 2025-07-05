@@ -40,110 +40,283 @@ export default function GetCoordArray(numAwards) {
   console.log(numAwards);
 
   switch (numAwards) {
-    case 33:
+    case 34:
       return [
         {
-          //32
+          //34
           dx: c4,
           dy: r13,
         },
         {
-          //31
+          //33
           dx: c3,
           dy: r12,
+        },
+        {
+          //32
+          dx: c4,
+          dy: r12,
+        },
+        {
+          //31
+          dx: c3,
+          dy: r11,
         },
         {
           //30
           dx: c4,
-          dy: r12,
+          dy: r11,
         },
         {
           //29
           dx: c3,
-          dy: r11,
+          dy: r10,
         },
         {
           //28
           dx: c4,
-          dy: r11,
+          dy: r10,
         },
         {
           //27
           dx: c3,
-          dy: r10,
+          dy: r9,
         },
         {
           //26
           dx: c4,
-          dy: r10,
+          dy: r9,
         },
         {
           //25
           dx: c3,
-          dy: r9,
+          dy: r8,
         },
         {
           //24
           dx: c4,
-          dy: r9,
+          dy: r8,
         },
         {
           //23
           dx: c3,
-          dy: r8,
+          dy: r7,
         },
         {
           //22
           dx: c4,
-          dy: r8,
+          dy: r7,
         },
         {
           //21
-          dx: c3,
-          dy: r7,
+          dx: c2,
+          dy: r6,
         },
         {
           //20
-          dx: c4,
-          dy: r7,
+          dx: c3,
+          dy: r6,
         },
         {
           //19
-          dx: c3,
+          dx: c4,
           dy: r6,
         },
         {
           //18
-          dx: c4,
-          dy: r6,
+          dx: c2,
+          dy: r5,
         },
         {
           //17
-          dx: c2,
+          dx: c3,
           dy: r5,
         },
         {
           //16
-          dx: c3,
-          dy: r5,
-        },
-        {
-          //15
           dx: c4,
           dy: r5,
         },
         {
-          //14
+          //15
           dx: c2,
           dy: r4,
         },
         {
-          //13
+          //14
           dx: c3,
           dy: r4,
         },
         {
+          //13
+          dx: c1,
+          dy: r3,
+        },
+        {
           //12
+          dx: c4,
+          dy: r4,
+        },
+        {
+          //11
+          dx: c2,
+          dy: r3,
+        },
+        {
+          //10
+          dx: c3,
+          dy: r3,
+        },
+        {
+          //9
+          dx: c4,
+          dy: r3,
+        },
+        {
+          //8
+          dx: c1,
+          dy: r2,
+        },
+        {
+          //7
+          dx: c2,
+          dy: r2,
+        },
+        {
+          //6
+          dx: c3,
+          dy: r2,
+        },
+        {
+          //5
+          dx: c4,
+          dy: r2,
+        },
+        {
+          //4
+          dx: c1,
+          dy: r1,
+        },
+        {
+          //3
+          dx: c2,
+          dy: r1,
+        },
+        {
+          //2
+          dx: c3,
+          dy: r1,
+        },
+        {
+          //1
+          dx: c4,
+          dy: r1,
+        },
+      ];
+    case 33:
+      return [
+        {
+          //33
+          dx: c4,
+          dy: r13,
+        },
+        {
+          //32
+          dx: c3,
+          dy: r12,
+        },
+        {
+          //31
+          dx: c4,
+          dy: r12,
+        },
+        {
+          //30
+          dx: c3,
+          dy: r11,
+        },
+        {
+          //29
+          dx: c4,
+          dy: r11,
+        },
+        {
+          //28
+          dx: c3,
+          dy: r10,
+        },
+        {
+          //27
+          dx: c4,
+          dy: r10,
+        },
+        {
+          //26
+          dx: c3,
+          dy: r9,
+        },
+        {
+          //25
+          dx: c4,
+          dy: r9,
+        },
+        {
+          //24
+          dx: c3,
+          dy: r8,
+        },
+        {
+          //23
+          dx: c4,
+          dy: r8,
+        },
+        {
+          //22
+          dx: c3,
+          dy: r7,
+        },
+        {
+          //21
+          dx: c4,
+          dy: r7,
+        },
+        {
+          //20
+          dx: c3,
+          dy: r6,
+        },
+        {
+          //19
+          dx: c4,
+          dy: r6,
+        },
+        {
+          //18
+          dx: c2,
+          dy: r5,
+        },
+        {
+          //17
+          dx: c3,
+          dy: r5,
+        },
+        {
+          //16
+          dx: c4,
+          dy: r5,
+        },
+        {
+          //15
+          dx: c2,
+          dy: r4,
+        },
+        {
+          //14
+          dx: c3,
+          dy: r4,
+        },
+        {
+          //13
           dx: c1,
           dy: r3,
         },
