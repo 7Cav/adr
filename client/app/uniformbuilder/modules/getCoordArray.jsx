@@ -24,9 +24,29 @@ export default function GetCoordArray(numAwards) {
   let r12 = 133;
   let r13 = 119;
 
+  /* included for use later
+  {
+    // -1 (On the pinboard)
+    dx: 706,
+    dy: 571,
+  },
+  {
+    // -2
+    dx: 750,
+    dy: 571,
+  },
+  */
+
+  console.log(numAwards);
+
   switch (numAwards) {
     case 33:
       return [
+        {
+          //32
+          dx: c4,
+          dy: r13,
+        },
         {
           //31
           dx: c3,
@@ -124,6 +144,11 @@ export default function GetCoordArray(numAwards) {
         },
         {
           //12
+          dx: c1,
+          dy: r3,
+        },
+        {
+          //12
           dx: c4,
           dy: r4,
         },
@@ -181,16 +206,6 @@ export default function GetCoordArray(numAwards) {
           //1
           dx: c4,
           dy: r1,
-        },
-        {
-          // -1 (On the pinboard)
-          dx: 706,
-          dy: 571,
-        },
-        {
-          // -2
-          dx: 750,
-          dy: 571,
         },
       ];
     case 32:

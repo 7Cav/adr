@@ -87,19 +87,21 @@ export default function GetCombatBadgeCoords(numAwards) {
     case 30:
     case 31:
     case 32:
+    case 33:
+    case 34:
       return {
         //1
         dx: 535,
         dy: 75,
       };
-    case 33:
-    case 34:
-    case 35:
-      return {
-        //1
-        dx: 545,
-        dy: 80,
-      };
+    // case 33:
+    // case 34:
+    // case 35:
+    //   return {
+    //     //1
+    //     dx: 545,
+    //     dy: 80,
+    //   };
     default:
       return null;
   }
