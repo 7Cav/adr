@@ -5,10 +5,12 @@ const { API_TOKEN } = require("../credentials/token");
 let cacheStatus = {
   combat: false,
   reserve: false,
+  individual: false,
 };
 
 let cachedCombatRoster;
 let cachedReserveRoster;
+let cachedIndividual;
 let cacheTime = {};
 
 axiosRetry(axios, {
@@ -57,6 +59,30 @@ const updateReserveRosterCache = async () => {
   }
 };
 
+const updateCachedIndividual = async (userName) => {
+  try {
+    const response = await axios(
+      `https://api.7cav.us/api/v1/milpacs/profile/username/${userName}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + API_TOKEN,
+          "Accept-Encoding": "gzip",
+        },
+      }
+    );
+    cachedIndividual = response.data;
+    cacheTime["individual"] = Date.now();
+    cacheStatus.individual = true;
+    return cachedIndividual;
+  } catch (error) {
+    console.error("Failed to update individual user cache:", error);
+    cacheStatus.individual = false;
+    return null;
+  }
+};
+
 const scheduleCacheUpdate = (updateFunction) => {
   const now = new Date();
   const delay =
@@ -97,9 +123,15 @@ const getCachedReserveRoster = () => {
   return cachedReserveRoster;
 };
 
+const getCachedIndividual = () => {
+  return cachedIndividual;
+};
+
 module.exports = {
+  updateCachedIndividual,
   getCachedCombatRoster,
   getCachedReserveRoster,
+  getCachedIndividual,
   cacheTime,
   initializeCache,
 };

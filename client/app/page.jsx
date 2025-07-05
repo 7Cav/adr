@@ -6,7 +6,9 @@ export default function Home() {
   return (
     <div className="masterbox">
       <div className="logobox">
-        <Logo width="50em" height="15em" />
+        <Link href="https://7cav.us/forums/">
+          <Logo width="50em" height="15em" />
+        </Link>
       </div>
       <div className="buttonbox">
         <Link href="/adr">
@@ -14,6 +16,9 @@ export default function Home() {
         </Link>
         <Link href="/rosterstatistics">
           <button className="button">Roster Statistics</button>
+        </Link>
+        <Link href="/uniformbuilder">
+          <button className="button">Uniform Builder</button>
         </Link>
       </div>
     </div>
