@@ -1,0 +1,126 @@
+.masterboxbuilder {
+  height: 100vh;
+  width: 100vw;
+}
+
+a {
+  color: #ebc729;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logobuilder {
+  animation: logoboxanimbuilder 28800s infinite linear;
+}
+
+.logoboxbuilder {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+@keyframes logoboxanimbuilder {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.textboxbuilder {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: small;
+  font-weight: 900;
+  color: #f1f1f1;
+
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  text-align: center;
+}
+
+.inputboxbuilder {
+  padding-top: 3em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.canvasboxbuilder {
+  padding-top: 1.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+input {
+  color: #f1f1f1;
+  width: 26%;
+  text-align: center;
+  display: inline-block;
+  border-radius: 3px;
+  border: 1px solid #ebc829;
+  border-image: radial-gradient(#ebc729, transparent) 1 0%;
+  box-sizing: border-box;
+  background-color: #111111;
+  outline: none;
+}
+input:focus {
+  outline: none;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 60vh;
+  flex-direction: column;
+}
+
+.gif-spinner-wrapper {
+  position: relative;
+}
+
+.spinner {
+  border: 0.5em solid #f3f3f3;
+  border-top: 0.5em solid #ebc729;
+  border-radius: 50%;
+  width: 11em;
+  /* Make this larger than the GIF */
+  height: 11em;
+  /* Make this larger than the GIF */
+  animation: spin 2s linear infinite;
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  z-index: 1;
+  margin: -4em 0 0 -4.5em;
+  /* Half of width and height */
+}
+
+.p-loading-png {
+  width: 8em;
+  height: 8em;
+  position: relative;
+  z-index: 2;
+  transform: translatex(-7%);
+}
+
+.loading-subtitle {
+  color: #f1f1f1;
+  font-size: x-large;
+  font-weight: bold;
+  padding: 1em;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
