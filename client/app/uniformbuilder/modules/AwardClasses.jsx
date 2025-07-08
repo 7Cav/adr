@@ -193,7 +193,12 @@ export class BadgeCombat extends Badge {
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
 
-    if (userMos == "153A" || userMos == "155A" || userMos == "15A") {
+    if (
+      userMos == "153A" ||
+      userMos == "155A" ||
+      userMos == "15A" ||
+      userMos == "15T"
+    ) {
       this.isAviation = true;
     }
 
