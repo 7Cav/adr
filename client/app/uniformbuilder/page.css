@@ -124,3 +124,13 @@ input:focus {
     transform: rotate(360deg);
   }
 }
+
+.errorheader {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.errorbox {
+  padding-top: 0.5%;
+  padding-bottom: 0.5%;
+}

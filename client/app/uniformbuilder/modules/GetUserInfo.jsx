@@ -25,6 +25,7 @@ export default function GetUserInfo(
     unitCitationCoordArray: [],
     combatBadgeCoords: [],
     tabCoordArray: [],
+    mosCheck: checkMos(dataActive.mos, getRankGrade(dataActive.rank.rankId)),
     shoulderCord: setShoulderCord(dataActive.mos),
     neckPins: setNeckPins(dataActive.mos),
   };
@@ -203,7 +204,6 @@ function setNeckPins(mos) {
     case "42A":
     case "57B":
     case "46S":
-    case "47A":
     case "79R":
     case "79X":
     case "51S":
@@ -214,4 +214,29 @@ function setNeckPins(mos) {
     default:
       return false;
   }
+}
+
+function checkMos(mos, rankGrade) {
+  const officerRegex =
+    /\b(?!(?:00Z|11C|42A|49A|14B|12B|35B|31B|11B|57B|26B))[0-9]+[A,B,Z,Q,C,N]/gim;
+
+  if (rankGrade.includes("W") || rankGrade.includes("O")) {
+    if (mos.match(officerRegex) == null && mos) {
+      return [
+        "Failed",
+        `MOS ${mos} is an Enlisted/NCO MOS, despite user being of Officer/WO rank. Inform your lead if you see this error.`,
+      ];
+    }
+  }
+
+  if (rankGrade.includes("E")) {
+    if (mos.match(officerRegex) != null && mos) {
+      return [
+        "Failed",
+        `MOS ${mos} is an Officer/WO MOS, despite user being of Enlisted/NCO rank. Inform your lead if you see this error.`,
+      ];
+    }
+  }
+
+  return null;
 }
