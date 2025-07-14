@@ -15,10 +15,13 @@ function Canvas(props) {
 
   const [images, setImages] = useState({});
   const [loading, setLoading] = useState(true);
+  const [builderErrors, setBuilderErrors] = useState([]);
 
   useEffect(() => {
     setLoading(true);
     setImages({});
+    setBuilderErrors([]);
+
     const loadImage = (src, key) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -341,12 +344,6 @@ function Canvas(props) {
 
   const placeNameTag = (userData, context) => {
     return new Promise((resolve) => {
-      // Anything above 15 chars must be added manually
-      if (userData.nameTag.length > 15) {
-        resolve();
-        return;
-      }
-
       let tagWidth;
       let tagHeight;
       let selector;
@@ -577,45 +574,87 @@ function Canvas(props) {
         }
 
         //Draw Name Tag, 8 or more chars requires long boi
-        await Promise.all([placeNameTag(data[0], context)]);
+
+        try {
+          if (data[0].nameTag.length > 15)
+            throw new Error(
+              "Name Tag exceeds allowable length. You must add the name tag manually in the .xcf file."
+            );
+          await Promise.all([placeNameTag(data[0], context)]);
+        } catch (err) {
+          setBuilderErrors((prevErrors) => [...prevErrors, err.message]);
+        }
 
         //Draw Weapon Quals
 
-        if (data[5] !== 0) {
-          const activeQuals = [];
-          if (data[5].expertQuals.length > 0)
-            activeQuals.push({ type: "expert", data: data[5].expertQuals });
-          if (data[5].sharpshooterQuals.length > 0)
-            activeQuals.push({
-              type: "sharpshooter",
-              data: data[5].sharpshooterQuals,
-            });
-          if (data[5].marksmanQuals.length > 0)
-            activeQuals.push({ type: "marksman", data: data[5].marksmanQuals });
+        try {
+          if (data[5] !== 0) {
+            const uniqueEntries = new Set();
+            const activeQuals = [];
+            if (data[5].expertQuals.length > 0) {
+              activeQuals.push({ type: "expert", data: data[5].expertQuals });
+              for (let i = 0; i < data[5].expertQuals.length; i++) {
+                uniqueEntries.add(data[5].expertQuals[i]);
+              }
+            }
+            if (data[5].sharpshooterQuals.length > 0) {
+              activeQuals.push({
+                type: "sharpshooter",
+                data: data[5].sharpshooterQuals,
+              });
+              for (let i = 0; i < data[5].sharpshooterQuals.length; i++) {
+                uniqueEntries.add(data[5].sharpshooterQuals[i]);
+              }
+            }
 
-          const numActive = activeQuals.length;
+            if (data[5].marksmanQuals.length > 0) {
+              activeQuals.push({
+                type: "marksman",
+                data: data[5].marksmanQuals,
+              });
+              for (let i = 0; i < data[5].marksmanQuals.length; i++) {
+                uniqueEntries.add(data[5].marksmanQuals[i]);
+              }
+            }
 
-          const xPositions = [];
-          if (numActive === 1) {
-            xPositions.push(25);
-          } else if (numActive === 2) {
-            xPositions.push(25, 97);
-          } else if (numActive === 3) {
-            xPositions.push(25, 97, 170);
+            let checksum = 0;
+
+            if (activeQuals[0]) checksum += activeQuals[0].data.length;
+            if (activeQuals[1]) checksum += activeQuals[1].data.length;
+            if (activeQuals[2]) checksum += activeQuals[2].data.length;
+
+            if (checksum != uniqueEntries.size) {
+              throw new Error(
+                "Weapon Qual Checksum Failed. This is due to a double entry in the Milpac and cannot be fixed by you. Inform your lead if you see this error."
+              );
+            }
+
+            const numActive = activeQuals.length;
+
+            const xPositions = [];
+            if (numActive === 1) {
+              xPositions.push(25);
+            } else if (numActive === 2) {
+              xPositions.push(25, 97);
+            } else if (numActive === 3) {
+              xPositions.push(25, 97, 170);
+            }
+
+            //Draw each active qualification
+
+            await Promise.all([
+              ...activeQuals.map((activeQuals, index) =>
+                placeWeaponQual(
+                  activeQuals.data,
+                  xPositions[index],
+                  activeQuals.type,
+                  context
+                )
+              ),
+            ]);
           }
-
-          //Draw each active qualification
-
-          await Promise.all([
-            ...activeQuals.map((activeQuals, index) =>
-              placeWeaponQual(
-                activeQuals.data,
-                xPositions[index],
-                activeQuals.type,
-                context
-              )
-            ),
-          ]);
+        } catch (err) {
+          setBuilderErrors((prevErrors) => [...prevErrors, err.message]);
         }
 
         // Draw tabs
@@ -633,26 +672,36 @@ function Canvas(props) {
           ]);
         }
 
-        // Draw Cord
+        //Before drawing MOS Decorations, Do a check
 
-        if (data[0].shoulderCord != false) {
-          await Promise.all([
-            placeCordPins(
-              `skunkworks/uniformCords/${data[0].shoulderCord}.png`,
-              context
-            ),
-          ]);
-        }
+        try {
+          if (data[0].mosCheck != null) {
+            throw new Error(data[0].mosCheck[1]);
+          }
 
-        // Draw Neck Pins
+          // Draw Cord
 
-        if (data[0].neckPins != false) {
-          await Promise.all([
-            placeCordPins(
-              `skunkworks/uniformLapelPins/${data[0].neckPins}.png`,
-              context
-            ),
-          ]);
+          if (data[0].shoulderCord != false) {
+            await Promise.all([
+              placeCordPins(
+                `skunkworks/uniformCords/${data[0].shoulderCord}.png`,
+                context
+              ),
+            ]);
+          }
+
+          // Draw Neck Pins
+
+          if (data[0].neckPins != false) {
+            await Promise.all([
+              placeCordPins(
+                `skunkworks/uniformLapelPins/${data[0].neckPins}.png`,
+                context
+              ),
+            ]);
+          }
+        } catch (err) {
+          setBuilderErrors((prevErrors) => [...prevErrors, err.message]);
         }
 
         //Calculate medal coords
@@ -806,7 +855,24 @@ function Canvas(props) {
       <a id="canvasDownload" href="#" download>
         Download Image
       </a>
-      <canvas ref={canvasRef} {...props} width={837} height={1025} />
+      {builderErrors.length > 0 && (
+        <div className="errorbox">
+          <h3 className="errorheader">Errors have been detected!</h3>
+          <ul>
+            {builderErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+          <p>The uniform has rendered with non failing items.</p>
+        </div>
+      )}
+      <canvas
+        ref={canvasRef}
+        {...props}
+        width={837}
+        height={1025}
+        className="canvas"
+      />
     </div>
   );
 }
