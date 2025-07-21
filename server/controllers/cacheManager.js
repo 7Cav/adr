@@ -6,11 +6,13 @@ let cacheStatus = {
   combat: false,
   reserve: false,
   individual: false,
+  groups: false,
 };
 
 let cachedCombatRoster;
 let cachedReserveRoster;
 let cachedIndividual;
+let cachedGroups;
 let cacheTime = {};
 
 axiosRetry(axios, {
@@ -83,6 +85,30 @@ const updateCachedIndividual = async (userName) => {
   }
 };
 
+const updateCachedGroups = async () => {
+  try {
+    const response = await axios(
+      `https://api.7cav.us/api/v1/milpacs/position/groups`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + API_TOKEN,
+          "Accept-Encoding": "gzip",
+        },
+      }
+    );
+    cachedGroup = response.data;
+    cacheTime["individual"] = Date.now();
+    cacheStatus.groups = true;
+    return cachedIndividual;
+  } catch (error) {
+    console.error("Failed to update individual user cache:", error);
+    cacheStatus.groups = false;
+    return null;
+  }
+};
+
 const scheduleCacheUpdate = (updateFunction) => {
   const now = new Date();
   const delay =
@@ -99,6 +125,7 @@ const initializeCache = async () => {
     // Initial cache update
     await updateCombatRosterCache();
     await updateReserveRosterCache();
+    await updateCachedGroups();
 
     // Check if cache is valid
     if (!cacheStatus["combat"] || !cacheStatus["reserve"]) {
@@ -109,6 +136,7 @@ const initializeCache = async () => {
     // Schedule the updates
     scheduleCacheUpdate(updateCombatRosterCache);
     scheduleCacheUpdate(updateReserveRosterCache);
+    scheduleCacheUpdate(updateCachedGroups);
   } catch (error) {
     console.error("Critical error during cache initialization:", error);
     process.exit(1); // Exit to trigger Docker restart
@@ -127,11 +155,16 @@ const getCachedIndividual = () => {
   return cachedIndividual;
 };
 
+const getCachedGroups = () => {
+  return cachedGroups;
+};
+
 module.exports = {
   updateCachedIndividual,
   getCachedCombatRoster,
   getCachedReserveRoster,
   getCachedIndividual,
+  getCachedGroups,
   cacheTime,
   initializeCache,
 };
