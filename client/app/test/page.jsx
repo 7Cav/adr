@@ -23,8 +23,20 @@ export default async function ActiveDutyRoster() {
   const milpacArray = [{ combat, reserve }];
   const rosterGroups = groups;
 
-  const firstBattGroups = [2, 3, 4, 5, 6];
-
+  const units = [
+    { title: "Regimental Command", selectors: [0] },
+    { title: "First Battalion", selectors: [2, 3, 4, 5, 6] },
+    { title: "Second Battalion", selectors: [7, 8, 9, 10, 11] },
+    { title: "Third Battalion", selectors: [12, 15, 13 /*, 14*/] },
+    {
+      title: "Auxiallary Combat Division",
+      selectors: [16, 17, 18 /*, 19*/, 20],
+    },
+    {
+      title: "Support Departments",
+      selectors: [1],
+    },
+  ];
   return (
     <div className="MasterContainer">
       <div className="p-nav-primary">
@@ -55,17 +67,19 @@ export default async function ActiveDutyRoster() {
         </div>
       </div>
       <div className="ListContainer">
-        {/*<AdrListEntry bBGroup="regi" milpacArray={milpacArray} /> */}
-        <div className="DepartmentContainer">
-          <div className="Title">First Battalion</div>
-          {firstBattGroups.map((selector) => (
-            <AdrListEntry
-              rGSelector={selector}
-              milpacArray={milpacArray}
-              rosterGroups={rosterGroups}
-            />
-          ))}
-        </div>
+        {units.map((unit) => (
+          <div className="DepartmentContainer" key={unit.title}>
+            <div className="Title">{unit.title}</div>
+            {unit.selectors.map((selector) => (
+              <AdrListEntry
+                key={`${unit.title}-${selector}`} // Unique key for AdrListEntry
+                rGSelector={selector}
+                milpacArray={milpacArray}
+                rosterGroups={rosterGroups}
+              />
+            ))}
+          </div>
+        ))}
         {/*<AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="acd" milpacArray={milpacArray} />
