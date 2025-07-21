@@ -7,10 +7,10 @@ function AdrListEntry(props) {
 
   return (
     <div className="ResponseContainer">
-      <div className="Subtitle">{rosterGroups[selector].groupTitle}</div>
       <MilpacParse
         milpacArray={props.milpacArray}
         rosterGroups={rosterGroups[selector].positions}
+        subtitle={rosterGroups[selector].groupTitle}
       />
     </div>
   );

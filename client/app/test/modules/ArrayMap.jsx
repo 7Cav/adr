@@ -14,14 +14,6 @@ function ArrayMap(props) {
       <tbody>
         {inputArray.map((item, index) => (
           <React.Fragment key={`fragment-${index}`}>
-            {/* <tr key={`header-${index}`}>
-              {/* <th className="Subtitle" align="left">
-                {props.headerTitles[index]}
-              </th> 
-              <th align="right" className="Counter">
-                Unit Strength: {inputArray[index].length}
-              </th>
-            </tr>*/}
             <tr key={item.listKey}>
               <td>
                 <a href={"https://7cav.us/rosters/profile/" + item.itemKey}>

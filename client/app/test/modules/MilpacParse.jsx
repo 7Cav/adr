@@ -13,7 +13,7 @@ function MilpacParse(props) {
   console.log(rosterGroups);
 
   //Currently broken. Sypolt, pls fix.
-  //const uniqueNamesSet = new Set();
+  const uniqueNamesSet = new Set();
 
   let returnArray = [];
 
@@ -41,7 +41,7 @@ function MilpacParse(props) {
           itemKey: milpacIdCombat,
           listKey: primarySortKey + milpacIdCombat,
         });
-        //uniqueNamesSet.add(fullName);
+        uniqueNamesSet.add(fullName);
       }
 
       //Next, check the combat roster secondaries for matching billet id's, then push to return array if match is found.
@@ -134,8 +134,16 @@ function MilpacParse(props) {
   console.log(returnArray);
 
   return (
-    <div className="ItemList">
-      <ArrayMap inputArray={returnArray} headerTitles={props.headerTitles} />
+    <div className="ParseBox">
+      <div className="CounterSubtitle">
+        <div className="Subtitle">{props.subtitle}</div>
+        <div align="right" className="Counter">
+          Unit Strength: {uniqueNamesSet.size}
+        </div>
+      </div>
+      <div className="ItemList">
+        <ArrayMap inputArray={returnArray} headerTitles={props.headerTitles} />
+      </div>
     </div>
   );
 }
