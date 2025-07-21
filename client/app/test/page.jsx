@@ -23,8 +23,7 @@ export default async function ActiveDutyRoster() {
   const milpacArray = [{ combat, reserve }];
   const rosterGroups = groups;
 
-  console.log(milpacArray);
-  console.log(rosterGroups);
+  const firstBattGroups = [2, 3, 4, 5, 6];
 
   return (
     <div className="MasterContainer">
@@ -56,15 +55,23 @@ export default async function ActiveDutyRoster() {
         </div>
       </div>
       <div className="ListContainer">
-        {/* note: bBGroup = Billet Bank Group */}
-        <AdrListEntry bBGroup="regi" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="oneSeven" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
+        {/*<AdrListEntry bBGroup="regi" milpacArray={milpacArray} /> */}
+        <div className="DepartmentContainer">
+          <div className="Title">First Battalion</div>
+          {firstBattGroups.map((selector) => (
+            <AdrListEntry
+              rGSelector={selector}
+              milpacArray={milpacArray}
+              rosterGroups={rosterGroups}
+            />
+          ))}
+        </div>
+        {/*<AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="acd" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="secOps" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="roo" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="support" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="support" milpacArray={milpacArray} /> */}
       </div>
     </div>
   );
