@@ -239,3 +239,11 @@
   /* No idea why i have to do this stupidity. For some reason if I dont do this, this shit becomes off centered */
   transform-origin: 67% 67%;
 }
+
+.CounterSubtitle {
+  display: flex;
+}
+
+.Counter {
+  font-weight: bold;
+}
