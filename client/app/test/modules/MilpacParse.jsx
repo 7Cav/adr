@@ -12,14 +12,9 @@ function MilpacParse(props) {
 
   console.log(rosterGroups);
 
-  //Currently broken. Sypolt, pls fix.
   const uniqueNamesSet = new Set();
 
   let returnArray = [];
-
-  // let returnArray = Array(rosterGroups.length)
-  //   .fill()
-  //   .map(() => []);
 
   //First, check the combat roster primaries for matching billet id's, then push them to the return array if match is found.
 
@@ -46,90 +41,85 @@ function MilpacParse(props) {
 
       //Next, check the combat roster secondaries for matching billet id's, then push to return array if match is found.
 
-      // for (let index2 in milpacArray[0].combat.profiles[milpacIdCombat]
-      //   .secondaries) {
-      //   let secondary =
-      //     milpacArray[0].combat.profiles[milpacIdCombat].secondaries[index2];
-      //   let secondarySortKey =
-      //     milpacArray[0].combat.profiles[milpacIdCombat].secondaries[index2]
-      //       .positionId;
+      for (let index2 in milpacArray[0].combat.profiles[milpacIdCombat]
+        .secondaries) {
+        let secondary =
+          milpacArray[0].combat.profiles[milpacIdCombat].secondaries[index2];
+        let secondarySortKey =
+          milpacArray[0].combat.profiles[milpacIdCombat].secondaries[index2]
+            .positionId;
 
-      //   if (!rosterGroups[index].positionId.includes(secondary.positionId)) {
-      //     continue;
-      //   }
-
-      //   returnArray[index].push({
-      //     fullName: fullName,
-      //     position: secondary,
-      //     isPrimary: "false",
-      //     sortKey: secondarySortKey,
-      //     itemKey: milpacIdCombat,
-      //     listKey: secondarySortKey + milpacIdCombat,
-      //   });
-      //   //uniqueNamesSet.add(fullName);
-      // }
+        if (rosterGroups[index].positionId == secondary.positionId) {
+          returnArray.push({
+            fullName: fullName,
+            position: secondary,
+            isPrimary: "false",
+            sortKey: rosterGroups[index].positionDisplayOrder,
+            itemKey: milpacIdCombat,
+            listKey: secondarySortKey + milpacIdCombat,
+          });
+          uniqueNamesSet.add(fullName);
+        }
+      }
     }
   }
 
   //After the Combat Roster, check the Reserves.
 
-  // for (let milpacIdReserve in milpacArray[0].reserve.profiles) {
-  //   let rName = milpacArray[0].reserve.profiles[milpacIdReserve].realName;
-  //   let rRank = milpacArray[0].reserve.profiles[milpacIdReserve].rank.rankFull;
-  //   let rPrimary = milpacArray[0].reserve.profiles[milpacIdReserve].primary;
-  //   let rFullName = rRank + " " + rName;
-  //   let rPrimarySortKey =
-  //     milpacArray[0].reserve.profiles[milpacIdReserve].primary.positionId;
+  for (let milpacIdReserve in milpacArray[0].reserve.profiles) {
+    let rName = milpacArray[0].reserve.profiles[milpacIdReserve].realName;
+    let rRank = milpacArray[0].reserve.profiles[milpacIdReserve].rank.rankFull;
+    let rPrimary = milpacArray[0].reserve.profiles[milpacIdReserve].primary;
+    let rFullName = rRank + " " + rName;
+    let rPrimarySortKey =
+      milpacArray[0].reserve.profiles[milpacIdReserve].primary.positionId;
 
-  //   //Check the Reserve primaries, then push to return array if match is found.
+    //Check the Reserve primaries, then push to return array if match is found.
 
-  //   for (let index in rosterGroups) {
-  //     if (rosterGroups[index].positionId.includes(rPrimary.positionId)) {
-  //       returnArray[index].push({
-  //         fullName: rFullName,
-  //         position: rPrimary,
-  //         isPrimary: "true",
-  //         sortKey: rPrimarySortKey,
-  //         itemKey: milpacIdReserve,
-  //         listKey: rPrimarySortKey + milpacIdReserve,
-  //       });
-  //       //uniqueNamesSet.add(rFullName);
-  //     }
+    for (let index in rosterGroups) {
+      if (rosterGroups[index].positionId == rPrimary.positionId) {
+        returnArray.push({
+          fullName: rFullName,
+          position: rPrimary,
+          isPrimary: "true",
+          sortKey: rosterGroups[index].positionDisplayOrder,
+          itemKey: milpacIdReserve,
+          listKey: rPrimarySortKey + milpacIdReserve,
+        });
+        uniqueNamesSet.add(rFullName);
+      }
 
-  //     //Check the Reserve secondaries, then push to return array if match is found.
+      //Check the Reserve secondaries, then push to return array if match is found.
 
-  //     for (let rIndex in milpacArray[0].reserve.profiles[milpacIdReserve]
-  //       .secondaries) {
-  //       let rSecondary =
-  //         milpacArray[0].reserve.profiles[milpacIdReserve].secondaries[rIndex];
-  //       let rSecondarySortKey =
-  //         milpacArray[0].reserve.profiles[milpacIdReserve].secondaries[rIndex]
-  //           .positionId;
+      for (let rIndex in milpacArray[0].reserve.profiles[milpacIdReserve]
+        .secondaries) {
+        let rSecondary =
+          milpacArray[0].reserve.profiles[milpacIdReserve].secondaries[rIndex];
+        let rSecondarySortKey =
+          milpacArray[0].reserve.profiles[milpacIdReserve].secondaries[rIndex]
+            .positionId;
 
-  //       if (!rosterGroups[index].positionId.includes(rSecondary.positionId)) {
-  //         continue;
-  //       }
+        if (rosterGroups[index].positionId == rSecondary.positionId) {
+          returnArray.push({
+            fullName: rFullName,
+            position: rSecondary,
+            isPrimary: "false",
+            sortKey: rosterGroups[index].positionDisplayOrder,
+            itemKey: milpacIdReserve,
+            listKey: rSecondarySortKey + milpacIdReserve,
+          });
+          uniqueNamesSet.add(rFullName);
+        }
+      }
 
-  //       returnArray[index].push({
-  //         fullName: rFullName,
-  //         position: rSecondary,
-  //         isPrimary: "false",
-  //         sortKey: rSecondarySortKey,
-  //         itemKey: milpacIdReserve,
-  //         listKey: rSecondarySortKey + milpacIdReserve,
-  //       });
-  //       //uniqueNamesSet.add(rFullName);
-  //     }
-
-  //     // Sort the array based on the order of positionIds in the billetBankObject array. This is mostly accurate, however ranks are not taken into account in the final display
-
+      // Sort the array based on the order of positionIds in the billetBankObject array. This is mostly accurate, however ranks are not taken into account in the final display
+    }
+  }
   returnArray.sort((a, b) => {
     const aIndex = a.sortKey;
     const bIndex = b.sortKey;
     return aIndex - bIndex;
   });
-  //   }
-  // }
 
   console.log(returnArray);
 
