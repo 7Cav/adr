@@ -58,13 +58,13 @@ export default async function RosterStatistics() {
               lists.echo2,
               lists.threeSevenCommand,
               lists.alpha3,
-              //lists.bravo3,
-              //lists.charlie3,
+              lists.bravo3,
+              lists.charlie3,
               lists.acdCommand,
               lists.alpha4,
               lists.bravo4,
-              lists.charlie4,
-              lists.futureC,
+              //lists.charlie4,
+              //lists.futureC,
               //lists.starterPlatoon,
               //lists.starterPlatoon2,
               //lists.starterPlatoon3,
@@ -82,12 +82,12 @@ export default async function RosterStatistics() {
               "Echo Company 2-7",
               "3-7 Headquarters",
               "Alpha Company 3-7",
-              //"Bravo Company 3-7",
-              //"Charlie Company 3-7",
-              "ACD Headquarters",
+              "Bravo Company 3-7",
+              "Charlie Company 3-7",
+              "R&DC Headquarters",
               "Alpha Company ACD",
               "Bravo Company ACD",
-              "Charlie Company ACD",
+              //"Charlie Company ACD",
               //"Star Citizen SP",
               //"Star Wars RPG SP",
               //"Counter Strike 2 SP",
@@ -138,26 +138,25 @@ export default async function RosterStatistics() {
             milpacArray={milpacArray}
           />
         </div>
-        {/* 
         <div className="threeSevenBreakdown">
           <div className="Subtitle">Third Battalion</div>
           <Statistics
             billetIDs={[
               lists.threeSevenCommand,
               lists.alpha3,
-              //lists.bravo3,
-              //lists.charlie3,
+              lists.bravo3,
+              lists.charlie3,
             ]}
             centerLabel="Total 3-7 Strength"
             labelArray={[
               "3-7 Headquarters",
               "Alpha Company",
-              //"Bravo Company",
-              //"Charlie Company",
+              "Bravo Company",
+              "Charlie Company",
             ]}
             milpacArray={milpacArray}
           />
-        </div> */}
+        </div>
 
         <div className="ACDStrength">
           <div className="Subtitle">Reserve and Development Command</div>
