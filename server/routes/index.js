@@ -4,6 +4,7 @@ const cors = require("cors");
 const cRequest = require("../controllers/cRequest");
 const rRequest = require("../controllers/rRequest");
 const iRequest = require("../controllers/iRequest");
+const gRequest = require("../controllers/gRequest");
 const app = express();
 
 app.use(
@@ -21,4 +22,5 @@ router.get("/individual", (req, res) => {
   }
   iRequest(req, res, userName);
 });
+router.get("/groups", gRequest);
 module.exports = router;
