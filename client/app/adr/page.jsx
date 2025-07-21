@@ -2,6 +2,7 @@ import Link from "next/link";
 import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
 import GetApiTimestamp from "../reusableModules/getApiTimestamp";
+import GetRosterGroups from "../reusableModules/getGroups";
 import AdrListEntry from "./modules/AdrListEntry";
 import Logo from "../theme/adrLogo";
 import "./page.css";
@@ -12,14 +13,30 @@ export const metadata = {
 };
 
 export default async function ActiveDutyRoster() {
-  const [combat, reserve, timestamp] = await Promise.all([
+  const [combat, reserve, timestamp, groups] = await Promise.all([
     GetCombatRoster(),
     GetReserveRoster(),
     GetApiTimestamp(),
+    GetRosterGroups(),
   ]);
 
   const milpacArray = [{ combat, reserve }];
+  const rosterGroups = groups;
 
+  const units = [
+    { title: "Regimental Command", selectors: [0] },
+    { title: "First Battalion", selectors: [2, 3, 4, 5, 6] },
+    { title: "Second Battalion", selectors: [7, 8, 9, 10, 11] },
+    { title: "Third Battalion", selectors: [12, 15, 13 /*, 14*/] },
+    {
+      title: "Auxiallary Combat Division",
+      selectors: [16, 17, 18 /*, 19*/, 20],
+    },
+    {
+      title: "Support Departments",
+      selectors: [1],
+    },
+  ];
   return (
     <div className="MasterContainer">
       <div className="p-nav-primary">
@@ -50,15 +67,25 @@ export default async function ActiveDutyRoster() {
         </div>
       </div>
       <div className="ListContainer">
-        {/* note: bBGroup = Billet Bank Group */}
-        <AdrListEntry bBGroup="regi" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="oneSeven" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
+        {units.map((unit) => (
+          <div className="DepartmentContainer" key={unit.title}>
+            <div className="Title">{unit.title}</div>
+            {unit.selectors.map((selector) => (
+              <AdrListEntry
+                key={`${unit.title}-${selector}`} // Unique key for AdrListEntry
+                rGSelector={selector}
+                milpacArray={milpacArray}
+                rosterGroups={rosterGroups}
+              />
+            ))}
+          </div>
+        ))}
+        {/*<AdrListEntry bBGroup="twoSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="threeSeven" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="acd" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="secOps" milpacArray={milpacArray} />
         <AdrListEntry bBGroup="roo" milpacArray={milpacArray} />
-        <AdrListEntry bBGroup="support" milpacArray={milpacArray} />
+        <AdrListEntry bBGroup="support" milpacArray={milpacArray} /> */}
       </div>
     </div>
   );
