@@ -98,10 +98,10 @@ const updateCachedGroups = async () => {
         },
       }
     );
-    cachedGroup = response.data;
+    cachedGroups = response.data;
     cacheTime["individual"] = Date.now();
     cacheStatus.groups = true;
-    return cachedIndividual;
+    return cachedGroups;
   } catch (error) {
     console.error("Failed to update individual user cache:", error);
     cacheStatus.groups = false;
@@ -128,7 +128,11 @@ const initializeCache = async () => {
     await updateCachedGroups();
 
     // Check if cache is valid
-    if (!cacheStatus["combat"] || !cacheStatus["reserve"]) {
+    if (
+      !cacheStatus["combat"] ||
+      !cacheStatus["reserve"] ||
+      !cacheStatus["groups"]
+    ) {
       console.error("Failed to initialize cache. Exiting...");
       process.exit(1); // Exit to trigger Docker restart
     }
