@@ -3,10 +3,9 @@ import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
 import GetApiTimestamp from "../reusableModules/getApiTimestamp";
 import GetRosterGroups from "../reusableModules/getGroups";
-import AdrListEntry from "./modules/AdrListEntry";
 import Logo from "../theme/adrLogo";
-import "./page.css";
-import "../globals.css";
+//import "./page.css";
+//import "../globals.css";
 
 export const metadata = {
   title: "Active Duty Roster",
