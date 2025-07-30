@@ -7,30 +7,21 @@ milpac link, name and rank, and position title.*/
 
 function ArrayMap(props) {
   let inputArray = props.inputArray;
+  console.log(inputArray);
 
   return (
     <table>
       <tbody>
-        {inputArray.map((subArray, index) => (
+        {inputArray.map((item, index) => (
           <React.Fragment key={`fragment-${index}`}>
-            <tr key={`header-${index}`}>
-              <th className="Subtitle" align="left">
-                {props.headerTitles[index]}
-              </th>
-              <th align="right" className="Counter">
-                Unit Strength: {inputArray[index].length}
-              </th>
+            <tr key={item.listKey}>
+              <td>
+                <a href={"https://7cav.us/rosters/profile/" + item.itemKey}>
+                  {item.fullName}
+                </a>
+              </td>
+              <td className="positionName">{item.position.positionTitle}</td>
             </tr>
-            {subArray.map((item, subIndex) => (
-              <tr key={item.listKey}>
-                <td>
-                  <a href={"https://7cav.us/rosters/profile/" + item.itemKey}>
-                    {item.fullName}
-                  </a>
-                </td>
-                <td className="positionName">{item.position.positionTitle}</td>
-              </tr>
-            ))}
           </React.Fragment>
         ))}
       </tbody>
