@@ -1,21 +1,19 @@
+//Honestly, I could probably just delete this file.
+
 import React from "react";
 import MilpacParse from "./MilpacParse";
-import lists from "../../reusableModules/BilletBank";
 
 function AdrListEntry(props) {
-  let billetBankObject = lists.billetBankObject;
-  let selector = props.bBGroup;
+  const rosterGroups = props.rosterGroups.groups;
+  const selector = props.rGSelector;
 
   return (
-    <div className="DepartmentContainer">
-      <div className="Title">{billetBankObject[selector].collapsibleTitle}</div>
-      <div className="ResponseContainer">
-        <MilpacParse
-          milpacArray={props.milpacArray}
-          headerTitles={billetBankObject[selector].positionTitles}
-          billetBankObject={billetBankObject[selector].positionIds}
-        />
-      </div>
+    <div className="ResponseContainer">
+      <MilpacParse
+        milpacArray={props.milpacArray}
+        rosterGroups={rosterGroups[selector].positions}
+        subtitle={rosterGroups[selector].groupTitle}
+      />
     </div>
   );
 }
