@@ -4,7 +4,7 @@ const compression = require("compression");
 const app = express();
 const cors = require("cors");
 const port = 4000;
-const { CLIENT_TOKEN } = require("./credentials/token");
+const { CLIENT_TOKEN } = process.env.CLIENT_TOKEN;
 const { cacheTime, initializeCache } = require("./controllers/cacheManager");
 
 const corsOptions = {
