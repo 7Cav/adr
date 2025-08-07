@@ -1,33 +1,32 @@
 services:
   server:
     restart: always
-    container_name: adr-server
-    image: node:lts-alpine
-    env_file:
-      - ./client/.env
-    volumes:
-      - ./server:/app
+    build:
+      dockerfile: "./server.Dockerfile"
+      context: "./server"
+    image: 7cav/cavapps-server:latest
+    container_name: apps-server
     ports:
       - "4000:4000"
     enviornment:
       API_TOKEN:
       CLIENT_TOKEN:
-
-    working_dir: /app
-    command: /bin/sh -c "apk add curl && npm install && node server.js"
+    working_dir: /server
     healthcheck:
       test: ["CMD", "curl", "-f", "http://server:4000"]
       interval: 10s
       timeout: 10s
       retries: 5
       start_period: 30s
+    networks: mynetwork
 
   client:
     restart: always
-    container_name: adr-client
-    image: node:lts-alpine
-    volumes:
-      - ./client:/app
+    build:
+      context: ./client
+      dockerfile: ./client.Dockerfile
+    image: 7cav/cavapps-client:latest
+    container_name: apps-client
     ports:
       - "80:3000"
     enviornment:
@@ -37,8 +36,12 @@ services:
       NEXT_PUBLIC_INDIVIDUAL_API_URL: http://server:4000/roster/individual
       CACHE_TIMESTAMP_URL: http://server:4000/cache-timestamp
       GROUP_API_URL: http://server:4000/roster/groups
-    entrypoint: /bin/sh -c "until wget -q --spider http://server:4000; do echo 'Waiting for server...'; sleep 5; done; npm install && npm run build && npm run start"
-    working_dir: /app
+    working_dir: /client
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - mynetwork
 
 networks:
   mynetwork:
