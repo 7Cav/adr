@@ -9,13 +9,10 @@ services:
       - ./server:/app
     ports:
       - "4000:4000"
-    #enviornment:
-    #NEXT_PUBLIC_CLIENT_TOKEN:
-    #COMBAT_API_URL: http://server:4000/roster/combat
-    #RESERVE_API_URL: http://server:4000/roster/reserves
-    #NEXT_PUBLIC_INDIVIDUAL_API_URL: http://server:4000/roster/individual
-    #CACHE_TIMESTAMP_URL: http://server:4000/cache-timestamp
-    #GROUP_API_URL: http://server:4000/roster/groups
+    enviornment:
+      API_TOKEN:
+      CLIENT_TOKEN:
+
     working_dir: /app
     command: /bin/sh -c "apk add curl && npm install && node server.js"
     healthcheck:
