@@ -2,7 +2,7 @@
 
 FROM node:lts-alpine
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl wget
 
 WORKDIR /client
 
