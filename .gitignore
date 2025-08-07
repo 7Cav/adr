@@ -42,4 +42,3 @@ server/credentials/token.js
 .env
 
 /.idea/
-compose.yml
