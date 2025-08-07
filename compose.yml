@@ -19,7 +19,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - mynetwork
+      - cavapps-network
 
   client:
     restart: always
@@ -43,8 +43,8 @@ services:
         condition: service_healthy
     entrypoint: /bin/sh -c "until wget -q --spider http://server:4000; do echo 'Waiting for server...'; sleep 5; done; npm run build && npm run start"
     networks:
-      - mynetwork
+      - cavapps-network
 
 networks:
-  mynetwork:
+  cavapps-network:
     driver: bridge
