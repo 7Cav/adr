@@ -10,8 +10,6 @@ function MilpacParse(props) {
   const rosterGroups = props.rosterGroups;
   let milpacArray = props.milpacArray;
 
-  console.log(rosterGroups);
-
   const uniqueNamesSet = new Set();
 
   let returnArray = [];
@@ -120,8 +118,6 @@ function MilpacParse(props) {
     const bIndex = b.sortKey;
     return aIndex - bIndex;
   });
-
-  console.log(returnArray);
 
   return (
     <div className="ParseBox">
