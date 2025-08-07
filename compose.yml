@@ -5,7 +5,7 @@ services:
       dockerfile: "./server.Dockerfile"
       context: "./server"
     image: 7cav/cavapps-server:latest
-    container_name: apps-server
+    container_name: cavapps-server
     ports:
       - "4000:4000"
     environment:
@@ -27,7 +27,7 @@ services:
       context: ./client
       dockerfile: ./client.Dockerfile
     image: 7cav/cavapps-client:latest
-    container_name: apps-client
+    container_name: cavapps-client
     ports:
       - "80:3000"
     environment:
