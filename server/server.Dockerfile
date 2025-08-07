@@ -8,13 +8,13 @@ WORKDIR /server
 
 # Acquire dependencies
 
-COPY server/package*.json ./
+COPY package*.json ./
 
 RUN npm install
 
 # Copy server source code
 
-COPY server/. .
+COPY . .
 
 # Deploy
 
