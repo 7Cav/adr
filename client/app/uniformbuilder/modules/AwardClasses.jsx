@@ -73,6 +73,7 @@ export class MedalWithValor extends Medal {
 export class RibbonDonationLogic extends Ribbon {
   constructor(data, AwardRegistry) {
     super(data, AwardRegistry);
+    this.ribbonTrueAttachmentCount = 1;
   }
 
   incrementAwardCount() {
