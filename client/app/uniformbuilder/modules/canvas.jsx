@@ -351,7 +351,7 @@ function Canvas(props) {
       let fontSize = 18;
       const dy = 313;
 
-      if (userData.nameTag.length < 8) {
+      if (userData.nameTag.length < 9) {
         tagWidth = 101;
         tagHeight = 40;
         selector = "short";
