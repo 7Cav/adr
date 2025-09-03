@@ -115,6 +115,7 @@ export default async function RosterStatistics() {
               "Alpha Company",
               "Bravo Troop",
               "Charlie Company",
+              "Delta Company",
             ]}
             milpacArray={milpacArray}
           />
