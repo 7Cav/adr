@@ -107,6 +107,7 @@ export default async function RosterStatistics() {
               lists.alpha1,
               lists.bravo1,
               lists.charlie1,
+              lists.delta1,
             ]}
             centerLabel="Total 1-7 Strength"
             labelArray={[

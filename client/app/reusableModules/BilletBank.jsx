@@ -1153,6 +1153,7 @@ const billetBank = {
   alpha1,
   bravo1,
   charlie1,
+  delta1,
   twoSevenCommand,
   alpha2,
   bravo2,
