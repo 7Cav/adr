@@ -1,6 +1,6 @@
 const axios = require("axios");
 const axiosRetry = require("axios-retry").default || require("axios-retry");
-const { API_TOKEN } = require("../credentials/token");
+const API_TOKEN = process.env.API_TOKEN;
 
 let cacheStatus = {
   combat: false,

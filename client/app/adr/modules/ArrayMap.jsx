@@ -7,7 +7,6 @@ milpac link, name and rank, and position title.*/
 
 function ArrayMap(props) {
   let inputArray = props.inputArray;
-  console.log(inputArray);
 
   return (
     <table>

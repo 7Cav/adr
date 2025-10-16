@@ -108,6 +108,7 @@ class Statistics extends Component {
             "#b61217",
             "#b61217",
             "#b61217",
+            "#b61217",
             "#2a487c",
             "#2a487c",
             "#2a487c",

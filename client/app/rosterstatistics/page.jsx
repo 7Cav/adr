@@ -51,6 +51,7 @@ export default async function RosterStatistics() {
               lists.alpha1,
               lists.bravo1,
               lists.charlie1,
+              lists.delta1,
               lists.twoSevenCommand,
               lists.alpha2,
               lists.bravo2,
@@ -75,6 +76,7 @@ export default async function RosterStatistics() {
               "Alpha Company 1-7",
               "Bravo Troop 1-7",
               "Charlie Company 1-7",
+              "Delta Company 1-7",
               "2-7 Headquarters",
               "Alpha Company 2-7",
               "Bravo Company 2-7",
@@ -105,6 +107,7 @@ export default async function RosterStatistics() {
               lists.alpha1,
               lists.bravo1,
               lists.charlie1,
+              lists.delta1,
             ]}
             centerLabel="Total 1-7 Strength"
             labelArray={[
@@ -112,6 +115,7 @@ export default async function RosterStatistics() {
               "Alpha Company",
               "Bravo Troop",
               "Charlie Company",
+              "Delta Company",
             ]}
             milpacArray={milpacArray}
           />
