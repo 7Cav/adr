@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Development Deploy
 
 on:
   workflow_dispatch:
@@ -29,6 +29,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./client
+          file: ./client/client.Dockerfile
           push: true
           tags: |
             7cav/apps_beta_client:${{ github.sha }}
@@ -38,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./server
+          file: ./server/server.Dockerfile
           push: true
           tags: |
             7cav/apps_beta_server:${{ github.sha }}
