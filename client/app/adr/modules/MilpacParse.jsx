@@ -119,6 +119,8 @@ function MilpacParse(props) {
     return aIndex - bIndex;
   });
 
+  if (uniqueNamesSet.size === 0) return null;
+
   return (
     <div className="ParseBox">
       <div className="CounterSubtitle">

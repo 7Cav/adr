@@ -27,10 +27,10 @@ export default async function ActiveDutyRoster() {
     { title: "Regimental Command", selectors: [0] },
     { title: "First Battalion", selectors: [2, 3, 4, 5, 6] },
     { title: "Second Battalion", selectors: [7, 8, 9, 10, 11] },
-    { title: "Third Battalion", selectors: [12, 15, 13 /*, 14*/] },
+    { title: "Third Battalion", selectors: [12, 13, 14, 16] },
     {
       title: "Auxiallary Combat Division",
-      selectors: [16, 17, 18 /*, 19*/, 20],
+      selectors: [15, 17, 18, 19, 20],
     },
     {
       title: "Support Departments",
