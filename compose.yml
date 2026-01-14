@@ -28,6 +28,8 @@ services:
       dockerfile: ./client.Dockerfile
     image: 7cav/cavapps-client:latest
     container_name: cavapps-client
+    volumes:
+      - ./client:/client
     ports:
       - "80:3000"
     environment:
