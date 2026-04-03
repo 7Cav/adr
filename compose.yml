@@ -62,7 +62,7 @@ services:
     ports:
       - "80:3000"
     environment:
-      NEXT_PUBLIC_CLIENT_TOKEN:
+      NEXT_PUBLIC_CLIENT_TOKEN: ${CLIENT_TOKEN}
       COMBAT_API_URL: http://server:4000/roster/combat
       RESERVE_API_URL: http://server:4000/roster/reserves
       NEXT_PUBLIC_INDIVIDUAL_API_URL: http://server:4000/roster/individual
