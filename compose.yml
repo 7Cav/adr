@@ -9,8 +9,8 @@ services:
     ports:
       - "4000:4000"
     environment:
-      API_TOKEN:
-      CLIENT_TOKEN:
+      API_TOKEN: ${API_TOKEN}
+      CLIENT_TOKEN: ${CLIENT_TOKEN}
     working_dir: /server
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4000"]
@@ -33,7 +33,7 @@ services:
     ports:
       - "80:3000"
     environment:
-      NEXT_PUBLIC_CLIENT_TOKEN:
+      NEXT_PUBLIC_CLIENT_TOKEN: ${CLIENT_TOKEN}
       COMBAT_API_URL: http://server:4000/roster/combat
       RESERVE_API_URL: http://server:4000/roster/reserves
       NEXT_PUBLIC_INDIVIDUAL_API_URL: http://server:4000/roster/individual
