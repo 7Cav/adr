@@ -7,9 +7,15 @@ const port = 4000;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 const { cacheTime, initializeCache } = require("./controllers/cacheManager");
 
+app.use((req, res, next) => {
+  console.log(req.method, req.path, req.headers["authorization"]);
+  next();
+});
+
 const corsOptions = {
   origin: function (origin, callback) {
     const allowlist = [
+      "http://localhost",
       "http://localhost:3000",
       "http://apps.7cav.us",
       "https://apps.7cav.us",
@@ -28,9 +34,13 @@ const corsOptions = {
 
 // Token Checking Middleware
 const checkToken = (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
   const authToken = req.headers["authorization"];
   if (authToken === CLIENT_TOKEN) {
-    next(); // proceed to the next middleware or route handler
+    next();
   } else {
     res.status(403).send("Forbidden");
   }
@@ -41,13 +51,13 @@ app.use(compression());
 app.use(
   cors({
     origin: corsOptions.origin,
-  })
+  }),
 );
 // Apply token checking middleware only to these routes
 app.use("/roster", checkToken, middleware);
 app.get("/", (req, res) => {
   res.send(
-    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/"
+    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/",
   );
 });
 
