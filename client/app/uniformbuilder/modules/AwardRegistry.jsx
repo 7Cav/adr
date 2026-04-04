@@ -41,7 +41,7 @@ export class AwardRegistry {
     this.awards.set("Donation Ribbon", {awardPriority: 29, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // Requires Special Case
     this.awards.set("7th Cavalry Server Upgrade Award", {awardPriority: 30, medalPriority: 29, awardAttachmentType: "stars", awardType: "MedalTiered"}); // Fuck you, whoever put this into SOP
     this.awards.set("StackUp Donation Medal", {awardPriority: 31, medalPriority: 30, awardAttachmentType: "gcNotches", awardType: "MedalTiered"}); // and again
-    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, medalPriority: 31, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, medalPriority: 31, awardAttachmentType: "stars", awardType: "Medal"});
     this.awards.set("NCO Professional Development Ribbon", {awardPriority: 33, awardAttachmentType: "ncoNums", awardType: "Ribbon"});
     this.awards.set("Honor Graduate Ribbon", {awardPriority: 34, awardType: "Ribbon"});
     this.awards.set("Army Service Ribbon", {awardPriority: 35, awardType: "Ribbon"});
