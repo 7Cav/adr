@@ -10,10 +10,6 @@ const { initDatabase } = require("./db/database");
 const diffRoutes = require("./routes/diffRoutes");
 const { startPoller } = require("./controllers/diffPoller");
 
-app.use((req, res, next) => {
-  console.log(req.method, req.path, req.headers["authorization"]);
-  next();
-});
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -48,6 +44,17 @@ const checkToken = (req, res, next) => {
     res.status(403).send("Forbidden");
   }
 };
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(
+      `${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${duration}ms | origin=${req.headers["origin"] || "-"}`
+    );
+  });
+  next();
+});
 
 app.use(compression());
 
