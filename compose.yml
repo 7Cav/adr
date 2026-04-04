@@ -81,6 +81,7 @@ services:
       done;
       if [ \"$$DEVMODE\" = \"true\" ]; then
         echo 'Starting in dev mode...';
+        export WATCHPACK_POLLING=true;
         npm install;
         npm run dev;
       else
