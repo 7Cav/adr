@@ -77,7 +77,14 @@ export default function Skunkworks() {
         }
       </div>
       {loading && <Loading />}
-      {error && <div>Error: {error.message}</div>}
+      {error && (
+        <div className="canvasboxbuilder">
+          <div className="errorbox">
+            <h3 className="errorheader">Network Error!</h3>
+            {error.message}
+          </div>
+        </div>
+      )}
       {canvasData && !loading && !error && (
         <div className="canvasboxbuilder">
           <Canvas data={canvasData} />
