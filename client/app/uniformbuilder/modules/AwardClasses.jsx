@@ -67,6 +67,7 @@ export class MedalWithValor extends Medal {
     this.awardTitle = baseAwardName;
     this.hasValorDevice = true;
     this.ribbonAttachmentType = "oakClustersValor";
+    this.maxAwardcount = 14;
   }
 }
 
@@ -251,7 +252,7 @@ export class BadgeCombat extends Badge {
 
   updateBadgeCombat(newAwardData, AwardRegistry) {
     const registryDetails = AwardRegistry.getAwardDetails(
-      newAwardData.awardName
+      newAwardData.awardName,
     );
     const newAwardPriority = registryDetails.awardPriority;
 
