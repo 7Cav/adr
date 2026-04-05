@@ -17,12 +17,13 @@ function MilpacParse(props) {
   //First, check the combat roster primaries for matching billet id's, then push them to the return array if match is found.
 
   for (let milpacIdCombat in milpacArray[0].combat.profiles) {
-    let name = milpacArray[0].combat.profiles[milpacIdCombat].realName;
-    let rank = milpacArray[0].combat.profiles[milpacIdCombat].rank.rankFull;
-    let primary = milpacArray[0].combat.profiles[milpacIdCombat].primary;
+    const profile = milpacArray[0].combat.profiles[milpacIdCombat];
+    if (!profile?.rank || !profile?.primary) continue;
+    let name = profile.realName;
+    let rank = profile.rank.rankFull;
+    let primary = profile.primary;
     let fullName = rank + " " + name;
-    let primarySortKey =
-      milpacArray[0].combat.profiles[milpacIdCombat].primary.positionId;
+    let primarySortKey = profile.primary.positionId;
 
     for (let index in rosterGroups) {
       if (rosterGroups[index].positionId == primary.positionId) {
@@ -65,12 +66,13 @@ function MilpacParse(props) {
   //After the Combat Roster, check the Reserves.
 
   for (let milpacIdReserve in milpacArray[0].reserve.profiles) {
-    let rName = milpacArray[0].reserve.profiles[milpacIdReserve].realName;
-    let rRank = milpacArray[0].reserve.profiles[milpacIdReserve].rank.rankFull;
-    let rPrimary = milpacArray[0].reserve.profiles[milpacIdReserve].primary;
+    const rProfile = milpacArray[0].reserve.profiles[milpacIdReserve];
+    if (!rProfile?.rank || !rProfile?.primary) continue;
+    let rName = rProfile.realName;
+    let rRank = rProfile.rank.rankFull;
+    let rPrimary = rProfile.primary;
     let rFullName = rRank + " " + rName;
-    let rPrimarySortKey =
-      milpacArray[0].reserve.profiles[milpacIdReserve].primary.positionId;
+    let rPrimarySortKey = rProfile.primary.positionId;
 
     //Check the Reserve primaries, then push to return array if match is found.
 
