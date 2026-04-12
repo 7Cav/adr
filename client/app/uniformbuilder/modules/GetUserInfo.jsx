@@ -9,7 +9,7 @@ export default function GetUserInfo(
   ribbonCount,
   citationCount,
   yearsInService,
-  tabCount
+  tabCount,
 ) {
   const returnObject = {
     nameTag: generateNameTag(dataActive.user.username),
@@ -34,7 +34,7 @@ export default function GetUserInfo(
   returnObject.combatBadgeCoords = GetCombatBadgeCoords(ribbonCount);
   returnObject.yearsInServiceCoordArray = GetYearsInServiceCoordArray(
     yearsInService,
-    getRankGrade(dataActive.rank.rankId)
+    getRankGrade(dataActive.rank.rankId),
   );
   returnObject.tabCoordArray = GetTabCoordArray(tabCount);
 
@@ -130,6 +130,7 @@ function setShoulderCord(mos) {
       return "MP";
     case "19K":
     case "19A":
+    case "19C":
     case "19D":
       return "Armor";
     default:
