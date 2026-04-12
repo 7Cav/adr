@@ -38,11 +38,58 @@ a {
 }
 
 .inputboxbuilder {
-  padding-top: 3em;
+  margin-top: 3em;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+.inputboxflex {
+  border-radius: 3px;
+  border: 1px solid #ebc829;
+  border-image: radial-gradient(#ebc729, transparent) 1 0%;
+  width: 26%;
+}
+
+.suggestions-container {
+  animation: slideDown 0.2s ease-out forwards;
+  transform-origin: top;
+}
+
+.suggestion-item {
+  display: span;
+  font-size: 12px;
+  color: #ebc729;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.suggestion-item:hover {
+  text-decoration: underline;
+}
+
+/* Keyframe Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .canvasboxbuilder {
@@ -55,16 +102,14 @@ a {
 }
 
 input {
+  font-size: 14px;
   color: #f1f1f1;
-  width: 26%;
   text-align: center;
   display: inline-block;
-  border-radius: 3px;
-  border: 1px solid #ebc829;
-  border-image: radial-gradient(#ebc729, transparent) 1 0%;
   box-sizing: border-box;
   background-color: #111111;
   outline: none;
+  width: 100%;
 }
 input:focus {
   outline: none;
