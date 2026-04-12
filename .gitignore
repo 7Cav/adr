@@ -42,3 +42,6 @@ server/credentials/token.js
 .env
 
 /.idea/
+/sqliteCache/node_modules
+compose.yml
+
