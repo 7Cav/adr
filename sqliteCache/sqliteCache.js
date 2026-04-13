@@ -37,7 +37,6 @@ async function updateCache() {
     `[${new Date().toISOString()}] Starting MariaDB to SQLite sync...`,
   );
 
-  const connection = await mysql.createConnection({
   const mariaConnection = await mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
