@@ -37,17 +37,18 @@ async function updateCache() {
     `[${new Date().toISOString()}] Starting MariaDB to SQLite sync...`,
   );
 
-  // 1. Secure Connection to MariaDB
-
   const connection = await mysql.createConnection({
+  const mariaConnection = await mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
   });
 
+  let liteDB;
+
   try {
-    const [rows] = await connection.execute(
+    const [rows] = await mariaConnection.execute(
       `SELECT xu.username 
        FROM xenforo.xf_user AS xu
        WHERE xu.username REGEXP '^[A-Za-z]+\\\\.[A-Z]{1,2}$'`,
@@ -57,36 +58,46 @@ async function updateCache() {
       `Fetched ${rows.length} valid members. Updating local cache...`,
     );
 
-    const db = await open({
+    liteDB = await open({
       filename: "./cache.db",
       driver: sqlite3.Database,
     });
 
-    await db.exec("BEGIN TRANSACTION");
+    await liteDB.exec("BEGIN TRANSACTION");
 
-    await db.exec(
-      "CREATE TABLE IF NOT EXISTS search_index (id INTEGER, username TEXT)",
+    await liteDB.exec(
+      "CREATE TABLE IF NOT EXISTS search_index (username TEXT)",
     );
 
-    await db.exec("DELETE FROM search_index");
+    await liteDB.exec("DELETE FROM search_index");
 
-    const insert = await db.prepare(
-      "INSERT INTO search_index (id, username) VALUES (?, ?)",
+    const insert = await liteDB.prepare(
+      "INSERT INTO search_index (username) VALUES (?)",
     );
 
     for (const row of rows) {
-      await insert.run(row.id, row.username);
+      await insert.run(row.username);
     }
 
     await insert.finalize();
 
-    await db.exec("COMMIT");
+    await liteDB.exec("COMMIT");
 
     console.log("Local SQLite cache successfully updated.");
   } catch (err) {
     console.error("Sync Error:", err.message);
+
+    if (liteDB) {
+      await liteDB.exec("ROLLBACK");
+    }
   } finally {
-    await connection.end();
+    if (mariaConnection) {
+      await mariaConnection.end();
+    }
+
+    if (liteDB) {
+      await liteDB.close();
+    }
   }
 }
 
@@ -97,8 +108,10 @@ app.get("/sql/search", async (req, res) => {
     return res.json([]);
   }
 
+  let db;
+
   try {
-    const db = await open({
+    db = await open({
       filename: "./cache.db",
       driver: sqlite3.Database,
     });
@@ -125,6 +138,10 @@ app.get("/sql/search", async (req, res) => {
   } catch (err) {
     console.error("Search error:", err);
     res.status(500).json({ error: "Search failed" });
+  } finally {
+    if (db) {
+      await db.close();
+    }
   }
 });
 
