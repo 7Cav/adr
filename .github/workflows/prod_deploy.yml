@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -39,6 +37,16 @@ jobs:
           tags: |
             7cav/apps_server:${{ github.ref_name }}
             7cav/apps_server:latest
+
+      - name: Build and Push SqliteCache Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./sqliteCache
+          file: ./sqliteCache/sqliteCache.Dockerfile
+          push: true
+          tags: |
+            7cav/apps_sqlitecache:${{ github.ref_name }}
+            7cav/apps_sqlitecache:latest
 
       - name: Force Watchtower Update
         run: |
