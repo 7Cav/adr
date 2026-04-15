@@ -1,4 +1,4 @@
-const baseSearchApiUrl = "http://localhost:5000/sql/search";
+const baseSearchApiUrl = process.env.SQLCACHE_API_URL;
 
 export default async function searchForUser(query) {
   const url = new URL(baseSearchApiUrl);
