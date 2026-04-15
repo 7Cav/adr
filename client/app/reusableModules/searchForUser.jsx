@@ -1,7 +1,7 @@
-const baseSearchApiUrl = process.env.SQLCACHE_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_SQLCACHE_API_URL;
 
 export default async function searchForUser(query) {
-  const url = new URL(baseSearchApiUrl);
+  const url = new URL(BASE_URL);
 
   url.searchParams.append("q", query);
   const fullIndividualApiUrl = url.toString();
@@ -20,7 +20,6 @@ export default async function searchForUser(query) {
 
   try {
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     throw new Error(`Invalid JSON response: ${error.message}`);
