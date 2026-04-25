@@ -68,7 +68,7 @@ const startServer = async () => {
     console.log("Cache initialized successfully.");
 
     await initDatabase();
-    startPoller(process.env.DIFF_POLL_SCHEDULE || "0 2 * * *");
+    startPoller(process.env.DIFF_POLL_SCHEDULE || "*/15 * * * *");
 
     app.listen(port, () => {
       console.log(`Roster Server listening on ${port}`);

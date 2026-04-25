@@ -29,7 +29,7 @@ services:
       API_TOKEN:
       CLIENT_TOKEN:
       DATABASE_URL: postgres://cavapps:${PG_PASSWORD}@postgres:5432/cavapps?sslmode=disable
-      DIFF_POLL_SCHEDULE: ${DIFF_POLL_SCHEDULE:-0 2 * * *}
+      DIFF_POLL_SCHEDULE: ${DIFF_POLL_SCHEDULE:-*/15 * * * *}
       DIFF_SNAPSHOT_RETAIN_DAYS: ${DIFF_SNAPSHOT_RETAIN_DAYS:-95}
       XENFORO_DB_HOST: xenforo-db
       XENFORO_DB_PORT: 3306

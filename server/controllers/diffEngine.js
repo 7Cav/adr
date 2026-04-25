@@ -129,8 +129,19 @@ const ROSTER_LABELS = {
   ROSTER_TYPE_PAST_MEMBERS:  'Past Members',
 };
 
+// Maps destination roster → the event type emitted for that cross-roster move.
+// DISCHARGE reuses the existing type since the semantic is identical.
+const DESTINATION_EVENT_TYPE = {
+  ROSTER_TYPE_PAST_MEMBERS:  'DISCHARGE',
+  ROSTER_TYPE_COMBAT:        'RETURN_TO_ACTIVE',
+  ROSTER_TYPE_RESERVE:       'TRANSFER_RESERVE',
+  ROSTER_TYPE_ELOA:          'TRANSFER_ELOA',
+  ROSTER_TYPE_ARLINGTON:     'FALLEN',
+  ROSTER_TYPE_WALL_OF_HONOR: 'WALL_OF_HONOR_INDUCTION',
+};
+
 // After computing per-roster diffs, collapse same-run DISCHARGE + NEW_MEMBER pairs
-// for the same profile_id into a single ROSTER_TRANSFER event.
+// for the same profile_id into a single context-aware transfer event.
 // Events that are ambiguous (multiple discharges or arrivals for the same person) are left as-is.
 function correlateTransfers(allEvents) {
   const discharges = {};
@@ -151,27 +162,32 @@ function correlateTransfers(allEvents) {
 
     const d = ds[0];
     const a = as[0];
-    const fromLabel = ROSTER_LABELS[d.roster_type] ?? d.roster_type;
-    const toLabel   = ROSTER_LABELS[a.roster_type] ?? a.roster_type;
+    const fromLabel  = ROSTER_LABELS[d.roster_type] ?? d.roster_type;
+    const toLabel    = ROSTER_LABELS[a.roster_type] ?? a.roster_type;
+    const eventType  = DESTINATION_EVENT_TYPE[a.roster_type] ?? 'ROSTER_TRANSFER';
 
     removeSet.add(d);
     removeSet.add(a);
 
     transfers.push({
-      event_type:    'ROSTER_TRANSFER',
-      profile_id:    profileId,
-      profile_name:  d.profile_name,
-      rank_short:    d.rank_short,
+      event_type:     eventType,
+      profile_id:     profileId,
+      profile_name:   d.profile_name,
+      rank_short:     d.rank_short,
       rank_image_url: d.rank_image_url,
-      old_value:     fromLabel,
-      new_value:     toLabel,
-      detail:        `Transferred from ${fromLabel} to ${toLabel}`,
-      roster_type:   d.roster_type, // source roster
-      _snapshotId:   d._snapshotId,
+      old_value:      fromLabel,
+      new_value:      toLabel,
+      detail:         `Transferred from ${fromLabel} to ${toLabel}`,
+      roster_type:    d.roster_type, // source roster
+      _snapshotId:    d._snapshotId,
     });
   }
 
   const result = allEvents.filter(e => !removeSet.has(e));
+  // Unpaired discharges are true deletions (duplicate removal etc.), not roster moves
+  for (const e of result) {
+    if (e.event_type === 'DISCHARGE') e.event_type = 'REMOVED';
+  }
   result.push(...transfers);
   return result;
 }

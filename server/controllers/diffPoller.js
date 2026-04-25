@@ -76,9 +76,10 @@ async function runSnapshot() {
       if (clean.length) await db.bulkInsertEvents(snapshotId, clean);
     }
 
+    const TRANSFER_TYPES   = new Set(['ROSTER_TRANSFER','DISCHARGE','RETURN_TO_ACTIVE','TRANSFER_RESERVE','TRANSFER_ELOA','FALLEN','WALL_OF_HONOR_INDUCTION']);
     const totalRaw         = allEvents.length;
     const totalCorrelated  = correlated.length;
-    const transfers        = correlated.filter(e => e.event_type === 'ROSTER_TRANSFER').length;
+    const transfers        = correlated.filter(e => TRANSFER_TYPES.has(e.event_type) && e.old_value).length;
     console.log(`diffPoller: ${totalRaw} raw events → ${totalCorrelated} after correlation (${transfers} transfers)`);
   }
 
@@ -91,8 +92,8 @@ async function runSnapshot() {
 
 function startPoller(schedule) {
   if (!cron.validate(schedule)) {
-    console.error(`diffPoller: invalid cron schedule "${schedule}", falling back to "0 2 * * *"`);
-    schedule = '0 2 * * *';
+    console.error(`diffPoller: invalid cron schedule "${schedule}", falling back to "*/15 * * * *"`);
+    schedule = '*/15 * * * *';
   }
   cron.schedule(schedule, runSnapshot);
   console.log(`diffPoller: started with schedule "${schedule}"`);

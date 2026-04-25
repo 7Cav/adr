@@ -47,8 +47,14 @@ export function DiffEventCard({ event }) {
           {event.event_type === 'PROMOTION' && (
             <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
           )}
-          {event.event_type === 'ROSTER_TRANSFER' && (
+          {['ROSTER_TRANSFER', 'RETURN_TO_ACTIVE', 'TRANSFER_RESERVE', 'TRANSFER_ELOA', 'WALL_OF_HONOR_INDUCTION'].includes(event.event_type) && (
             <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
+          )}
+          {event.event_type === 'DISCHARGE' && event.old_value && (
+            <span className="opacity-90 text-xs">from {event.old_value}</span>
+          )}
+          {event.event_type === 'FALLEN' && event.old_value && (
+            <span className="opacity-70 text-xs italic">formerly {event.old_value}</span>
           )}
           {event.event_type === 'NEW_RECORD' && event.new_value && (
             <span className="opacity-70 text-xs font-medium">{formatRecordType(event.new_value)}</span>

@@ -30,7 +30,7 @@ const RANK_SHORT = {
   28: 'CW3',
   29: 'CW2',
   30: 'WO1',
-  31: 'RST',
+  31: 'AR',
   32: 'TST',
 };
 
