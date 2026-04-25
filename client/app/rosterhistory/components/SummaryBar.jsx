@@ -28,7 +28,7 @@ export function SummaryBar({ counts, activeFilters, onToggle, recordTypeCounts, 
                 )}
               >
                 <span className={cn('h-1.5 w-1.5 rounded-full', EVENT_DOT_COLORS[type])} />
-                <span>{count}</span>
+                <span className="font-bold tabular-nums">{count}</span>
                 <span>{EVENT_LABELS[type]}{count !== 1 ? 's' : ''}</span>
                 <button
                   onClick={(e) => { e.stopPropagation(); setRecordsExpanded((v) => !v) }}
@@ -70,7 +70,7 @@ export function SummaryBar({ counts, activeFilters, onToggle, recordTypeCounts, 
             )}
           >
             <span className={cn('h-1.5 w-1.5 rounded-full', EVENT_DOT_COLORS[type])} />
-            <span>{count}</span>
+            <span className="font-bold tabular-nums">{count}</span>
             <span>{EVENT_LABELS[type]}{count !== 1 ? 's' : ''}</span>
           </button>
         )

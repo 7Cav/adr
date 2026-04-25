@@ -10,7 +10,7 @@ import { EVENT_COLORS, EVENT_DOT_COLORS, formatRecordType } from '../lib/constan
 export function GroupedRecordCard({ profileName, rankImageUrl, rankShort, records }) {
   const [open, setOpen] = useState(false)
   const colorClass = EVENT_COLORS['NEW_RECORD']
-  const dotColor = EVENT_DOT_COLORS['NEW_RECORD']
+  const accentColor = EVENT_DOT_COLORS['NEW_RECORD']
 
   const typeCounts = records.reduce((acc, r) => {
     const label = formatRecordType(r.new_value ?? '')
@@ -23,17 +23,23 @@ export function GroupedRecordCard({ profileName, rankImageUrl, rankShort, record
     .join(', ')
 
   return (
-    <div className={cn('rounded-lg border text-sm', colorClass)}>
+    <div className={cn(
+      'relative rounded-lg border overflow-hidden text-sm transition-all duration-150 hover:translate-x-0.5 hover:shadow-md',
+      colorClass
+    )}>
+      {/* Left accent bar */}
+      <div className={cn('absolute left-0 top-0 bottom-0 w-[3px]', accentColor)} />
+
       <div
-        className="flex cursor-pointer items-center gap-3 px-3 py-2.5"
+        className="flex cursor-pointer items-center gap-3 pl-4 pr-3 py-2.5"
         onClick={() => setOpen((o) => !o)}
       >
-        <span className={cn('mt-0.5 h-2 w-2 shrink-0 rounded-full', dotColor)} />
-
-        <div className="w-7 shrink-0 flex items-center justify-center">
-          {rankImageUrl && (
-            <img src={rankImageUrl} alt={rankShort} title={rankShort} className="h-5 w-7 object-contain" />
-          )}
+        {/* Rank insignia with dark backing */}
+        <div className="w-8 h-7 shrink-0 flex items-center justify-center rounded bg-black/25">
+          {rankImageUrl
+            ? <img src={rankImageUrl} alt={rankShort} title={rankShort} className="h-5 w-7 object-contain" />
+            : <span className="text-[10px] font-mono opacity-40 leading-none">{rankShort}</span>
+          }
         </div>
 
         <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -54,10 +60,10 @@ export function GroupedRecordCard({ profileName, rankImageUrl, rankShort, record
           <Separator className="bg-current opacity-10" />
           <div className="divide-y divide-current/10">
             {records.map((r, i) => (
-              <div key={i} className="px-4 py-2">
+              <div key={i} className="pl-[3.25rem] pr-3 py-2">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                   <span className="font-medium text-xs opacity-90">{formatRecordType(r.new_value ?? '')}</span>
-                  {r.record_date && <span className="text-xs opacity-50">{r.record_date}</span>}
+                  {r.record_date && <span className="text-xs opacity-40 tabular-nums">{r.record_date}</span>}
                 </div>
                 {r.detail && <p className="text-xs opacity-60 mt-0.5 leading-relaxed">{r.detail}</p>}
               </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { format, parseISO } from 'date-fns'
 import { RefreshCw, Download, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -26,7 +26,28 @@ export function TodayView() {
   const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
   const [unitFilter, setUnitFilter] = useState(EMPTY_UNIT_FILTER)
   const [memberSearch, setMemberSearch] = useState('')
+  const [cooldownUntil, setCooldownUntil] = useState(null)
+  const [cooldownSecs, setCooldownSecs] = useState(0)
+  const cooldownRef = useRef(null)
   const trigger = useTriggerSnapshot()
+
+  // Tick the cooldown countdown every second
+  useEffect(() => {
+    if (!cooldownUntil) return
+    function tick() {
+      const remaining = Math.ceil((cooldownUntil - Date.now()) / 1000)
+      if (remaining <= 0) {
+        setCooldownUntil(null)
+        setCooldownSecs(0)
+        clearInterval(cooldownRef.current)
+      } else {
+        setCooldownSecs(remaining)
+      }
+    }
+    tick()
+    cooldownRef.current = setInterval(tick, 1000)
+    return () => clearInterval(cooldownRef.current)
+  }, [cooldownUntil])
 
   const { data: summaries, isLoading: listLoading } = useDiffList()
   const { data: ranksData } = useRanks()
@@ -159,11 +180,15 @@ export function TodayView() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => trigger.mutate()}
-            disabled={trigger.isPending}
+            onClick={() => {
+              trigger.mutate(undefined, {
+                onSuccess: () => setCooldownUntil(Date.now() + 5 * 60 * 1000),
+              })
+            }}
+            disabled={trigger.isPending || cooldownUntil != null}
           >
             <RefreshCw size={14} className={cn(trigger.isPending && 'animate-spin')} />
-            {trigger.isPending ? 'Fetching…' : 'Fetch Now'}
+            {trigger.isPending ? 'Fetching…' : cooldownUntil != null ? `Wait ${cooldownSecs}s` : 'Fetch Now'}
           </Button>
 
           {diff?.events?.length > 0 && (

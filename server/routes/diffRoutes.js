@@ -61,8 +61,14 @@ router.get('/ranks', (req, res) => {
 });
 
 // POST /admin/snapshot — trigger a manual snapshot fetch for all roster types
+// In-flight guard: reject concurrent requests so the endpoint can't be spammed
+let snapshotRunning = false;
 router.post('/admin/snapshot', (req, res) => {
-  runSnapshot(); // fire and forget
+  if (snapshotRunning) {
+    return res.status(429).json({ error: 'snapshot already in progress' });
+  }
+  snapshotRunning = true;
+  runSnapshot().finally(() => { snapshotRunning = false; });
   res.json({ status: 'snapshot triggered' });
 });
 

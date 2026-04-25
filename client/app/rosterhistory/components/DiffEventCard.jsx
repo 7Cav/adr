@@ -9,26 +9,27 @@ import { EVENT_COLORS, EVENT_DOT_COLORS, EVENT_LABELS, ROSTER_TYPE_COLORS, ROSTE
 export function DiffEventCard({ event }) {
   const [open, setOpen] = useState(false)
   const colorClass = EVENT_COLORS[event.event_type]
-  const dotColor = EVENT_DOT_COLORS[event.event_type]
+  const accentColor = EVENT_DOT_COLORS[event.event_type]
   const hasDetail = !!event.detail
 
   return (
-    <div className={cn('rounded-lg border px-3 py-2.5 text-sm', colorClass)}>
+    <div className={cn(
+      'relative rounded-lg border overflow-hidden text-sm transition-all duration-150 hover:translate-x-0.5 hover:shadow-md',
+      colorClass
+    )}>
+      {/* Left accent bar */}
+      <div className={cn('absolute left-0 top-0 bottom-0 w-[3px]', accentColor)} />
+
       <div
-        className={cn('flex items-center gap-3', hasDetail && 'cursor-pointer')}
+        className={cn('flex items-center gap-3 pl-4 pr-3 py-2.5', hasDetail && 'cursor-pointer')}
         onClick={() => hasDetail && setOpen((o) => !o)}
       >
-        <span className={cn('mt-0.5 h-2 w-2 shrink-0 rounded-full', dotColor)} />
-
-        <div className="w-7 shrink-0 flex items-center justify-center">
-          {event.rank_image_url && (
-            <img
-              src={event.rank_image_url}
-              alt={event.rank_short}
-              title={event.rank_short}
-              className="h-5 w-7 object-contain"
-            />
-          )}
+        {/* Rank insignia with dark backing */}
+        <div className="w-8 h-7 shrink-0 flex items-center justify-center rounded bg-black/25">
+          {event.rank_image_url
+            ? <img src={event.rank_image_url} alt={event.rank_short} title={event.rank_short} className="h-5 w-7 object-contain" />
+            : <span className="text-[10px] font-mono opacity-40 leading-none">{event.rank_short}</span>
+          }
         </div>
 
         <div className="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -45,7 +46,7 @@ export function DiffEventCard({ event }) {
           )}
 
           {event.event_type === 'PROMOTION' && (
-            <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
+            <span className="opacity-90 text-xs font-mono">{event.old_value} → {event.new_value}</span>
           )}
           {['ROSTER_TRANSFER', 'RETURN_TO_ACTIVE', 'TRANSFER_RESERVE', 'TRANSFER_ELOA', 'WALL_OF_HONOR_INDUCTION'].includes(event.event_type) && (
             <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
@@ -69,7 +70,7 @@ export function DiffEventCard({ event }) {
             <span className="opacity-80 text-xs">{event.old_value} → {event.new_value}</span>
           )}
           {event.record_date && (
-            <span className="opacity-50 text-xs ml-auto">{event.record_date}</span>
+            <span className="opacity-40 text-xs tabular-nums ml-auto">{event.record_date}</span>
           )}
         </div>
 
@@ -81,7 +82,7 @@ export function DiffEventCard({ event }) {
       </div>
 
       {open && hasDetail && (
-        <p className="mt-1.5 ml-5 text-xs opacity-70 leading-relaxed">{event.detail}</p>
+        <p className="pb-2.5 pl-[3.25rem] pr-3 text-xs opacity-70 leading-relaxed">{event.detail}</p>
       )}
     </div>
   )
