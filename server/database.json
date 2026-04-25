@@ -1,0 +1,4 @@
+{
+  "migrationsTable": "pgmigrations",
+  "dir": "db/migrations"
+}

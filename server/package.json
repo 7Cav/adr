@@ -4,7 +4,10 @@
   "description": "Javascript server for CavApps backend",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "node-pg-migrate up",
+    "migrate:create": "node-pg-migrate create",
+    "migrate:down": "node-pg-migrate down"
   },
   "keywords": [
     "7cav"
@@ -16,6 +19,9 @@
     "axios-retry": "^4.5.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "node-cron": "^3.0.3",
+    "node-pg-migrate": "^8.0.4",
+    "pg": "^8.11.3"
   }
 }
