@@ -5,6 +5,8 @@ function computeDiff(prevProfiles, currProfiles) {
     const name = displayName(cp);
     const pp = prevProfiles[id];
 
+    const currPos = cp.primary?.positionTitle || '';
+
     if (!pp) {
       events.push({
         event_type: 'NEW_MEMBER',
@@ -12,6 +14,7 @@ function computeDiff(prevProfiles, currProfiles) {
         profile_name: name,
         rank_short: cp.rank?.rankShort || '',
         rank_image_url: cp.rank?.rankImageUrl || '',
+        position_title: currPos,
         detail: `Joined as ${cp.rank?.rankFull || ''}`,
       });
       continue;
@@ -24,6 +27,7 @@ function computeDiff(prevProfiles, currProfiles) {
         profile_name: name,
         rank_short: cp.rank?.rankShort || '',
         rank_image_url: cp.rank?.rankImageUrl || '',
+        position_title: currPos,
         old_value: pp.rank?.rankShort || '',
         new_value: cp.rank?.rankShort || '',
         detail: `Promoted from ${pp.rank?.rankFull || ''} to ${cp.rank?.rankFull || ''}`,
@@ -37,6 +41,7 @@ function computeDiff(prevProfiles, currProfiles) {
         profile_name: name,
         rank_short: cp.rank?.rankShort || '',
         rank_image_url: cp.rank?.rankImageUrl || '',
+        position_title: currPos,
         old_value: pp.primary?.positionTitle || '',
         new_value: cp.primary?.positionTitle || '',
         detail: `Reassigned from ${pp.primary?.positionTitle || ''} to ${cp.primary?.positionTitle || ''}`,
@@ -50,6 +55,7 @@ function computeDiff(prevProfiles, currProfiles) {
         profile_name: name,
         rank_short: cp.rank?.rankShort || '',
         rank_image_url: cp.rank?.rankImageUrl || '',
+        position_title: currPos,
         old_value: pp.realName || '',
         new_value: cp.realName || '',
       });
@@ -68,6 +74,7 @@ function computeDiff(prevProfiles, currProfiles) {
           profile_name: name,
           rank_short: cp.rank?.rankShort || '',
           rank_image_url: cp.rank?.rankImageUrl || '',
+          position_title: currPos,
           new_value: r.recordType || '',
           record_date: r.recordDate || '',
           detail: r.recordDetails || '',
@@ -84,6 +91,7 @@ function computeDiff(prevProfiles, currProfiles) {
           profile_name: name,
           rank_short: cp.rank?.rankShort || '',
           rank_image_url: cp.rank?.rankImageUrl || '',
+          position_title: currPos,
           new_value: a.awardName || '',
           record_date: a.awardDate || '',
           detail: a.awardDetails || '',
@@ -101,6 +109,7 @@ function computeDiff(prevProfiles, currProfiles) {
         profile_name: name,
         rank_short: pp.rank?.rankShort || '',
         rank_image_url: pp.rank?.rankImageUrl || '',
+        position_title: pp.primary?.positionTitle || '',
         detail: `${pp.rank?.rankFull || ''} removed from roster`,
       });
     }
@@ -179,6 +188,7 @@ function correlateTransfers(allEvents) {
       profile_name:   d.profile_name,
       rank_short:     d.rank_short,
       rank_image_url: d.rank_image_url,
+      position_title: d.position_title || '',
       old_value:      fromLabel,
       new_value:      toLabel,
       detail:         `Transferred from ${fromLabel} to ${toLabel}`,

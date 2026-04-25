@@ -34,9 +34,9 @@ async function insertSnapshot(profileCount, rawJson, rosterType) {
 async function bulkInsertEvents(snapshotId, events) {
   if (!events.length) return;
 
-  const cols = ['snapshot_id', 'event_type', 'profile_id', 'profile_name', 'rank_short', 'rank_image_url', 'old_value', 'new_value', 'record_date', 'detail'];
+  const cols = ['snapshot_id', 'event_type', 'profile_id', 'profile_name', 'rank_short', 'rank_image_url', 'old_value', 'new_value', 'record_date', 'detail', 'position_title'];
   const COLS_PER_ROW = cols.length;
-  const CHUNK_SIZE = Math.floor(65000 / COLS_PER_ROW); // ~6500 rows per batch
+  const CHUNK_SIZE = Math.floor(65000 / COLS_PER_ROW); // ~5909 rows per batch
 
   for (let offset = 0; offset < events.length; offset += CHUNK_SIZE) {
     const chunk = events.slice(offset, offset + CHUNK_SIZE);
@@ -46,9 +46,9 @@ async function bulkInsertEvents(snapshotId, events) {
 
     for (const e of chunk) {
       const recordDate = e.record_date && e.record_date !== '' ? e.record_date : null;
-      placeholders.push(`($${idx},$${idx+1},$${idx+2},$${idx+3},$${idx+4},$${idx+5},$${idx+6},$${idx+7},$${idx+8},$${idx+9})`);
-      values.push(snapshotId, e.event_type, e.profile_id, e.profile_name, e.rank_short || '', e.rank_image_url || '', e.old_value || '', e.new_value || '', recordDate, e.detail || '');
-      idx += 10;
+      placeholders.push(`($${idx},$${idx+1},$${idx+2},$${idx+3},$${idx+4},$${idx+5},$${idx+6},$${idx+7},$${idx+8},$${idx+9},$${idx+10})`);
+      values.push(snapshotId, e.event_type, e.profile_id, e.profile_name, e.rank_short || '', e.rank_image_url || '', e.old_value || '', e.new_value || '', recordDate, e.detail || '', e.position_title || '');
+      idx += 11;
     }
 
     await pool.query(
@@ -139,7 +139,7 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
     SELECT e.event_type, e.profile_id, e.profile_name, e.rank_short, e.rank_image_url,
            e.old_value, e.new_value,
            COALESCE(TO_CHAR(e.record_date, 'YYYY-MM-DD'), '') as record_date,
-           e.detail,
+           e.detail, e.position_title,
            s.roster_type,
            TO_CHAR(s.fetched_at, 'YYYY-MM-DD') as snapshot_date
     FROM diff_events e

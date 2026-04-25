@@ -13,13 +13,18 @@ import { GroupedRecordCard } from './GroupedRecordCard'
 import { MemberTimeline } from './MemberTimeline'
 import { ALL_EVENT_TYPES, ALL_ROSTER_TYPES } from '../lib/constants'
 import { RosterTypeFilterBar } from './RosterTypeFilterBar'
+import { UnitFilterBar } from './UnitFilterBar'
 import { groupAndSortEvents } from '../lib/groupEvents'
 import { exportEventsCsv } from '../lib/csvExport'
+import { parseUnit } from '../lib/parseUnit'
+
+const EMPTY_UNIT_FILTER = { battalion: null, company: null, platoon: null }
 
 export function TodayView() {
   const [activeFilters, setActiveFilters] = useState(new Set(ALL_EVENT_TYPES))
   const [excludedRecordTypes, setExcludedRecordTypes] = useState(new Set())
   const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
+  const [unitFilter, setUnitFilter] = useState(EMPTY_UNIT_FILTER)
   const [memberSearch, setMemberSearch] = useState('')
   const trigger = useTriggerSnapshot()
 
@@ -50,9 +55,18 @@ export function TodayView() {
       if (!activeFilters.has(e.event_type)) return false
       if (e.event_type === 'NEW_RECORD' && excludedRecordTypes.has(e.new_value)) return false
       if (e.roster_type && !activeRosterTypes.has(e.roster_type)) return false
+      if (unitFilter.battalion) {
+        const u = parseUnit(e.position_title || '')
+        if (!u || u.battalion !== unitFilter.battalion) return false
+        if (unitFilter.company) {
+          const co = u.company ?? 'HQ'
+          if (co !== unitFilter.company) return false
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon) return false
+      }
       return true
     }),
-    [diff, activeFilters, excludedRecordTypes, activeRosterTypes]
+    [diff, activeFilters, excludedRecordTypes, activeRosterTypes, unitFilter]
   )
 
   const recordTypeCounts = useMemo(() => {
@@ -106,6 +120,22 @@ export function TodayView() {
       next.has(rt) ? next.delete(rt) : next.add(rt)
       return next
     })
+  }
+
+  function handleUnitSelect(level, value) {
+    setUnitFilter((prev) => ({
+      battalion: level === 'battalion' ? value : prev.battalion,
+      company:   level === 'company'  ? value : level === 'battalion' ? null : prev.company,
+      platoon:   level === 'platoon'  ? value : null,
+    }))
+  }
+
+  function handleUnitClear(level) {
+    setUnitFilter((prev) => ({
+      battalion: level === 'battalion' ? null : prev.battalion,
+      company:   (level === 'battalion' || level === 'company') ? null : prev.company,
+      platoon:   null,
+    }))
   }
 
   function handleExport() {
@@ -175,6 +205,13 @@ export function TodayView() {
       {!matchedProfile && (
         <>
           <RosterTypeFilterBar activeRosterTypes={activeRosterTypes} onToggle={toggleRosterType} presentRosterTypes={presentRosterTypes} />
+
+          <UnitFilterBar
+            events={typeFilteredEvents}
+            unitFilter={unitFilter}
+            onSelect={handleUnitSelect}
+            onClear={handleUnitClear}
+          />
 
           {diff?.counts && (
             <SummaryBar counts={diff.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />

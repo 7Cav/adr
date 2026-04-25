@@ -12,6 +12,11 @@ import { GroupedRecordCard } from './GroupedRecordCard'
 import { SummaryBar } from './SummaryBar'
 import { MemberTimeline } from './MemberTimeline'
 import { ALL_EVENT_TYPES, ALL_ROSTER_TYPES } from '../lib/constants'
+import { RosterTypeFilterBar } from './RosterTypeFilterBar'
+import { UnitFilterBar } from './UnitFilterBar'
+import { groupAndSortEvents } from '../lib/groupEvents'
+import { exportEventsCsv } from '../lib/csvExport'
+import { parseUnit } from '../lib/parseUnit'
 
 const RANGE_PRESETS = [
   { label: '30d',  days: 30 },
@@ -20,9 +25,6 @@ const RANGE_PRESETS = [
   { label: '1yr',  days: 365 },
   { label: 'All',  days: null },
 ]
-import { RosterTypeFilterBar } from './RosterTypeFilterBar'
-import { groupAndSortEvents } from '../lib/groupEvents'
-import { exportEventsCsv } from '../lib/csvExport'
 
 function totalCount(s) {
   return Object.values(s.counts).reduce((a, b) => a + b, 0)
@@ -38,11 +40,14 @@ function heatIntensity(count, max) {
   return 'bg-blue-400'
 }
 
+const EMPTY_UNIT_FILTER = { battalion: null, company: null, platoon: null }
+
 export function HistoryView() {
   const { data: summaries } = useDiffList()
   const [activeFilters, setActiveFilters] = useState(new Set(ALL_EVENT_TYPES))
   const [excludedRecordTypes, setExcludedRecordTypes] = useState(new Set())
   const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
+  const [unitFilter, setUnitFilter] = useState(EMPTY_UNIT_FILTER)
   const [memberSearch, setMemberSearch] = useState('')
   const [selectedDay, setSelectedDay] = useState(null)
   const [selectedRange, setSelectedRange] = useState(90)
@@ -74,9 +79,18 @@ export function HistoryView() {
       if (!activeFilters.has(e.event_type)) return false
       if (e.event_type === 'NEW_RECORD' && excludedRecordTypes.has(e.new_value)) return false
       if (e.roster_type && !activeRosterTypes.has(e.roster_type)) return false
+      if (unitFilter.battalion) {
+        const u = parseUnit(e.position_title || '')
+        if (!u || u.battalion !== unitFilter.battalion) return false
+        if (unitFilter.company) {
+          const co = u.company ?? 'HQ'
+          if (co !== unitFilter.company) return false
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon) return false
+      }
       return true
     }),
-    [activeData, activeFilters, excludedRecordTypes, activeRosterTypes]
+    [activeData, activeFilters, excludedRecordTypes, activeRosterTypes, unitFilter]
   )
 
   const recordTypeCounts = useMemo(() => {
@@ -113,7 +127,6 @@ export function HistoryView() {
   const heatmapData = useMemo(() => {
     if (!summaries) return []
 
-    // Filter summaries to the selected range
     const cutoff = selectedRange ? subDays(new Date(), selectedRange - 1) : null
 
     const byBucket = {}
@@ -123,17 +136,14 @@ export function HistoryView() {
 
       let bucketKey, bucketLabel, bucketDate
       if (!selectedRange || selectedRange > 365) {
-        // Monthly
         bucketKey   = format(d, 'yyyy-MM')
         bucketLabel = format(d, 'MMM yyyy')
         bucketDate  = format(d, 'yyyy-MM-dd')
       } else if (selectedRange > 90) {
-        // Weekly (ISO week)
         bucketKey   = `${getISOWeekYear(d)}-W${String(getISOWeek(d)).padStart(2, '0')}`
         bucketLabel = `Week of ${format(d, 'MMM d, yyyy')}`
         bucketDate  = format(d, 'yyyy-MM-dd')
       } else {
-        // Daily
         bucketKey   = format(d, 'yyyy-MM-dd')
         bucketLabel = format(d, 'MMM d, yyyy')
         bucketDate  = bucketKey
@@ -175,9 +185,23 @@ export function HistoryView() {
     })
   }
 
+  function handleUnitSelect(level, value) {
+    setUnitFilter((prev) => ({
+      battalion: level === 'battalion' ? value : prev.battalion,
+      company:   level === 'company'  ? value : level === 'battalion' ? null : prev.company,
+      platoon:   level === 'platoon'  ? value : null,
+    }))
+  }
+
+  function handleUnitClear(level) {
+    setUnitFilter((prev) => ({
+      battalion: level === 'battalion' ? null : prev.battalion,
+      company:   (level === 'battalion' || level === 'company') ? null : prev.company,
+      platoon:   null,
+    }))
+  }
+
   function handleDotClick(entry) {
-    // For weekly/monthly buckets clicking drills into the representative date;
-    // for daily buckets it selects that exact day.
     setSelectedDay((prev) => (prev === entry.date ? null : entry.date))
     setMemberSearch('')
   }
@@ -186,6 +210,7 @@ export function HistoryView() {
     setSelectedRange(days)
     setSelectedDay(null)
     setMemberSearch('')
+    setUnitFilter(EMPTY_UNIT_FILTER)
   }
 
   function handleBackToRange() {
@@ -316,6 +341,13 @@ export function HistoryView() {
       {!matchedProfile && (
         <>
           <RosterTypeFilterBar activeRosterTypes={activeRosterTypes} onToggle={toggleRosterType} presentRosterTypes={presentRosterTypes} />
+
+          <UnitFilterBar
+            events={typeFilteredEvents}
+            unitFilter={unitFilter}
+            onSelect={handleUnitSelect}
+            onClear={handleUnitClear}
+          />
 
           {activeData?.counts && (
             <SummaryBar counts={activeData.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />
