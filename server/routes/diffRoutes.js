@@ -1,70 +1,66 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
 const db = require('../db/database');
 const { runSnapshot } = require('../controllers/diffPoller');
 
-const API_TOKEN = process.env.API_TOKEN;
-const RANKS_URL = 'https://api.7cav.us/api/v1/milpacs/ranks';
+const VALID_ROSTER_TYPES = new Set([
+  'ROSTER_TYPE_COMBAT', 'ROSTER_TYPE_RESERVE', 'ROSTER_TYPE_ELOA',
+  'ROSTER_TYPE_WALL_OF_HONOR', 'ROSTER_TYPE_ARLINGTON', 'ROSTER_TYPE_PAST_MEMBERS',
+]);
 
-let ranksCache = null;
-let ranksCacheTime = 0;
+function parseRosterType(query) {
+  const rt = query?.roster_type;
+  if (!rt) return null;
+  if (!VALID_ROSTER_TYPES.has(rt)) return 'INVALID';
+  return rt;
+}
 
-// GET /diffs
+// GET /diffs — returns all roster types; frontend filters client-side
 router.get('/diffs', async (req, res) => {
   try {
-    const summaries = await db.listDiffs(90);
+    const summaries = await db.listDiffs(600);
     res.json(summaries);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /diffs/range?from=YYYY-MM-DD&to=YYYY-MM-DD
+// GET /diffs/range?from=YYYY-MM-DD&to=YYYY-MM-DD[&roster_type=X]
 // MUST be registered before /diffs/:date to avoid Express capturing "range" as the date param
 router.get('/diffs/range', async (req, res) => {
   const { from, to } = req.query;
-  if (!from || !to) return res.status(400).json({ error: 'from and to query params required' });
+  if (!to) return res.status(400).json({ error: 'to query param required' });
+  const rosterType = parseRosterType(req.query);
+  if (rosterType === 'INVALID') return res.status(400).json({ error: 'invalid roster_type' });
   try {
-    const result = await db.eventsForDateRange(from, to);
+    const result = await db.eventsForDateRange(from ?? null, to, rosterType);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /diffs/:date
+// GET /diffs/:date[?roster_type=X]
 router.get('/diffs/:date', async (req, res) => {
   const { date } = req.params;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'date must be YYYY-MM-DD' });
+  const rosterType = parseRosterType(req.query);
+  if (rosterType === 'INVALID') return res.status(400).json({ error: 'invalid roster_type' });
   try {
-    const result = await db.eventsForDate(date);
+    const result = await db.eventsForDate(date, rosterType);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /ranks — proxy MILPACS ranks with 1h cache
-router.get('/ranks', async (req, res) => {
-  const now = Date.now();
-  if (ranksCache && now - ranksCacheTime < 3600000) {
-    return res.set('Cache-Control', 'public, max-age=3600').json(ranksCache);
-  }
-  try {
-    const response = await axios(RANKS_URL, {
-      headers: { Authorization: 'Bearer ' + API_TOKEN, Accept: 'application/json' },
-      timeout: 15000,
-    });
-    ranksCache = response.data;
-    ranksCacheTime = now;
-    res.set('Cache-Control', 'public, max-age=3600').json(ranksCache);
-  } catch (err) {
-    res.status(502).json({ error: err.message });
-  }
+// GET /ranks — rank images are now constructed directly from the DB; this endpoint
+// returns an empty ranks array for backward compatibility with any cached clients.
+router.get('/ranks', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600').json({ ranks: [] });
 });
 
-// POST /admin/snapshot — trigger a manual snapshot fetch
+// POST /admin/snapshot — trigger a manual snapshot fetch for all roster types
 router.post('/admin/snapshot', (req, res) => {
   runSnapshot(); // fire and forget
   res.json({ status: 'snapshot triggered' });

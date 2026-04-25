@@ -19,51 +19,83 @@ export function formatRecordType(raw) {
 }
 
 export const EVENT_SORT_ORDER = {
-  PROMOTION:       0,
-  NEW_MEMBER:      1,
-  DISCHARGE:       2,
-  NEW_AWARD:       3,
-  POSITION_CHANGE: 4,
-  NAME_CHANGE:     5,
-  NEW_RECORD:      6,
+  PROMOTION:        0,
+  NEW_MEMBER:       1,
+  ROSTER_TRANSFER:  2,
+  DISCHARGE:        3,
+  NEW_AWARD:        4,
+  POSITION_CHANGE:  5,
+  NAME_CHANGE:      6,
+  NEW_RECORD:       7,
 }
 
 export const EVENT_LABELS = {
-  PROMOTION:       'Promotion',
-  NEW_MEMBER:      'New Member',
-  DISCHARGE:       'Discharge',
-  NEW_RECORD:      'New Record',
-  NEW_AWARD:       'New Award',
-  POSITION_CHANGE: 'Position Change',
-  NAME_CHANGE:     'Name Change',
+  PROMOTION:        'Promotion',
+  NEW_MEMBER:       'New Member',
+  ROSTER_TRANSFER:  'Roster Transfer',
+  DISCHARGE:        'Discharge',
+  NEW_RECORD:       'New Record',
+  NEW_AWARD:        'New Award',
+  POSITION_CHANGE:  'Position Change',
+  NAME_CHANGE:      'Name Change',
 }
 
 export const EVENT_COLORS = {
-  PROMOTION:       'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  NEW_MEMBER:      'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  DISCHARGE:       'bg-red-500/15 text-red-400 border-red-500/30',
-  NEW_RECORD:      'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  NEW_AWARD:       'bg-purple-500/15 text-purple-400 border-purple-500/30',
-  POSITION_CHANGE: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-  NAME_CHANGE:     'bg-slate-500/15 text-slate-400 border-slate-500/30',
+  PROMOTION:        'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  NEW_MEMBER:       'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  ROSTER_TRANSFER:  'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
+  DISCHARGE:        'bg-red-500/15 text-red-400 border-red-500/30',
+  NEW_RECORD:       'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  NEW_AWARD:        'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  POSITION_CHANGE:  'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+  NAME_CHANGE:      'bg-slate-500/15 text-slate-400 border-slate-500/30',
 }
 
 export const EVENT_DOT_COLORS = {
-  PROMOTION:       'bg-amber-400',
-  NEW_MEMBER:      'bg-emerald-400',
-  DISCHARGE:       'bg-red-400',
-  NEW_RECORD:      'bg-blue-400',
-  NEW_AWARD:       'bg-purple-400',
-  POSITION_CHANGE: 'bg-cyan-400',
-  NAME_CHANGE:     'bg-slate-400',
+  PROMOTION:        'bg-amber-400',
+  NEW_MEMBER:       'bg-emerald-400',
+  ROSTER_TRANSFER:  'bg-indigo-400',
+  DISCHARGE:        'bg-red-400',
+  NEW_RECORD:       'bg-blue-400',
+  NEW_AWARD:        'bg-purple-400',
+  POSITION_CHANGE:  'bg-cyan-400',
+  NAME_CHANGE:      'bg-slate-400',
 }
 
 export const ALL_EVENT_TYPES = [
   'PROMOTION',
   'NEW_MEMBER',
+  'ROSTER_TRANSFER',
   'DISCHARGE',
   'NEW_AWARD',
   'POSITION_CHANGE',
   'NEW_RECORD',
   'NAME_CHANGE',
 ]
+
+export const ALL_ROSTER_TYPES = [
+  'ROSTER_TYPE_COMBAT',
+  'ROSTER_TYPE_RESERVE',
+  'ROSTER_TYPE_ELOA',
+  'ROSTER_TYPE_WALL_OF_HONOR',
+  'ROSTER_TYPE_ARLINGTON',
+  'ROSTER_TYPE_PAST_MEMBERS',
+]
+
+export const ROSTER_TYPE_LABELS = {
+  ROSTER_TYPE_COMBAT:        'Combat',
+  ROSTER_TYPE_RESERVE:       'Reserve',
+  ROSTER_TYPE_ELOA:          'ELOA',
+  ROSTER_TYPE_WALL_OF_HONOR: 'Wall of Honor',
+  ROSTER_TYPE_ARLINGTON:     'Arlington',
+  ROSTER_TYPE_PAST_MEMBERS:  'Past Members',
+}
+
+export const ROSTER_TYPE_COLORS = {
+  ROSTER_TYPE_COMBAT:        'bg-zinc-500/15 text-zinc-300 border-zinc-500/30',
+  ROSTER_TYPE_RESERVE:       'bg-sky-500/15 text-sky-300 border-sky-500/30',
+  ROSTER_TYPE_ELOA:          'bg-orange-500/15 text-orange-300 border-orange-500/30',
+  ROSTER_TYPE_WALL_OF_HONOR: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
+  ROSTER_TYPE_ARLINGTON:     'bg-rose-500/15 text-rose-300 border-rose-500/30',
+  ROSTER_TYPE_PAST_MEMBERS:  'bg-neutral-500/15 text-neutral-400 border-neutral-500/30',
+}

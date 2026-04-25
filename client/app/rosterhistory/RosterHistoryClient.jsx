@@ -28,7 +28,7 @@ export default function RosterHistoryClient() {
     <QueryProvider>
       <div className="mb-6 flex gap-1 border-b border-[#333]">
         {tabBtn('today', 'Today')}
-        {tabBtn('history', '90-Day History')}
+        {tabBtn('history', 'History')}
       </div>
       {tab === 'today' ? <TodayView /> : <HistoryView />}
     </QueryProvider>

@@ -28,7 +28,7 @@ export function useDiffByDate(date) {
 export function useDiffRange(from, to, enabled = true) {
   return useQuery({
     queryKey: ['diff-range', from, to],
-    queryFn: () => get(`/diffs/range?from=${from}&to=${to}`),
+    queryFn: () => get(from ? `/diffs/range?from=${from}&to=${to}` : `/diffs/range?to=${to}`),
     enabled,
   })
 }

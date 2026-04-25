@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { format, subDays, parseISO } from 'date-fns'
+import { format, subDays, parseISO, getISOWeek, getISOWeekYear } from 'date-fns'
 import { Download, Search, X, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,16 @@ import { DiffEventCard } from './DiffEventCard'
 import { GroupedRecordCard } from './GroupedRecordCard'
 import { SummaryBar } from './SummaryBar'
 import { MemberTimeline } from './MemberTimeline'
-import { ALL_EVENT_TYPES } from '../lib/constants'
+import { ALL_EVENT_TYPES, ALL_ROSTER_TYPES } from '../lib/constants'
+
+const RANGE_PRESETS = [
+  { label: '30d',  days: 30 },
+  { label: '90d',  days: 90 },
+  { label: '6mo',  days: 182 },
+  { label: '1yr',  days: 365 },
+  { label: 'All',  days: null },
+]
+import { RosterTypeFilterBar } from './RosterTypeFilterBar'
 import { groupAndSortEvents } from '../lib/groupEvents'
 import { exportEventsCsv } from '../lib/csvExport'
 
@@ -33,12 +42,14 @@ export function HistoryView() {
   const { data: summaries } = useDiffList()
   const [activeFilters, setActiveFilters] = useState(new Set(ALL_EVENT_TYPES))
   const [excludedRecordTypes, setExcludedRecordTypes] = useState(new Set())
+  const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
   const [memberSearch, setMemberSearch] = useState('')
   const [selectedDay, setSelectedDay] = useState(null)
+  const [selectedRange, setSelectedRange] = useState(90)
   const { data: ranksData } = useRanks()
 
   const to = format(new Date(), 'yyyy-MM-dd')
-  const from = format(subDays(new Date(), 89), 'yyyy-MM-dd')
+  const from = selectedRange ? format(subDays(new Date(), selectedRange - 1), 'yyyy-MM-dd') : null
   const { data: rangeData, isLoading: rangeLoading } = useDiffRange(from, to, true)
   const { data: dayData, isLoading: dayLoading } = useDiffByDate(selectedDay)
 
@@ -52,13 +63,20 @@ export function HistoryView() {
   const activeData = selectedDay ? dayData : rangeData
   const isLoading = selectedDay ? dayLoading : rangeLoading
 
+  const presentRosterTypes = useMemo(() => {
+    const s = new Set()
+    for (const e of activeData?.events ?? []) if (e.roster_type) s.add(e.roster_type)
+    return s
+  }, [activeData])
+
   const typeFilteredEvents = useMemo(
     () => (activeData?.events ?? []).filter((e) => {
       if (!activeFilters.has(e.event_type)) return false
       if (e.event_type === 'NEW_RECORD' && excludedRecordTypes.has(e.new_value)) return false
+      if (e.roster_type && !activeRosterTypes.has(e.roster_type)) return false
       return true
     }),
-    [activeData, activeFilters, excludedRecordTypes]
+    [activeData, activeFilters, excludedRecordTypes, activeRosterTypes]
   )
 
   const recordTypeCounts = useMemo(() => {
@@ -89,7 +107,49 @@ export function HistoryView() {
   )
 
   const totalVisible = notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0)
-  const maxCount = useMemo(() => Math.max(1, ...(summaries ?? []).map(totalCount)), [summaries])
+
+  // Aggregate snapshots into heatmap buckets. Bucket size scales with range:
+  // ≤90d → daily, ≤365d → weekly, >365d or All → monthly
+  const heatmapData = useMemo(() => {
+    if (!summaries) return []
+
+    // Filter summaries to the selected range
+    const cutoff = selectedRange ? subDays(new Date(), selectedRange - 1) : null
+
+    const byBucket = {}
+    for (const s of summaries) {
+      const d = parseISO(s.fetched_at)
+      if (cutoff && d < cutoff) continue
+
+      let bucketKey, bucketLabel, bucketDate
+      if (!selectedRange || selectedRange > 365) {
+        // Monthly
+        bucketKey   = format(d, 'yyyy-MM')
+        bucketLabel = format(d, 'MMM yyyy')
+        bucketDate  = format(d, 'yyyy-MM-dd')
+      } else if (selectedRange > 90) {
+        // Weekly (ISO week)
+        bucketKey   = `${getISOWeekYear(d)}-W${String(getISOWeek(d)).padStart(2, '0')}`
+        bucketLabel = `Week of ${format(d, 'MMM d, yyyy')}`
+        bucketDate  = format(d, 'yyyy-MM-dd')
+      } else {
+        // Daily
+        bucketKey   = format(d, 'yyyy-MM-dd')
+        bucketLabel = format(d, 'MMM d, yyyy')
+        bucketDate  = bucketKey
+      }
+
+      if (!byBucket[bucketKey]) {
+        byBucket[bucketKey] = { date: bucketDate, bucketKey, label: bucketLabel, fetched_at: s.fetched_at, counts: {} }
+      }
+      for (const [type, cnt] of Object.entries(s.counts))
+        byBucket[bucketKey].counts[type] = (byBucket[bucketKey].counts[type] ?? 0) + cnt
+    }
+
+    return Object.values(byBucket).sort((a, b) => new Date(b.date) - new Date(a.date))
+  }, [summaries, selectedRange])
+
+  const maxCount = useMemo(() => Math.max(1, ...heatmapData.map(totalCount)), [heatmapData])
 
   function toggleFilter(type) {
     setActiveFilters((prev) => {
@@ -107,10 +167,24 @@ export function HistoryView() {
     })
   }
 
-  function handleDotClick(s) {
-    const date = format(parseISO(s.fetched_at), 'yyyy-MM-dd')
-    // Toggle off if already selected, otherwise drill in
-    setSelectedDay((prev) => (prev === date ? null : date))
+  function toggleRosterType(rt) {
+    setActiveRosterTypes((prev) => {
+      const next = new Set(prev)
+      next.has(rt) ? next.delete(rt) : next.add(rt)
+      return next
+    })
+  }
+
+  function handleDotClick(entry) {
+    // For weekly/monthly buckets clicking drills into the representative date;
+    // for daily buckets it selects that exact day.
+    setSelectedDay((prev) => (prev === entry.date ? null : entry.date))
+    setMemberSearch('')
+  }
+
+  function handleRangeSelect(days) {
+    setSelectedRange(days)
+    setSelectedDay(null)
     setMemberSearch('')
   }
 
@@ -139,7 +213,7 @@ export function HistoryView() {
                 className="text-muted-foreground hover:text-foreground -ml-2 gap-1"
               >
                 <ChevronLeft size={14} />
-                90-day history
+                History
               </Button>
             </div>
           ) : null}
@@ -147,7 +221,11 @@ export function HistoryView() {
             {selectedDay ? format(parseISO(selectedDay), 'MMMM d, yyyy') : 'Change History'}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {selectedDay ? 'Daily snapshot — click the highlighted square to deselect' : 'Last 90 days'}
+            {selectedDay
+              ? 'Daily snapshot — click the highlighted square to deselect'
+              : selectedRange
+                ? `Last ${RANGE_PRESETS.find(p => p.days === selectedRange)?.label ?? selectedRange + 'd'}`
+                : 'All time'}
           </p>
         </div>
         {activeData?.events?.length > 0 && (
@@ -159,22 +237,38 @@ export function HistoryView() {
       </div>
 
       {/* Heatmap — always visible */}
-      {summaries?.length > 0 && (
+      {heatmapData.length > 0 && (
         <div>
+          {/* Range preset selector */}
+          <div className="flex gap-1 mb-3">
+            {RANGE_PRESETS.map((p) => (
+              <button
+                key={p.label}
+                onClick={() => handleRangeSelect(p.days)}
+                className={cn(
+                  'px-2.5 py-1 rounded text-xs font-medium transition-colors',
+                  selectedRange === p.days
+                    ? 'bg-[#ebc729] text-black'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-            Activity — click a day to drill down
+            Activity — click a {!selectedRange || selectedRange > 365 ? 'month' : selectedRange > 90 ? 'week' : 'day'} to drill down
           </p>
           <div className="flex flex-wrap gap-1">
-            {summaries.slice(0, 90).map((s) => {
-              const count = totalCount(s)
-              const date = format(parseISO(s.fetched_at), 'yyyy-MM-dd')
-              const dateLabel = format(parseISO(s.fetched_at), 'MMM d, yyyy')
-              const isSelected = date === selectedDay
+            {heatmapData.map((entry) => {
+              const count = totalCount(entry)
+              const isSelected = entry.date === selectedDay
               return (
                 <button
-                  key={s.snapshot_id}
-                  title={`${dateLabel}: ${count} change${count !== 1 ? 's' : ''}`}
-                  onClick={() => handleDotClick(s)}
+                  key={entry.date}
+                  title={`${entry.label}: ${count} change${count !== 1 ? 's' : ''}`}
+                  onClick={() => handleDotClick(entry)}
                   className={cn(
                     'h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     heatIntensity(count, maxCount),
@@ -221,6 +315,8 @@ export function HistoryView() {
 
       {!matchedProfile && (
         <>
+          <RosterTypeFilterBar activeRosterTypes={activeRosterTypes} onToggle={toggleRosterType} presentRosterTypes={presentRosterTypes} />
+
           {activeData?.counts && (
             <SummaryBar counts={activeData.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />
           )}
@@ -265,7 +361,7 @@ export function HistoryView() {
       {searchTerm && !matchedProfile && activeData && (
         <div className="rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground text-sm">
           No members found matching <span className="font-medium">"{memberSearch}"</span>
-          {selectedDay ? '.' : ' in the last 90 days.'}
+          {selectedDay ? '.' : ' in the selected range.'}
         </div>
       )}
     </div>

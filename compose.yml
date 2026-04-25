@@ -31,6 +31,11 @@ services:
       DATABASE_URL: postgres://cavapps:${PG_PASSWORD}@postgres:5432/cavapps?sslmode=disable
       DIFF_POLL_SCHEDULE: ${DIFF_POLL_SCHEDULE:-0 2 * * *}
       DIFF_SNAPSHOT_RETAIN_DAYS: ${DIFF_SNAPSHOT_RETAIN_DAYS:-95}
+      XENFORO_DB_HOST: xenforo-db
+      XENFORO_DB_PORT: 3306
+      XENFORO_DB_USER: xenforo
+      XENFORO_DB_PASSWORD: ${XENFORO_DB_PASSWORD}
+      XENFORO_DB_NAME: xenforo
     working_dir: /server
     depends_on:
       postgres:
@@ -43,6 +48,7 @@ services:
       start_period: 30s
     networks:
       - cavapps-network
+      - xenforo_internal
 
   client:
     restart: always
@@ -74,6 +80,9 @@ services:
 networks:
   cavapps-network:
     driver: bridge
+  xenforo_internal:
+    external: true
+    name: xenforo_internal
 
 volumes:
   pgdata:

@@ -11,13 +11,15 @@ import { SummaryBar } from './SummaryBar'
 import { DiffEventCard } from './DiffEventCard'
 import { GroupedRecordCard } from './GroupedRecordCard'
 import { MemberTimeline } from './MemberTimeline'
-import { ALL_EVENT_TYPES } from '../lib/constants'
+import { ALL_EVENT_TYPES, ALL_ROSTER_TYPES } from '../lib/constants'
+import { RosterTypeFilterBar } from './RosterTypeFilterBar'
 import { groupAndSortEvents } from '../lib/groupEvents'
 import { exportEventsCsv } from '../lib/csvExport'
 
 export function TodayView() {
   const [activeFilters, setActiveFilters] = useState(new Set(ALL_EVENT_TYPES))
   const [excludedRecordTypes, setExcludedRecordTypes] = useState(new Set())
+  const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
   const [memberSearch, setMemberSearch] = useState('')
   const trigger = useTriggerSnapshot()
 
@@ -37,13 +39,20 @@ export function TodayView() {
 
   const { data: diff, isLoading: diffLoading } = useDiffByDate(effectiveDate)
 
+  const presentRosterTypes = useMemo(() => {
+    const s = new Set()
+    for (const e of diff?.events ?? []) if (e.roster_type) s.add(e.roster_type)
+    return s
+  }, [diff])
+
   const typeFilteredEvents = useMemo(
     () => (diff?.events ?? []).filter((e) => {
       if (!activeFilters.has(e.event_type)) return false
       if (e.event_type === 'NEW_RECORD' && excludedRecordTypes.has(e.new_value)) return false
+      if (e.roster_type && !activeRosterTypes.has(e.roster_type)) return false
       return true
     }),
-    [diff, activeFilters, excludedRecordTypes]
+    [diff, activeFilters, excludedRecordTypes, activeRosterTypes]
   )
 
   const recordTypeCounts = useMemo(() => {
@@ -87,6 +96,14 @@ export function TodayView() {
     setExcludedRecordTypes((prev) => {
       const next = new Set(prev)
       next.has(rawType) ? next.delete(rawType) : next.add(rawType)
+      return next
+    })
+  }
+
+  function toggleRosterType(rt) {
+    setActiveRosterTypes((prev) => {
+      const next = new Set(prev)
+      next.has(rt) ? next.delete(rt) : next.add(rt)
       return next
     })
   }
@@ -157,6 +174,8 @@ export function TodayView() {
       {/* Normal view */}
       {!matchedProfile && (
         <>
+          <RosterTypeFilterBar activeRosterTypes={activeRosterTypes} onToggle={toggleRosterType} presentRosterTypes={presentRosterTypes} />
+
           {diff?.counts && (
             <SummaryBar counts={diff.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />
           )}

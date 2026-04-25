@@ -7,9 +7,10 @@ function escapeCsv(val) {
 }
 
 export function exportEventsCsv(events, filename) {
-  const headers = ['date', 'event_type', 'profile_name', 'rank', 'old_value', 'new_value', 'record_date', 'detail']
+  const headers = ['date', 'roster_type', 'event_type', 'profile_name', 'rank', 'old_value', 'new_value', 'record_date', 'detail']
   const rows = events.map((e) => [
     escapeCsv(e.snapshot_date),
+    escapeCsv(e.roster_type ?? 'ROSTER_TYPE_COMBAT'),
     escapeCsv(e.event_type),
     escapeCsv(e.profile_name),
     escapeCsv(e.rank_short),

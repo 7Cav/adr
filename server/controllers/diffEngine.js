@@ -119,4 +119,61 @@ function awardSet(awards) {
   return new Set(awards.map(a => a.awardUid).filter(Boolean));
 }
 
-module.exports = { computeDiff };
+// Roster type → human label (mirrors ROSTER_TYPE_LABELS on the frontend)
+const ROSTER_LABELS = {
+  ROSTER_TYPE_COMBAT:        'Combat',
+  ROSTER_TYPE_RESERVE:       'Reserve',
+  ROSTER_TYPE_ELOA:          'ELOA',
+  ROSTER_TYPE_WALL_OF_HONOR: 'Wall of Honor',
+  ROSTER_TYPE_ARLINGTON:     'Arlington',
+  ROSTER_TYPE_PAST_MEMBERS:  'Past Members',
+};
+
+// After computing per-roster diffs, collapse same-run DISCHARGE + NEW_MEMBER pairs
+// for the same profile_id into a single ROSTER_TRANSFER event.
+// Events that are ambiguous (multiple discharges or arrivals for the same person) are left as-is.
+function correlateTransfers(allEvents) {
+  const discharges = {};
+  const arrivals   = {};
+
+  for (const e of allEvents) {
+    if (e.event_type === 'DISCHARGE')   (discharges[e.profile_id] ??= []).push(e);
+    if (e.event_type === 'NEW_MEMBER')  (arrivals[e.profile_id]   ??= []).push(e);
+  }
+
+  const removeSet = new Set();
+  const transfers = [];
+
+  for (const profileId of Object.keys(discharges)) {
+    const ds = discharges[profileId];
+    const as = arrivals[profileId];
+    if (!as || ds.length !== 1 || as.length !== 1) continue; // ambiguous — leave as-is
+
+    const d = ds[0];
+    const a = as[0];
+    const fromLabel = ROSTER_LABELS[d.roster_type] ?? d.roster_type;
+    const toLabel   = ROSTER_LABELS[a.roster_type] ?? a.roster_type;
+
+    removeSet.add(d);
+    removeSet.add(a);
+
+    transfers.push({
+      event_type:    'ROSTER_TRANSFER',
+      profile_id:    profileId,
+      profile_name:  d.profile_name,
+      rank_short:    d.rank_short,
+      rank_image_url: d.rank_image_url,
+      old_value:     fromLabel,
+      new_value:     toLabel,
+      detail:        `Transferred from ${fromLabel} to ${toLabel}`,
+      roster_type:   d.roster_type, // source roster
+      _snapshotId:   d._snapshotId,
+    });
+  }
+
+  const result = allEvents.filter(e => !removeSet.has(e));
+  result.push(...transfers);
+  return result;
+}
+
+module.exports = { computeDiff, correlateTransfers };

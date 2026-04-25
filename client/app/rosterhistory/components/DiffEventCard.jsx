@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { EVENT_COLORS, EVENT_DOT_COLORS, EVENT_LABELS, formatRecordType } from '../lib/constants'
+import { EVENT_COLORS, EVENT_DOT_COLORS, EVENT_LABELS, ROSTER_TYPE_COLORS, ROSTER_TYPE_LABELS, formatRecordType } from '../lib/constants'
 
 export function DiffEventCard({ event }) {
   const [open, setOpen] = useState(false)
@@ -38,7 +38,16 @@ export function DiffEventCard({ event }) {
             {EVENT_LABELS[event.event_type]}
           </Badge>
 
+          {event.roster_type && event.roster_type !== 'ROSTER_TYPE_COMBAT' && (
+            <Badge variant="outline" className={cn('text-xs border-current bg-transparent', ROSTER_TYPE_COLORS[event.roster_type])}>
+              {ROSTER_TYPE_LABELS[event.roster_type]}
+            </Badge>
+          )}
+
           {event.event_type === 'PROMOTION' && (
+            <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
+          )}
+          {event.event_type === 'ROSTER_TRANSFER' && (
             <span className="opacity-90 text-xs">{event.old_value} → {event.new_value}</span>
           )}
           {event.event_type === 'NEW_RECORD' && event.new_value && (
