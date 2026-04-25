@@ -55,9 +55,13 @@ function computeDiff(prevProfiles, currProfiles) {
       });
     }
 
+    const hadPromotion = cp.rank?.rankId !== pp.rank?.rankId;
     const prevRecords = recordSet(pp.records || []);
     for (const r of (cp.records || [])) {
       if (!prevRecords.has(r.recordUid)) {
+        // Skip promotion service records when a rank change was already detected —
+        // the PROMOTION event covers it and showing both is duplicate noise.
+        if (hadPromotion && r.recordType === 'Promotion') continue;
         events.push({
           event_type: 'NEW_RECORD',
           profile_id: id,
