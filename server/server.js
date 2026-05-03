@@ -37,6 +37,10 @@ const checkToken = (req, res, next) => {
     return next();
   }
 
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
   const authToken = req.headers["authorization"];
   if (authToken === CLIENT_TOKEN) {
     next();
