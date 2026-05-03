@@ -10,12 +10,12 @@ const { initDatabase } = require("./db/database");
 const diffRoutes = require("./routes/diffRoutes");
 const { startPoller } = require("./controllers/diffPoller");
 
-
 const corsOptions = {
   origin: function (origin, callback) {
     const allowlist = [
       "http://localhost",
       "http://localhost:3000",
+      "http://localhost/",
       "http://apps.7cav.us",
       "https://apps.7cav.us",
       "https://apps.7cav.us/",
@@ -50,7 +50,7 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     console.log(
-      `${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${duration}ms | origin=${req.headers["origin"] || "-"}`
+      `${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${duration}ms | origin=${req.headers["origin"] || "-"}`,
     );
   });
   next();

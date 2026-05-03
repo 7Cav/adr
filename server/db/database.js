@@ -1,22 +1,22 @@
-const { Pool } = require('pg');
-const path = require('path');
-const { runner: migrate } = require('node-pg-migrate');
+const { Pool } = require("pg");
+const path = require("path");
+const { runner: migrate } = require("node-pg-migrate");
 
 let pool;
 
 async function initDatabase() {
   pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  await pool.query('SELECT 1'); // ping
+  await pool.query("SELECT 1"); // ping
 
   await migrate({
     databaseUrl: process.env.DATABASE_URL,
-    migrationsTable: 'pgmigrations',
-    dir: path.join(__dirname, 'migrations'),
-    direction: 'up',
-    log: (msg) => console.log('[migrate]', msg),
+    migrationsTable: "pgmigrations",
+    dir: path.join(__dirname, "migrations"),
+    direction: "up",
+    log: (msg) => console.log("[migrate]", msg),
   });
 
-  console.log('Database ready.');
+  console.log("Database ready.");
 }
 
 function getPool() {
@@ -25,8 +25,8 @@ function getPool() {
 
 async function insertSnapshot(profileCount, rawJson, rosterType) {
   const res = await pool.query(
-    'INSERT INTO snapshots (profile_count, raw_json, roster_type) VALUES ($1, $2, $3) RETURNING id',
-    [profileCount, JSON.stringify(rawJson), rosterType]
+    "INSERT INTO snapshots (profile_count, raw_json, roster_type) VALUES ($1, $2, $3) RETURNING id",
+    [profileCount, JSON.stringify(rawJson), rosterType],
   );
   return res.rows[0].id;
 }
@@ -34,7 +34,19 @@ async function insertSnapshot(profileCount, rawJson, rosterType) {
 async function bulkInsertEvents(snapshotId, events) {
   if (!events.length) return;
 
-  const cols = ['snapshot_id', 'event_type', 'profile_id', 'profile_name', 'rank_short', 'rank_image_url', 'old_value', 'new_value', 'record_date', 'detail', 'position_title'];
+  const cols = [
+    "snapshot_id",
+    "event_type",
+    "profile_id",
+    "profile_name",
+    "rank_short",
+    "rank_image_url",
+    "old_value",
+    "new_value",
+    "record_date",
+    "detail",
+    "position_title",
+  ];
   const COLS_PER_ROW = cols.length;
   const CHUNK_SIZE = Math.floor(65000 / COLS_PER_ROW); // ~5909 rows per batch
 
@@ -45,23 +57,38 @@ async function bulkInsertEvents(snapshotId, events) {
     let idx = 1;
 
     for (const e of chunk) {
-      const recordDate = e.record_date && e.record_date !== '' ? e.record_date : null;
-      placeholders.push(`($${idx},$${idx+1},$${idx+2},$${idx+3},$${idx+4},$${idx+5},$${idx+6},$${idx+7},$${idx+8},$${idx+9},$${idx+10})`);
-      values.push(snapshotId, e.event_type, e.profile_id, e.profile_name, e.rank_short || '', e.rank_image_url || '', e.old_value || '', e.new_value || '', recordDate, e.detail || '', e.position_title || '');
+      const recordDate =
+        e.record_date && e.record_date !== "" ? e.record_date : null;
+      placeholders.push(
+        `($${idx},$${idx + 1},$${idx + 2},$${idx + 3},$${idx + 4},$${idx + 5},$${idx + 6},$${idx + 7},$${idx + 8},$${idx + 9},$${idx + 10})`,
+      );
+      values.push(
+        snapshotId,
+        e.event_type,
+        e.profile_id,
+        e.profile_name,
+        e.rank_short || "",
+        e.rank_image_url || "",
+        e.old_value || "",
+        e.new_value || "",
+        recordDate,
+        e.detail || "",
+        e.position_title || "",
+      );
       idx += 11;
     }
 
     await pool.query(
-      `INSERT INTO diff_events (${cols.join(',')}) VALUES ${placeholders.join(',')}`,
-      values
+      `INSERT INTO diff_events (${cols.join(",")}) VALUES ${placeholders.join(",")}`,
+      values,
     );
   }
 }
 
-async function latestSnapshot(rosterType = 'ROSTER_TYPE_COMBAT') {
+async function latestSnapshot(rosterType = "ROSTER_TYPE_COMBAT") {
   const res = await pool.query(
-    'SELECT id, raw_json FROM snapshots WHERE raw_json IS NOT NULL AND roster_type = $1 ORDER BY fetched_at DESC LIMIT 1',
-    [rosterType]
+    "SELECT id, raw_json FROM snapshots WHERE raw_json IS NOT NULL AND roster_type = $1 ORDER BY fetched_at DESC LIMIT 1",
+    [rosterType],
   );
   if (!res.rows.length) return null;
   const { id, raw_json } = res.rows[0];
@@ -70,20 +97,23 @@ async function latestSnapshot(rosterType = 'ROSTER_TYPE_COMBAT') {
 
 async function purgeOldRawJson(cutoffDate) {
   await pool.query(
-    'UPDATE snapshots SET raw_json = NULL WHERE fetched_at < $1 AND raw_json IS NOT NULL',
-    [cutoffDate]
+    "UPDATE snapshots SET raw_json = NULL WHERE fetched_at < $1 AND raw_json IS NOT NULL",
+    [cutoffDate],
   );
 }
 
 async function listDiffs(limit = 600) {
-  const res = await pool.query(`
+  const res = await pool.query(
+    `
     SELECT s.id, s.fetched_at, s.roster_type, e.event_type, COUNT(*) as cnt
     FROM snapshots s
     JOIN diff_events e ON e.snapshot_id = s.id
     GROUP BY s.id, s.fetched_at, s.roster_type, e.event_type
     ORDER BY s.fetched_at DESC
     LIMIT $1
-  `, [limit * 50]);
+  `,
+    [limit * 50],
+  );
 
   const summaryMap = {};
   const order = [];
@@ -91,13 +121,19 @@ async function listDiffs(limit = 600) {
   for (const row of res.rows) {
     const sid = row.id;
     if (!summaryMap[sid]) {
-      summaryMap[sid] = { snapshot_id: sid, fetched_at: row.fetched_at, roster_type: row.roster_type, counts: {} };
+      summaryMap[sid] = {
+        snapshot_id: sid,
+        fetched_at: row.fetched_at,
+        roster_type: row.roster_type,
+        counts: {},
+      };
       order.push(sid);
     }
-    summaryMap[sid].counts[row.event_type] = (summaryMap[sid].counts[row.event_type] || 0) + parseInt(row.cnt, 10);
+    summaryMap[sid].counts[row.event_type] =
+      (summaryMap[sid].counts[row.event_type] || 0) + parseInt(row.cnt, 10);
   }
 
-  return order.slice(0, limit).map(id => summaryMap[id]);
+  return order.slice(0, limit).map((id) => summaryMap[id]);
 }
 
 async function eventsForDate(dateStr, rosterType = null) {
@@ -106,14 +142,14 @@ async function eventsForDate(dateStr, rosterType = null) {
 }
 
 async function eventsForDateRange(fromStr, toStr, rosterType = null) {
-  const to = new Date(toStr + 'T23:59:59.999Z');
+  const to = new Date(toStr + "T23:59:59.999Z");
 
   const params = [to];
-  let fromClause = '';
+  let fromClause = "";
   if (fromStr) {
-    const from = new Date(fromStr + 'T00:00:00Z');
+    const from = new Date(fromStr + "T00:00:00Z");
     params.unshift(from);
-    fromClause = 's.fetched_at >= $1 AND ';
+    fromClause = "s.fetched_at >= $1 AND ";
     // to is now $2
     params[1] = to;
     params.shift(); // rebuild cleanly below
@@ -121,21 +157,22 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
 
   // Build params cleanly
   const qParams = [];
-  let fromCondition = '';
+  let fromCondition = "";
   if (fromStr) {
-    qParams.push(new Date(fromStr + 'T00:00:00Z'));
+    qParams.push(new Date(fromStr + "T00:00:00Z"));
     fromCondition = `s.fetched_at >= $${qParams.length} AND `;
   }
   qParams.push(to);
   const toCondition = `s.fetched_at <= $${qParams.length}`;
 
-  let rosterClause = '';
+  let rosterClause = "";
   if (rosterType) {
     qParams.push(rosterType);
     rosterClause = `AND s.roster_type = $${qParams.length}`;
   }
 
-  const res = await pool.query(`
+  const res = await pool.query(
+    `
     SELECT e.event_type, e.profile_id, e.profile_name, e.rank_short, e.rank_image_url,
            e.old_value, e.new_value,
            COALESCE(TO_CHAR(e.record_date, 'YYYY-MM-DD'), '') as record_date,
@@ -147,13 +184,82 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
     WHERE ${fromCondition}${toCondition}
     ${rosterClause}
     ORDER BY s.fetched_at DESC, e.event_type, e.profile_name
-  `, qParams);
+  `,
+    qParams,
+  );
 
   const events = res.rows;
   const counts = {};
-  for (const e of events) counts[e.event_type] = (counts[e.event_type] || 0) + 1;
+  for (const e of events)
+    counts[e.event_type] = (counts[e.event_type] || 0) + 1;
 
   return { from: fromStr ?? null, to: toStr, counts, events };
 }
 
-module.exports = { initDatabase, getPool, insertSnapshot, bulkInsertEvents, latestSnapshot, purgeOldRawJson, listDiffs, eventsForDate, eventsForDateRange };
+async function writeUserTable(usernames) {
+  //Ported code from sqliteCache
+
+  console.log("Updating username cache...");
+
+  const db = getPool();
+
+  const flattenedUsers = usernames.map((u) => u.username);
+
+  try {
+    await db.query(`BEGIN TRANSACTION`);
+    await db.query(`CREATE TABLE IF NOT EXISTS search_index (username TEXT)`);
+    await db.query(`TRUNCATE TABLE search_index`);
+    await db.query(
+      "INSERT INTO search_index (username) SELECT * FROM UNNEST($1::text[])",
+      [flattenedUsers],
+    );
+    await db.query(`COMMIT`);
+    console.log(`Sucessfully updated username cache`);
+  } catch (error) {
+    if (db) {
+      db.query(`ROLLBACK`);
+    }
+    console.log(
+      `Error when attempting to update username cache: `,
+      error.message,
+    );
+  }
+}
+
+async function searchUserTable(query) {
+  const db = getPool();
+
+  // basic Postgres sanitization
+  const sanitizedSearch = query
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_");
+
+  const results = await db.query(
+    "SELECT username FROM search_index WHERE username ILIKE $1 ESCAPE '\\' LIMIT 11",
+    [`${sanitizedSearch}%`],
+  );
+
+  let usernames = results.rows.map((row) => row.username);
+
+  if (usernames.length >= 11) {
+    usernames.pop();
+    usernames.push("...");
+  }
+
+  return usernames;
+}
+
+module.exports = {
+  initDatabase,
+  getPool,
+  insertSnapshot,
+  bulkInsertEvents,
+  latestSnapshot,
+  purgeOldRawJson,
+  listDiffs,
+  eventsForDate,
+  eventsForDateRange,
+  writeUserTable,
+  searchUserTable,
+};

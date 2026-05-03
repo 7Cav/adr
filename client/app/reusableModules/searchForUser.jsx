@@ -1,4 +1,5 @@
-const BASE_URL = process.env.NEXT_PUBLIC_SQLCACHE_API_URL;
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
+const BASE_URL = process.env.NEXT_PUBLIC_USERCACHE_API_URL;
 
 export default async function searchForUser(query) {
   const url = new URL(BASE_URL);
@@ -7,10 +8,9 @@ export default async function searchForUser(query) {
   const fullIndividualApiUrl = url.toString();
 
   const response = await fetch(fullIndividualApiUrl, {
-    // TODO: Add basic auth.
-    // headers: {
-    //   Authorization: CLIENT_TOKEN,
-    // },
+    headers: {
+      Authorization: CLIENT_TOKEN,
+    },
     cache: "no-store",
   });
 
