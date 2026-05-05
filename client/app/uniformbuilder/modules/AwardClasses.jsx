@@ -188,6 +188,7 @@ export class BadgeCombat extends Badge {
   isAviation = false;
   imageNum = 0;
   maxAllowed;
+  userMos = "";
 
   constructor(awardData, userMos, AwardRegistry) {
     super(awardData, AwardRegistry);
@@ -195,16 +196,17 @@ export class BadgeCombat extends Badge {
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
 
+    this.userMos = userMos;
     if (
-      userMos == "153A" ||
-      userMos == "155A" ||
-      userMos == "15A" ||
-      userMos == "15T"
+      this.userMos == "153A" ||
+      this.userMos == "155A" ||
+      this.userMos == "15A" ||
+      this.userMos == "15T"
     ) {
       this.isAviation = true;
     }
 
-    if (userMos == "68W" || userMos == "67A") {
+    if (this.userMos == "68W" || this.userMos == "67A") {
       this.isMedical = true;
     }
 
@@ -230,9 +232,10 @@ export class BadgeCombat extends Badge {
   getImageNum(num) {
     // 1 - 5 EIB thru CIB4
     // 6 FMB
-    // 7 - 10 wings
+    // 7 - 9 aviator wings
+    // 10 - 12 aircrew wings
 
-    if (this.isAviation) {
+    if (this.isAviation && this.userMos != "15T") {
       switch (num) {
         case 6:
           return 7;
@@ -240,6 +243,17 @@ export class BadgeCombat extends Badge {
           return 8;
         case 8:
           return 9;
+      }
+    }
+
+    if (this.isAviation && this.userMos == "15T") {
+      switch (num) {
+        case 6:
+          return 10;
+        case 7:
+          return 11;
+        case 8:
+          return 12;
       }
     }
 
