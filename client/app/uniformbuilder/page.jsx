@@ -16,15 +16,41 @@ export default function Skunkworks() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submittedUserName, setSubmittedUserName] = useState(""); // Track submitted username
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [suggestions]);
 
   const handleInputChange = (event) => {
     setUserName(event.target.value);
   };
 
   const handleInputKeyDown = (event) => {
-    if (event.key === "Enter") {
+    if (suggestions.length > 0) {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setActiveIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : prev,
+        );
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
+      } else if (
+        (event.key === "Enter" || event.key === "ArrowRight") &&
+        activeIndex !== -1
+      ) {
+        event.preventDefault();
+        const selectedName = suggestions[activeIndex];
+        if (selectedName !== "...") {
+          selectUser(selectedName);
+        }
+      } else if (event.key === "Enter") {
+        setSubmittedUserName(userName);
+        setSuggestions([]);
+      }
+    } else if (event.key === "Enter") {
       setSubmittedUserName(userName);
-      setSuggestions([]);
     }
   };
 
@@ -106,9 +132,10 @@ export default function Skunkworks() {
               {suggestions.map((name, index) => (
                 <div
                   key={index}
-                  className={
+                  className={`${
                     name === "..." ? "suggestion-more" : "suggestion-item"
-                  }
+                  } ${index === activeIndex ? "active" : ""}`}
+                  style={{ animationDelay: `${index * 0.03}s` }}
                   onClick={() => name !== "..." && suggestionClicked(name)}
                 >
                   {name}

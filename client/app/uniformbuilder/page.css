@@ -69,6 +69,21 @@ a {
   text-decoration: underline;
 }
 
+.suggestion-item.active,
+.suggestion-more.active {
+  background: #2a2a2a;
+  color: #ffcc00;
+  border-left: 3px solid #ffcc00;
+  padding-left: 20px; /* Slight shift to show focus */
+  transition: all 0.1s ease;
+}
+
+/* Ensure the ... isn't treated like a clickable link if active */
+.suggestion-more.active {
+  cursor: default;
+  border-left: none; /* Keep the ellipsis centered if that's your style */
+}
+
 /* Keyframe Animations */
 @keyframes slideDown {
   from {
