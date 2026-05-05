@@ -84,31 +84,31 @@ export class RibbonDonationLogic extends Ribbon {
 
   //prettier-ignore
   calculateNewDisplayCount() {
-    if (this.ribbonTrueAttachmentCount < 6) {
+    if (this.ribbonTrueAttachmentCount < 7) {
       this.ribbonDisplayedAttachmentCount++;
     }
-    if ( this.ribbonTrueAttachmentCount >= 6 && this.ribbonTrueAttachmentCount < 10) {
+    if ( this.ribbonTrueAttachmentCount >= 7 && this.ribbonTrueAttachmentCount < 11) {
       this.ribbonDisplayedAttachmentCount = 5;
     }
-    if (this.ribbonTrueAttachmentCount >= 10 && this.ribbonTrueAttachmentCount < 15) {
+    if (this.ribbonTrueAttachmentCount >= 11 && this.ribbonTrueAttachmentCount < 16) {
       this.ribbonDisplayedAttachmentCount = 6;
     }
-    if (this.ribbonTrueAttachmentCount >= 15 && this.ribbonTrueAttachmentCount < 20) {
+    if (this.ribbonTrueAttachmentCount >= 16 && this.ribbonTrueAttachmentCount < 21) {
       this.ribbonDisplayedAttachmentCount = 7;
     }
-    if (this.ribbonTrueAttachmentCount >= 20 && this.ribbonTrueAttachmentCount < 25) {
+    if (this.ribbonTrueAttachmentCount >= 21 && this.ribbonTrueAttachmentCount < 26) {
       this.ribbonDisplayedAttachmentCount = 8;
     }
-    if (this.ribbonTrueAttachmentCount >= 25 && this.ribbonTrueAttachmentCount < 50) {
+    if (this.ribbonTrueAttachmentCount >= 26 && this.ribbonTrueAttachmentCount < 51) {
       this.ribbonDisplayedAttachmentCount = 9;
     }
-    if (this.ribbonTrueAttachmentCount >= 50 && this.ribbonTrueAttachmentCount < 75) {
+    if (this.ribbonTrueAttachmentCount >= 51 && this.ribbonTrueAttachmentCount < 76) {
       this.ribbonDisplayedAttachmentCount = 10;
     }
-    if ( this.ribbonTrueAttachmentCount >= 75 && this.ribbonTrueAttachmentCount < 100) {
+    if ( this.ribbonTrueAttachmentCount >= 76 && this.ribbonTrueAttachmentCount < 101) {
       this.ribbonDisplayedAttachmentCount = 11;
     }
-    if (this.ribbonTrueAttachmentCount >= 100) {
+    if (this.ribbonTrueAttachmentCount >= 101) {
       this.ribbonDisplayedAttachmentCount = 12;
     }
   }
