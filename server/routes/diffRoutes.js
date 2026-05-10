@@ -81,6 +81,19 @@ router.post("/admin/snapshot", (req, res) => {
   res.json({ status: "snapshot triggered" });
 });
 
+// GET /admin/runs?limit=N — recent snapshot runs (status, reason) for operator
+// visibility into rejected/bootstrap/ok ticks. Default 50, hard cap 500.
+router.get("/admin/runs", async (req, res) => {
+  const raw = parseInt(req.query.limit, 10);
+  const limit = Number.isFinite(raw) && raw > 0 ? Math.min(raw, 500) : 50;
+  try {
+    const rows = await db.recentRuns(limit);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/userSearch", async (req, res) => {
   const searchTerm = req.query.q;
 

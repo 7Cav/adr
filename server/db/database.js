@@ -23,19 +23,50 @@ function getPool() {
   return pool;
 }
 
-async function insertSnapshot(profileCount, rawJson, rosterType) {
-  const res = await pool.query(
-    "INSERT INTO snapshots (profile_count, raw_json, roster_type) VALUES ($1, $2, $3) RETURNING id",
-    [profileCount, JSON.stringify(rawJson), rosterType],
+async function withTransaction(fn) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function insertSnapshotRun(
+  client,
+  { rosterType, profileCount, status, reason = "" },
+) {
+  const res = await client.query(
+    `INSERT INTO snapshot_runs (roster_type, profile_count, status, reason)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id`,
+    [rosterType, profileCount, status, reason],
   );
   return res.rows[0].id;
 }
 
-async function bulkInsertEvents(snapshotId, events) {
+async function recentRuns(limit = 50) {
+  const res = await pool.query(
+    `SELECT id, fetched_at, roster_type, profile_count, status, reason
+     FROM snapshot_runs
+     ORDER BY id DESC
+     LIMIT $1`,
+    [limit],
+  );
+  return res.rows;
+}
+
+async function bulkInsertEvents(client, runId, events) {
   if (!events.length) return;
 
   const cols = [
-    "snapshot_id",
+    "snapshot_run_id",
     "event_type",
     "profile_id",
     "profile_name",
@@ -48,7 +79,7 @@ async function bulkInsertEvents(snapshotId, events) {
     "position_title",
   ];
   const COLS_PER_ROW = cols.length;
-  const CHUNK_SIZE = Math.floor(65000 / COLS_PER_ROW); // ~5909 rows per batch
+  const CHUNK_SIZE = Math.floor(65000 / COLS_PER_ROW);
 
   for (let offset = 0; offset < events.length; offset += CHUNK_SIZE) {
     const chunk = events.slice(offset, offset + CHUNK_SIZE);
@@ -63,7 +94,7 @@ async function bulkInsertEvents(snapshotId, events) {
         `($${idx},$${idx + 1},$${idx + 2},$${idx + 3},$${idx + 4},$${idx + 5},$${idx + 6},$${idx + 7},$${idx + 8},$${idx + 9},$${idx + 10})`,
       );
       values.push(
-        snapshotId,
+        runId,
         e.event_type,
         e.profile_id,
         e.profile_name,
@@ -75,39 +106,24 @@ async function bulkInsertEvents(snapshotId, events) {
         e.detail || "",
         e.position_title || "",
       );
-      idx += 11;
+      idx += COLS_PER_ROW;
     }
 
-    await pool.query(
+    await client.query(
       `INSERT INTO diff_events (${cols.join(",")}) VALUES ${placeholders.join(",")}`,
       values,
     );
   }
 }
 
-async function latestSnapshot(rosterType = "ROSTER_TYPE_COMBAT") {
-  const res = await pool.query(
-    "SELECT id, raw_json FROM snapshots WHERE raw_json IS NOT NULL AND roster_type = $1 ORDER BY fetched_at DESC LIMIT 1",
-    [rosterType],
-  );
-  if (!res.rows.length) return null;
-  const { id, raw_json } = res.rows[0];
-  return { id, profiles: raw_json.profiles };
-}
-
-async function purgeOldRawJson(cutoffDate) {
-  await pool.query(
-    "UPDATE snapshots SET raw_json = NULL WHERE fetched_at < $1 AND raw_json IS NOT NULL",
-    [cutoffDate],
-  );
-}
-
 async function listDiffs(limit = 600) {
+  // One row per (run, event_type) — frontend aggregates into heatmap buckets
+  // and reads only fetched_at + roster_type + counts.
   const res = await pool.query(
     `
     SELECT s.id, s.fetched_at, s.roster_type, e.event_type, COUNT(*) as cnt
-    FROM snapshots s
-    JOIN diff_events e ON e.snapshot_id = s.id
+    FROM snapshot_runs s
+    JOIN diff_events e ON e.snapshot_run_id = s.id
     GROUP BY s.id, s.fetched_at, s.roster_type, e.event_type
     ORDER BY s.fetched_at DESC
     LIMIT $1
@@ -144,18 +160,6 @@ async function eventsForDate(dateStr, rosterType = null) {
 async function eventsForDateRange(fromStr, toStr, rosterType = null) {
   const to = new Date(toStr + "T23:59:59.999Z");
 
-  const params = [to];
-  let fromClause = "";
-  if (fromStr) {
-    const from = new Date(fromStr + "T00:00:00Z");
-    params.unshift(from);
-    fromClause = "s.fetched_at >= $1 AND ";
-    // to is now $2
-    params[1] = to;
-    params.shift(); // rebuild cleanly below
-  }
-
-  // Build params cleanly
   const qParams = [];
   let fromCondition = "";
   if (fromStr) {
@@ -180,7 +184,7 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
            s.roster_type,
            TO_CHAR(s.fetched_at, 'YYYY-MM-DD') as snapshot_date
     FROM diff_events e
-    JOIN snapshots s ON s.id = e.snapshot_id
+    JOIN snapshot_runs s ON s.id = e.snapshot_run_id
     WHERE ${fromCondition}${toCondition}
     ${rosterClause}
     ORDER BY s.fetched_at DESC, e.event_type, e.profile_name
@@ -197,8 +201,6 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
 }
 
 async function writeUserTable(usernames) {
-  //Ported code from sqliteCache
-
   console.log("Updating username cache...");
 
   const db = getPool();
@@ -253,10 +255,10 @@ async function searchUserTable(query) {
 module.exports = {
   initDatabase,
   getPool,
-  insertSnapshot,
+  withTransaction,
+  insertSnapshotRun,
+  recentRuns,
   bulkInsertEvents,
-  latestSnapshot,
-  purgeOldRawJson,
   listDiffs,
   eventsForDate,
   eventsForDateRange,

@@ -192,8 +192,7 @@ function correlateTransfers(allEvents) {
       old_value:      fromLabel,
       new_value:      toLabel,
       detail:         `Transferred from ${fromLabel} to ${toLabel}`,
-      roster_type:    d.roster_type, // source roster
-      _snapshotId:    d._snapshotId,
+      roster_type:    d.roster_type, // source roster — caller groups by this for persistence
     });
   }
 

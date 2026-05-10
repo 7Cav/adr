@@ -45,3 +45,8 @@ server/credentials/token.js
 /sqliteCache/node_modules
 compose.yml
 
+# Claude Code
+CLAUDE.md
+.claude/
+
+_local/
