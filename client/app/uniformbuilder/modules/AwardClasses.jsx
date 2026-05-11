@@ -246,7 +246,7 @@ export class BadgeCombat extends Badge {
       }
     }
 
-    if (this.isAviation && this.userMos == "15T") {
+    if (this.isAviation && (this.userMos == "15T" || this.userMos == "155F")) {
       switch (num) {
         case 6:
           return 10;
