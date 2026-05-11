@@ -182,6 +182,7 @@ function setNeckPins(mos) {
     case "19A":
       return "ArmorOfficer";
     case "19K":
+    case "19C":
     case "19D":
       return "ArmorNCO";
     case "27A":
@@ -219,7 +220,7 @@ function setNeckPins(mos) {
 
 function checkMos(mos, rankGrade) {
   const officerRegex =
-    /\b(?!(?:00Z|11C|42A|49A|14B|12B|35B|31B|11B|57B|26B|13B))[0-9]+[A,B,Z,Q,C,N]/gim;
+    /\b(?!(?:00Z|11C|42A|49A|14B|12B|35B|31B|11B|57B|26B|13B|19C))[0-9]+[A,B,Z,Q,C,N]/gim;
 
   if (rankGrade.includes("W") || rankGrade.includes("O")) {
     if (mos.match(officerRegex) == null && mos) {
