@@ -48,5 +48,6 @@ compose.yml
 # Claude Code
 CLAUDE.md
 .claude/
+docs/superpowers/
 
 _local/
