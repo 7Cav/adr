@@ -6,9 +6,6 @@ const cors = require("cors");
 const port = 4000;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 const { cacheTime, initializeCache } = require("./controllers/cacheManager");
-const { initDatabase } = require("./db/database");
-const diffRoutes = require("./routes/diffRoutes");
-const { startPoller } = require("./controllers/diffPoller");
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -69,7 +66,6 @@ app.use(
 );
 // Apply token checking middleware only to these routes
 app.use("/roster", checkToken, middleware);
-app.use(diffRoutes);
 app.get("/", (req, res) => {
   res.send(
     "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/",
@@ -86,9 +82,6 @@ const startServer = async () => {
     console.log("Initializing cache...");
     await initializeCache(); // Ensure cache initialization completes before proceeding
     console.log("Cache initialized successfully.");
-
-    await initDatabase();
-    startPoller(process.env.DIFF_POLL_SCHEDULE || "*/15 * * * *");
 
     app.listen(port, () => {
       console.log(`Roster Server listening on ${port}`);
