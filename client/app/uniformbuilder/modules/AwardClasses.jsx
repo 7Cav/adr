@@ -266,7 +266,7 @@ export class BadgeCombat extends Badge {
 
   updateBadgeCombat(newAwardData, AwardRegistry) {
     const registryDetails = AwardRegistry.getAwardDetails(
-      newAwardData.awardName,
+      newAwardData.awardName
     );
     const newAwardPriority = registryDetails.awardPriority;
 

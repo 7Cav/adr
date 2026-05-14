@@ -16,7 +16,7 @@ export default async function GetIndividual(userName) {
   if (response.status != 200) {
     if (response.status == 404) {
       throw new Error(
-        `User Not Found. All requests must follow the specified format (Lastname.F)`,
+        `User Not Found. All requests must follow the specified format (Lastname.F)`
       );
     }
   }
