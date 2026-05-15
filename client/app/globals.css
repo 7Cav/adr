@@ -4,6 +4,32 @@
 
 /* heeeeyy this supports tailwind! */
 
+@layer base {
+  :root {
+    /* ADR dark theme mapped to shadcn CSS variables */
+    --background: 0 0% 7%; /* #111111 */
+    --foreground: 0 0% 95%; /* #f1f1f1 */
+    --card: 0 0% 10%; /* #1a1a1a */
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 48 83% 54%; /* #ebc729 gold */
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 75%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 63%; /* #a1a1a1 */
+    --accent: 0 0% 16%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 20%; /* #333 */
+    --input: 0 0% 20%;
+    --ring: 48 83% 54%; /* gold focus ring */
+    --radius: 0.5rem;
+  }
+}
+
 :root {
   background-color: #111111;
   margin: 0;

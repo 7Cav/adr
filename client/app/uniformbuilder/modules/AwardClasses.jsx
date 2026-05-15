@@ -67,6 +67,7 @@ export class MedalWithValor extends Medal {
     this.awardTitle = baseAwardName;
     this.hasValorDevice = true;
     this.ribbonAttachmentType = "oakClustersValor";
+    this.maxAwardcount = 14;
   }
 }
 
@@ -83,31 +84,31 @@ export class RibbonDonationLogic extends Ribbon {
 
   //prettier-ignore
   calculateNewDisplayCount() {
-    if (this.ribbonTrueAttachmentCount < 6) {
+    if (this.ribbonTrueAttachmentCount < 7) {
       this.ribbonDisplayedAttachmentCount++;
     }
-    if ( this.ribbonTrueAttachmentCount >= 6 && this.ribbonTrueAttachmentCount < 10) {
+    if ( this.ribbonTrueAttachmentCount >= 7 && this.ribbonTrueAttachmentCount < 11) {
       this.ribbonDisplayedAttachmentCount = 5;
     }
-    if (this.ribbonTrueAttachmentCount >= 10 && this.ribbonTrueAttachmentCount < 15) {
+    if (this.ribbonTrueAttachmentCount >= 11 && this.ribbonTrueAttachmentCount < 16) {
       this.ribbonDisplayedAttachmentCount = 6;
     }
-    if (this.ribbonTrueAttachmentCount >= 15 && this.ribbonTrueAttachmentCount < 20) {
+    if (this.ribbonTrueAttachmentCount >= 16 && this.ribbonTrueAttachmentCount < 21) {
       this.ribbonDisplayedAttachmentCount = 7;
     }
-    if (this.ribbonTrueAttachmentCount >= 20 && this.ribbonTrueAttachmentCount < 25) {
+    if (this.ribbonTrueAttachmentCount >= 21 && this.ribbonTrueAttachmentCount < 26) {
       this.ribbonDisplayedAttachmentCount = 8;
     }
-    if (this.ribbonTrueAttachmentCount >= 25 && this.ribbonTrueAttachmentCount < 50) {
+    if (this.ribbonTrueAttachmentCount >= 26 && this.ribbonTrueAttachmentCount < 51) {
       this.ribbonDisplayedAttachmentCount = 9;
     }
-    if (this.ribbonTrueAttachmentCount >= 50 && this.ribbonTrueAttachmentCount < 75) {
+    if (this.ribbonTrueAttachmentCount >= 51 && this.ribbonTrueAttachmentCount < 76) {
       this.ribbonDisplayedAttachmentCount = 10;
     }
-    if ( this.ribbonTrueAttachmentCount >= 75 && this.ribbonTrueAttachmentCount < 100) {
+    if ( this.ribbonTrueAttachmentCount >= 76 && this.ribbonTrueAttachmentCount < 101) {
       this.ribbonDisplayedAttachmentCount = 11;
     }
-    if (this.ribbonTrueAttachmentCount >= 100) {
+    if (this.ribbonTrueAttachmentCount >= 101) {
       this.ribbonDisplayedAttachmentCount = 12;
     }
   }
@@ -187,6 +188,7 @@ export class BadgeCombat extends Badge {
   isAviation = false;
   imageNum = 0;
   maxAllowed;
+  userMos = "";
 
   constructor(awardData, userMos, AwardRegistry) {
     super(awardData, AwardRegistry);
@@ -194,16 +196,17 @@ export class BadgeCombat extends Badge {
     const registryDetails = AwardRegistry.getAwardDetails(awardData.awardName);
     this.awardPriority = registryDetails.awardPriority;
 
+    this.userMos = userMos;
     if (
-      userMos == "153A" ||
-      userMos == "155A" ||
-      userMos == "15A" ||
-      userMos == "15T"
+      this.userMos == "153A" ||
+      this.userMos == "155A" ||
+      this.userMos == "15A" ||
+      this.userMos == "15T"
     ) {
       this.isAviation = true;
     }
 
-    if (userMos == "68W" || userMos == "67A") {
+    if (this.userMos == "68W" || this.userMos == "67A") {
       this.isMedical = true;
     }
 
@@ -229,9 +232,10 @@ export class BadgeCombat extends Badge {
   getImageNum(num) {
     // 1 - 5 EIB thru CIB4
     // 6 FMB
-    // 7 - 10 wings
+    // 7 - 9 aviator wings
+    // 10 - 12 aircrew wings
 
-    if (this.isAviation) {
+    if (this.isAviation && this.userMos != "15T") {
       switch (num) {
         case 6:
           return 7;
@@ -239,6 +243,17 @@ export class BadgeCombat extends Badge {
           return 8;
         case 8:
           return 9;
+      }
+    }
+
+    if (this.isAviation && (this.userMos == "15T" || this.userMos == "155F")) {
+      switch (num) {
+        case 6:
+          return 10;
+        case 7:
+          return 11;
+        case 8:
+          return 12;
       }
     }
 

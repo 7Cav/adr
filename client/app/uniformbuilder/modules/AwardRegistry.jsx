@@ -41,7 +41,7 @@ export class AwardRegistry {
     this.awards.set("Donation Ribbon", {awardPriority: 29, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // Requires Special Case
     this.awards.set("7th Cavalry Server Upgrade Award", {awardPriority: 30, medalPriority: 29, awardAttachmentType: "stars", awardType: "MedalTiered"}); // Fuck you, whoever put this into SOP
     this.awards.set("StackUp Donation Medal", {awardPriority: 31, medalPriority: 30, awardAttachmentType: "gcNotches", awardType: "MedalTiered"}); // and again
-    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, medalPriority: 31, awardAttachmentType: "oakClusters", awardType: "Medal"});
+    this.awards.set("Outstanding Volunteer Service Medal", {awardPriority: 32, medalPriority: 31, awardAttachmentType: "stars", awardType: "Medal"});
     this.awards.set("NCO Professional Development Ribbon", {awardPriority: 33, awardAttachmentType: "ncoNums", awardType: "Ribbon"});
     this.awards.set("Honor Graduate Ribbon", {awardPriority: 34, awardType: "Ribbon"});
     this.awards.set("Army Service Ribbon", {awardPriority: 35, awardType: "Ribbon"});
@@ -54,20 +54,21 @@ export class AwardRegistry {
     this.awards.set("WWII Service Ribbon", {awardPriority: 42, medalPriority: 38, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, medalPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, medalPriority: 40, awardAttachmentType: "oakClustersService", awardType: "Medal"});
-    this.awards.set("Recruiting Ribbon", {awardPriority: 45, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
-    this.awards.set("D-Day Commemorative Medal", {awardPriority: 46, medalPriority: 41, awardType: "Medal"});
-    this.awards.set("Ranger Selection Ribbon", {awardPriority: 47, awardType: "Ribbon"});
-    this.awards.set("Sniper Ribbon", {awardPriority: 48, medalPriority: 42, awardType: "Medal"});
-    this.awards.set("Basic Assault Course Ribbon", {awardPriority: 49, awardType: "Ribbon"});
+    this.awards.set("Battlefield 6 Service Ribbon", {awardPriority: 45, medalPriority: 41, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Recruiting Ribbon", {awardPriority: 46, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
+    this.awards.set("D-Day Commemorative Medal", {awardPriority: 47, medalPriority: 42, awardType: "Medal"});
+    this.awards.set("Ranger Selection Ribbon", {awardPriority: 48, awardType: "Ribbon"});
+    this.awards.set("Sniper Ribbon", {awardPriority: 49, medalPriority: 43, awardType: "Medal"});
+    this.awards.set("Basic Assault Course Ribbon", {awardPriority: 50, awardType: "Ribbon"});
 
     // ___ DISCONTINUED RIBBONS/MEDALS WITHOUT PRECIDENCE ___
     // These ones are a bit of an unknown precidence wise. Indeed we have some discon awards above, however precidence is known
     // Anything here is shown as is, and there is no inherent precicence for these. 
 
-    this.awards.set("Cadre Course Ribbon", {awardPriority: 50, awardType: "Ribbon"});
-    this.awards.set("Womens Army Corp Service Medal", {awardPriority: 51, medalPriority:43, awardType: "Medal"})
-    this.awards.set("D Day Participation Ribbon", {awardPriority: 52, awardType: "Ribbon"})
-    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 53, medalPriority:44, awardAttachmentType: "oakClusters", awardType: "Medal"})
+    this.awards.set("Cadre Course Ribbon", {awardPriority: 51, awardType: "Ribbon"});
+    this.awards.set("Womens Army Corp Service Medal", {awardPriority: 52, medalPriority:44, awardType: "Medal"})
+    this.awards.set("D Day Participation Ribbon", {awardPriority: 53, awardType: "Ribbon"})
+    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 54, medalPriority:45, awardAttachmentType: "oakClusters", awardType: "Medal"})
     
 
     //____ UNIT CITATIONS ____
@@ -85,6 +86,9 @@ export class AwardRegistry {
     this.awards.set("Master Army Aviator Badge", {awardPriority: 8, awardType: "BadgeCombat"}); // (A/1-7) (A/ACD)
     this.awards.set("Senior Army Aviator Badge", {awardPriority: 7, awardType: "BadgeCombat"})
     this.awards.set("Army Aviator Badge", {awardPriority: 6, awardType: "BadgeCombat"})
+    this.awards.set("Aircraft Master Crewman Badge", {awardPriority: 8, awardType: "BadgeCombat"}); // (A/1-7) (A/ACD)
+    this.awards.set("Aircraft Senior Crewman Badge", {awardPriority: 7, awardType: "BadgeCombat"})
+    this.awards.set("Aircraft Crewman Badge", {awardPriority: 6, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 4th Award", {awardPriority: 5, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 2nd Award", {awardPriority: 3, awardType: "BadgeCombat"})
     this.awards.set("Combat Infantry Badge 3rd Award", {awardPriority: 4, awardType: "BadgeCombat"})

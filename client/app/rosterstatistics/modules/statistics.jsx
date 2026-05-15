@@ -22,6 +22,7 @@ class Statistics extends Component {
 
     for (let milpacIdCombat in milpacArray[0].combat.profiles) {
       var primary = milpacArray[0].combat.profiles[milpacIdCombat].primary;
+      if (!primary) continue;
 
       for (let billetIdArray in billetIDs) {
         if (billetIDs[billetIdArray].includes(primary.positionId)) {

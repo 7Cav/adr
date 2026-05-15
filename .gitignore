@@ -42,3 +42,12 @@ server/credentials/token.js
 .env
 
 /.idea/
+/sqliteCache/node_modules
+compose.yml
+
+# Claude Code
+CLAUDE.md
+.claude/
+docs/superpowers/
+
+_local/

@@ -10,7 +10,9 @@ const { cacheTime, initializeCache } = require("./controllers/cacheManager");
 const corsOptions = {
   origin: function (origin, callback) {
     const allowlist = [
+      "http://localhost",
       "http://localhost:3000",
+      "http://localhost/",
       "http://apps.7cav.us",
       "https://apps.7cav.us",
       "https://apps.7cav.us/",
@@ -28,13 +30,34 @@ const corsOptions = {
 
 // Token Checking Middleware
 const checkToken = (req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
   const authToken = req.headers["authorization"];
   if (authToken === CLIENT_TOKEN) {
-    next(); // proceed to the next middleware or route handler
+    next();
   } else {
     res.status(403).send("Forbidden");
   }
 };
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(
+      `${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${
+        res.statusCode
+      } | ${duration}ms | origin=${req.headers["origin"] || "-"}`
+    );
+  });
+  next();
+});
 
 app.use(compression());
 
