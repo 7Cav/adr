@@ -36,23 +36,23 @@ function Canvas(props) {
       loadImage("/skunkworks/uniformBase/uniformBase.png", "uniformBase"),
       loadImage(
         "/skunkworks/uniformBase/uniformRightLapel.png",
-        "uniformLapel"
+        "uniformLapel",
       ),
       loadImage(
         `skunkworks/uniformEpaulettes/${data[0].rankGrade}.png`,
-        "uniformEpaulette"
+        "uniformEpaulette",
       ),
       loadImage(
         "skunkworks/uniformRibbons/ribbons/ribbonSpriteSheet.png",
-        "ribbonSprites"
+        "ribbonSprites",
       ),
       loadImage(
         "skunkworks/uniformRibbons/ribbons/unitCitationSprite.png",
-        "citationSprites"
+        "citationSprites",
       ),
       loadImage(
         "skunkworks/uniformMedals/medalSpriteSheet.png",
-        "medalSprites"
+        "medalSprites",
       ),
       loadImage("skunkworks/uniformTabs/tabSpriteSheet.png", "tabSprites"),
     ];
@@ -61,8 +61,8 @@ function Canvas(props) {
       imagePromises.push(
         loadImage(
           `skunkworks/uniformBadges/combatBadges/${data[4].imageNum}.png`,
-          "uniformCombatBadge"
-        )
+          "uniformCombatBadge",
+        ),
       );
     }
 
@@ -105,7 +105,7 @@ function Canvas(props) {
           desiredX,
           desiredY,
           ribbonWidth,
-          ribbonHeight
+          ribbonHeight,
         );
       };
 
@@ -128,7 +128,7 @@ function Canvas(props) {
             desiredX,
             desiredY,
             ribbonWidth,
-            ribbonHeight
+            ribbonHeight,
           );
           resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
         };
@@ -164,7 +164,7 @@ function Canvas(props) {
           desiredX,
           desiredY,
           ribbonWidth,
-          ribbonHeight
+          ribbonHeight,
         );
       };
 
@@ -184,7 +184,7 @@ function Canvas(props) {
             desiredX,
             desiredY,
             ribbonWidth,
-            ribbonHeight
+            ribbonHeight,
           );
           resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
         };
@@ -237,7 +237,7 @@ function Canvas(props) {
           xCoord,
           yCoord,
           ribbonWidth,
-          ribbonHeight
+          ribbonHeight,
         );
       };
 
@@ -260,7 +260,7 @@ function Canvas(props) {
             xCoord + 13,
             yCoord + 7,
             ribbonWidth,
-            ribbonHeight
+            ribbonHeight,
           );
           resolve(); // Resolve AFTER drawing BOTH ribbon and attachment
         };
@@ -286,7 +286,7 @@ function Canvas(props) {
       };
       img.onerror = () => {
         console.error(
-          `Error loading special award image: skunkworks/uniformSpecialMedals/${data.awardPriority}.png`
+          `Error loading special award image: skunkworks/uniformSpecialMedals/${data.awardPriority}.png`,
         );
         resolve(); // Resolve even on error
       };
@@ -326,7 +326,7 @@ function Canvas(props) {
             userData.yearsInServiceCoordArray[i].dx,
             userData.yearsInServiceCoordArray[i].dy,
             stripeWidth,
-            stripeHeight
+            stripeHeight,
           );
         }
         resolve();
@@ -334,7 +334,7 @@ function Canvas(props) {
 
       img.onerror = () => {
         console.error(
-          `Error loading service stripe image: skunkworks/uniformService/${userData.yearsInServiceCoordArray[0]}/serviceStripe.png`
+          `Error loading service stripe image: skunkworks/uniformService/${userData.yearsInServiceCoordArray[0]}/serviceStripe.png`,
         );
         resolve(); // Resolve even on error
       };
@@ -374,7 +374,7 @@ function Canvas(props) {
           dx,
           dy,
           tagWidth,
-          tagHeight
+          tagHeight,
         );
         if (userData.nameTag.length > 10) {
           fontSize = 18 - (userData.nameTag.length - 10) * 2;
@@ -390,7 +390,7 @@ function Canvas(props) {
 
       img.onerror = () => {
         console.error(
-          `Error loading name tag: skunkworks/uniformNameTag/${selector}.png`
+          `Error loading name tag: skunkworks/uniformNameTag/${selector}.png`,
         );
         resolve(); // Resolve even on error
       };
@@ -419,7 +419,7 @@ function Canvas(props) {
           dx,
           rootY,
           rootWidth,
-          rootHeight
+          rootHeight,
         );
 
         const initialPlateY = rootY + rootHeight - 10;
@@ -440,13 +440,13 @@ function Canvas(props) {
                 dx,
                 currentPlateY,
                 plateWidth,
-                plateHeight
+                plateHeight,
               );
               resolvePlate(); // Resolve the plate promise when the image is loaded and drawn
             };
             img2.onerror = () => {
               console.error(
-                `Error loading weapon qual plate: skunkworks/uniformWeaponQuals/plates/${data[i]}.png`
+                `Error loading weapon qual plate: skunkworks/uniformWeaponQuals/plates/${data[i]}.png`,
               );
               resolvePlate();
             };
@@ -462,7 +462,7 @@ function Canvas(props) {
 
       img.onerror = () => {
         console.error(
-          `Error loading weapon qual root: skunkworks/uniformWeaponQuals/root/${selector}.png`
+          `Error loading weapon qual root: skunkworks/uniformWeaponQuals/root/${selector}.png`,
         );
         resolve();
       };
@@ -489,7 +489,7 @@ function Canvas(props) {
           desiredX,
           desiredY,
           tabWidth,
-          tabHeight
+          tabHeight,
         );
       };
 
@@ -541,8 +541,8 @@ function Canvas(props) {
                 ribbonData,
                 images.ribbonSprites,
                 data[0].ribbonCoordArray[index],
-                context
-              )
+                context,
+              ),
             ),
           ...data[2]
             .slice(0, data[0].unitCitationCount)
@@ -551,14 +551,14 @@ function Canvas(props) {
                 ribbonData,
                 images.citationSprites,
                 data[0].unitCitationCoordArray[index],
-                context
-              )
+                context,
+              ),
             ),
           placeInfantryBadge(
             // Include the infantry badge promise here
             images.uniformCombatBadge,
             data[0].combatBadgeCoords,
-            context
+            context,
           ),
         ]);
 
@@ -578,7 +578,7 @@ function Canvas(props) {
         try {
           if (data[0].nameTag.length > 15)
             throw new Error(
-              "Name Tag exceeds allowable length. You must add the name tag manually in the .xcf file."
+              "Name Tag exceeds allowable length. You must add the name tag manually in the .xcf file.",
             );
           await Promise.all([placeNameTag(data[0], context)]);
         } catch (err) {
@@ -625,7 +625,7 @@ function Canvas(props) {
 
             if (checksum != uniqueEntries.size) {
               throw new Error(
-                "Weapon Qual Checksum Failed. This is due to a double entry in the Milpac and cannot be fixed by you. Inform your lead if you see this error."
+                "Weapon Qual Checksum Failed. This is due to a double entry in the Milpac and cannot be fixed by you. Inform your lead if you see this error.",
               );
             }
 
@@ -648,8 +648,8 @@ function Canvas(props) {
                   activeQuals.data,
                   xPositions[index],
                   activeQuals.type,
-                  context
-                )
+                  context,
+                ),
               ),
             ]);
           }
@@ -666,8 +666,8 @@ function Canvas(props) {
                 tabData,
                 images.tabSprites,
                 data[0].tabCoordArray[index],
-                context
-              )
+                context,
+              ),
             ),
           ]);
         }
@@ -685,7 +685,7 @@ function Canvas(props) {
             await Promise.all([
               placeCordPins(
                 `skunkworks/uniformCords/${data[0].shoulderCord}.png`,
-                context
+                context,
               ),
             ]);
           }
@@ -696,7 +696,7 @@ function Canvas(props) {
             await Promise.all([
               placeCordPins(
                 `skunkworks/uniformLapelPins/${data[0].neckPins}.png`,
-                context
+                context,
               ),
             ]);
           }
@@ -749,7 +749,7 @@ function Canvas(props) {
           }
 
           let _offsetX = Math.floor(
-            offsetX + 4 + x * (medalWidth + medalSpacing)
+            offsetX + 4 + x * (medalWidth + medalSpacing),
           );
           let _offsetY = offsetY + y * rowSpacing;
 
@@ -800,7 +800,7 @@ function Canvas(props) {
         // Draw medals in reverse row order (row 3, then 2, then 1)
         await Promise.all([
           ...specialMedals.map((medalData) =>
-            drawSpecialMedal(medalData, context)
+            drawSpecialMedal(medalData, context),
           ),
         ]);
         await Promise.all([
@@ -810,8 +810,8 @@ function Canvas(props) {
               images.medalSprites,
               context,
               medalCoordsRow3[index].x,
-              medalCoordsRow3[index].y
-            )
+              medalCoordsRow3[index].y,
+            ),
           ),
         ]);
         await Promise.all([
@@ -821,8 +821,8 @@ function Canvas(props) {
               images.medalSprites,
               context,
               medalCoordsRow2[index].x,
-              medalCoordsRow2[index].y
-            )
+              medalCoordsRow2[index].y,
+            ),
           ),
         ]);
 
@@ -833,8 +833,8 @@ function Canvas(props) {
               images.medalSprites,
               context,
               medalCoordsRow1[index].x,
-              medalCoordsRow1[index].y
-            )
+              medalCoordsRow1[index].y,
+            ),
           ),
         ]);
 

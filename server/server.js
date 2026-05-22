@@ -53,7 +53,7 @@ app.use((req, res, next) => {
     console.log(
       `${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${
         res.statusCode
-      } | ${duration}ms | origin=${req.headers["origin"] || "-"}`
+      } | ${duration}ms | origin=${req.headers["origin"] || "-"}`,
     );
   });
   next();
@@ -64,13 +64,13 @@ app.use(compression());
 app.use(
   cors({
     origin: corsOptions.origin,
-  })
+  }),
 );
 // Apply token checking middleware only to these routes
 app.use("/roster", checkToken, middleware);
 app.get("/", (req, res) => {
   res.send(
-    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/"
+    "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/",
   );
 });
 

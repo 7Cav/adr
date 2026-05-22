@@ -72,7 +72,7 @@ const updateCachedIndividual = async (userName) => {
           Authorization: "Bearer " + API_TOKEN,
           "Accept-Encoding": "gzip",
         },
-      }
+      },
     );
     cachedIndividual = response.data;
     cacheTime["individual"] = Date.now();
@@ -96,7 +96,7 @@ const updateCachedGroups = async () => {
           Authorization: "Bearer " + API_TOKEN,
           "Accept-Encoding": "gzip",
         },
-      }
+      },
     );
     cachedGroups = response.data;
     cacheTime["individual"] = Date.now();

@@ -73,7 +73,7 @@ export default async function GetCanvasObject(userName) {
         existingAward = awardMap.get(key);
       }
 
-      if (!existingAward instanceof Ribbon) {
+      if ((!existingAward) instanceof Ribbon) {
         continue;
       }
 
@@ -119,7 +119,7 @@ export default async function GetCanvasObject(userName) {
           case "RibbonDonationLogic":
             const newRibbonDonation = new RibbonDonationLogic(
               data.awards[i],
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set(key, newRibbonDonation);
             totalRibbonCount++;
@@ -132,7 +132,7 @@ export default async function GetCanvasObject(userName) {
           case "MedalTiered":
             const newTiered = new MedalTiered(
               data.awards[i],
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set(key, newTiered);
             totalRibbonCount++;
@@ -140,7 +140,7 @@ export default async function GetCanvasObject(userName) {
           case "MedalWithValor":
             const newMedalWithValor = new MedalWithValor(
               data.awards[i],
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set(key, newMedalWithValor);
             totalRibbonCount++;
@@ -148,7 +148,7 @@ export default async function GetCanvasObject(userName) {
           case "UnitCitation":
             const newUnitCitation = new UnitCitation(
               data.awards[i],
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set(key, newUnitCitation);
             totalUnitCitationCount++;
@@ -157,14 +157,14 @@ export default async function GetCanvasObject(userName) {
             const newBadgeCombat = new BadgeCombat(
               data.awards[i],
               data.mos,
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set("BadgeCombat", newBadgeCombat);
             break;
           case "WeaponQual":
             const newWeaponQual = new WeaponQual(
               data.awards[i],
-              AwardRegistryInstance
+              AwardRegistryInstance,
             );
             awardMap.set("WeaponQual", newWeaponQual);
             break;
@@ -187,7 +187,7 @@ export default async function GetCanvasObject(userName) {
     totalRibbonCount,
     totalUnitCitationCount,
     yearsInService,
-    tabCount
+    tabCount,
   );
 
   const arr = [];
