@@ -16,6 +16,6 @@
     "axios-retry": "^4.5.0",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
-    "express": "^4.17.2"
+    "express": "^5.2.1"
   }
 }
