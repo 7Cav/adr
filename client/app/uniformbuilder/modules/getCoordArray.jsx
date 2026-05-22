@@ -26,7 +26,7 @@ export default function GetCoordArray(numAwards) {
 
   if (numAwards >= 35)
     throw new Error(
-      "FATAL ERROR! The number of ribbons of this user exceeds the max allowable limit. This is a priority error. Inform your lead, S1 1IC and 2IC with the name of the affected user."
+      "FATAL ERROR! The number of ribbons of this user exceeds the max allowable limit. This is a priority error. Inform your lead, S1 1IC and 2IC with the name of the affected user.",
     );
 
   /* included for use later
