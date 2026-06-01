@@ -1,0 +1,10 @@
+# Local dev override. Use with:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Base compose expects an external `edge` network (created by the prod reverse
+# proxy). Locally that network doesn't exist, so this override redefines `edge`
+# as a compose-managed bridge — no `docker network create edge` needed.
+networks:
+  edge:
+    external: false
+    driver: bridge

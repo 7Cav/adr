@@ -13,9 +13,10 @@ The live deployment can be found at https://apps.7cav.us/ and the backend at htt
 ## Table of Contents
 
 - [Running Locally](#running-locally)
+    - [Quick Start with Docker (recommended)](#quick-start-with-docker-recommended)
     - [Requirements](#requirements)
         - [Authorization](#authorization)
-    - [Getting Started](#getting-started)
+    - [Manual Setup (without Docker)](#manual-setup-without-docker)
 - [Updating the ADR](#updating-the-adr)
     - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
     - [Add New Category](#add-new-category)
@@ -26,57 +27,109 @@ The live deployment can be found at https://apps.7cav.us/ and the backend at htt
 
 ## Running Locally
 
-### Requirements
+CavApps is a monorepo with two parts:
 
-In order to run the ADR locally for development, you need the following:
+- **`server/`** — an Express caching proxy ("BFF") that fetches roster data from the 7th Cavalry API and serves it from memory.
+- **`client/`** — a Next.js 13 (App Router) app with three tools: the Active Duty Roster (ADR), Roster Statistics, and the Uniform Builder.
 
-- A valid [7th Cavalry Gaming](https://7cav.us/) account with member-level privileges (i.e. not a public account).
-- [Node.js](https://nodejs.org/en) v16.14+
-- Your choice of IDE such as [VSCode](https://code.visualstudio.com/) or [neoVim](https://neovim.io/).
+The client never talks to the 7th Cavalry API directly — it only talks to the server.
 
-#### Authorization
+### Authorization
 
-Before you get started on CavApps, the dependancies need to be installed on your end.
+You need two tokens:
 
-- Open a terminal/cmd prompt, navigate to the CavApps project folder and execute the command `npm install`.
+| Token | Purpose | Where it goes |
+|-------|---------|---------------|
+| `API_TOKEN` | Authenticates the **server** to `api.7cav.us`. A real 7th Cavalry API bearer. | server env |
+| `CLIENT_TOKEN` | Shared secret between the **client and server**. Can be any string you choose — it just has to match on both sides. | server env + client env |
 
-Next, you require two methods of authentication. You require both an API token from 7th Cavalry Gaming and a local clientside token.
+To get your `API_TOKEN`:
 
-To get and apply your API token do the following steps:
+1. Log into your [7th Cavalry Gaming](https://7cav.us/) account (member-level, not a public account).
+2. Open your [Connected Accounts](https://7cav.us/account/connected-accounts/) and click "view account" for `auth.7cav.us`.
+3. Log into Keycloak and copy the provided API token.
 
-1. Log into your 7th Cavalry Gaming account.
-2. Navigate to your [Connected Accounts](https://7cav.us/account/connected-accounts/) and select the "view account" button for auth.7cav.us
-3. Once you have logged into keycloak, copy the provided API token into your clipboard.
-4. Open the CavApps project folder and navigate to `cavapps/server/credentials`. Inside should be a file named `example_token.js`.
-5. Make a duplicate `example_token.js` and rename it to `token.js`.
-6. Inside the new `token.js` file, paste your API token in the `API_TOKEN` constant and save the file.
+> **Heads up on `.env` formatting:** use `KEY=value` with **no spaces around the `=`** and no surrounding quotes. A line like `API_TOKEN ='abc'` (note the space) makes the variable name `API_TOKEN ` (with a trailing space), so Docker Compose treats `API_TOKEN` as unset and the server fails to start with a `401 Unauthorized`.
 
-To make a clientside token, do the following:
+### Quick Start with Docker (recommended)
 
-1. Open the root CavApps project folder.
-2. Inside the root folder create a nameless `.env` file. When opened, the directory should be `cavapps/.env`
-3. Paste the following code into the `.env` file.
+This is the fastest way to get a working dev environment — it builds and runs both the server and client for you, with hot-reload on the client.
 
-```dotenv
-REACT_APP_CLIENT_TOKEN ='XXXXXX'
-REACT_APP_COMBAT_API_URL=http://localhost:4000/roster/combat
-REACT_APP_RESERVE_API_URL=http://localhost:4000/roster/reserves
-REACT_APP_CACHE_TIMESTAMP_URL=http://localhost:4000/cache-timestamp
+1. Install [Docker](https://docs.docker.com/get-docker/) (Docker Desktop on macOS/Windows).
+2. In the project root, create a `.env` file:
+
+   ```dotenv
+   API_TOKEN=your-7cav-api-token-here
+   CLIENT_TOKEN=any-shared-secret-you-choose
+   ```
+
+3. Bring the stack up:
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+   ```
+
+That's it. The override file (`docker-compose.dev.yml`) provisions the `edge` network locally, so **no manual `docker network create` is needed**. When it finishes:
+
+- Client (CavApps index): http://localhost:3000
+- Server (BFF): http://localhost:4000
+
+The server must successfully load roster data on startup or it will exit and restart — if it keeps restarting, double-check your `API_TOKEN` (see the formatting note above).
+
+Stop the stack with `Ctrl+C`, or from another terminal:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 ```
 
-4. Replace the `REACT_APP_CLIENT_TOKEN` constant with a password of your choice and save.
-5. Navigate to `cavapps/server/credentials/token.js` and ensure the `CLIENT_TOKEN` constant matches the same constant in the previous `.env` file and save.
+> `docker-compose.yml` on its own is the **production** config and expects an externally managed `edge` network. For local dev always include the `-f docker-compose.dev.yml` override.
 
-### Getting Started
+### Requirements
 
-You should now be ready to run the Server and the Client.
+If you'd rather run the apps directly on your machine instead of in Docker:
 
-- Open two terminals. On the first terminal navigate to `cavapps/server` and enter the command `node server.js`. You should see that the server is listening on localhost:4000 and can be additionally verified by visiting localhost:4000 on your browser.
-- On the second terminal, navigate to `cavapps/client/app` and run the command `npm run dev`. Once the clientside is running, open your browser and go to http://localhost:3000 . You should see the CavApps index page on your screen.
+- A valid [7th Cavalry Gaming](https://7cav.us/) account with member-level privileges.
+- [Node.js](https://nodejs.org/en) v18+.
+- Your choice of IDE such as [VSCode](https://code.visualstudio.com/) or [neoVim](https://neovim.io/).
 
-You are now good to go! `cavapps/client/app` is the root folder in which CavApps is operated. Closing the terminals will close the servers. Happy Coding!
+### Manual Setup (without Docker)
 
-For further documentation on NextJS apps, visit https://nextjs.org/docs
+You'll run the server and client in two separate terminals.
+
+**1. Server** (`server/`):
+
+```bash
+cd server
+npm install
+API_TOKEN=your-7cav-api-token CLIENT_TOKEN=any-shared-secret node server.js
+```
+
+The server listens on `http://localhost:4000`. Visiting it in a browser confirms it's up. (It reads `API_TOKEN` and `CLIENT_TOKEN` from the environment — export them in your shell or use a tool like [`dotenv`](https://www.npmjs.com/package/dotenv) / a `.env` loader of your choice.)
+
+**2. Client** (`client/`):
+
+Create `client/.env.local` with:
+
+```dotenv
+NEXT_PUBLIC_CLIENT_TOKEN=any-shared-secret-you-choose
+COMBAT_API_URL=http://localhost:4000/roster/combat
+RESERVE_API_URL=http://localhost:4000/roster/reserves
+GROUP_API_URL=http://localhost:4000/roster/groups
+CACHE_TIMESTAMP_URL=http://localhost:4000/cache-timestamp
+NEXT_PUBLIC_INDIVIDUAL_API_URL=http://localhost:4000/roster/individual
+```
+
+`NEXT_PUBLIC_CLIENT_TOKEN` **must match** the server's `CLIENT_TOKEN`. Then:
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Open http://localhost:3000 and you should see the CavApps index page. Happy coding!
+
+For further documentation on Next.js, visit https://nextjs.org/docs
 
 ## Updating the ADR
 
@@ -225,24 +278,22 @@ In `CavApps-Test/client/`:
 npm install
 ```
 
-Next, cd into `CavApps-Test/server/credentials` and make the token.js file as described in [Authorization](#authorization).
-
-cd into `CavApps-Test/client` and create a .env file with the contents as shown:
+Next, create a `.env` file in the project root with your tokens (see [Authorization](#authorization)):
 
 ```dotenv
-REACT_APP_CLIENT_TOKEN ="XXXXXX"
-REACT_APP_COMBAT_API_URL=http://server:4000/roster/combat
-REACT_APP_RESERVE_API_URL=http://server:4000/roster/reserves
-REACT_APP_CACHE_TIMESTAMP_URL=http://server:4000/cache-timestamp
+API_TOKEN=your-7cav-api-token-here
+CLIENT_TOKEN=any-shared-secret-you-choose
 ```
 
-**IMPORTANT:** be sure that the urls link to http://server:4000 and **NOT** http://localhost:4000 as you would in a dev setting. If this is not done, docker will not recognize the back and front ends properly.
+The production `docker-compose.yml` wires the client to reach the server over the internal Docker network (`http://server:4000/...`), so you do **not** need to set the per-URL client variables by hand for a Docker deployment — they're defined in the compose file.
 
-Return to `CavApps-Test/` and enter:
+Then, from the project root:
 
-```
+```bash
 docker compose up
 ```
+
+> Production `docker compose up` (without the dev override) expects an externally managed `edge` network — create it once with `docker network create edge` if it doesn't already exist on the host.
 
 And you should be good! Simply navigate to your server in your browser and the index page should show. The server side should be accessable via port 4000.
 
