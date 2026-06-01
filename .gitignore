@@ -45,9 +45,14 @@ server/credentials/token.js
 /sqliteCache/node_modules
 compose.yml
 
-# Claude Code
+# Tooling (do not commit)
 CLAUDE.md
 .claude/
 docs/superpowers/
+.bmad/
+.bmad-core/
+bmad/
+_bmad/
+*.bmad
 
 _local/
