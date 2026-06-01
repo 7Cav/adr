@@ -201,7 +201,8 @@ export class BadgeCombat extends Badge {
       this.userMos == "153A" ||
       this.userMos == "155A" ||
       this.userMos == "15A" ||
-      this.userMos == "15T"
+      this.userMos == "15T" ||
+      this.userMos == "155F"
     ) {
       this.isAviation = true;
     }
@@ -246,7 +247,7 @@ export class BadgeCombat extends Badge {
       }
     }
 
-    if (this.isAviation && (this.userMos == "15T" || this.userMos == "155F")) {
+    if (this.isAviation && this.userMos == "15T") {
       switch (num) {
         case 6:
           return 10;
