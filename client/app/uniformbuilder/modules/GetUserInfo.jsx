@@ -111,28 +111,28 @@ function getRankGrade(rankId) {
 
 function setShoulderCord(mos) {
   switch (mos) {
-    case Mos.M68W:
-    case Mos.M67A:
+    case Mos.COMBAT_MEDIC:
+    case Mos.MEDICAL_OFFICER:
       return "Medical";
-    case Mos.M11B:
-    case Mos.M11A:
-    case Mos.M11C:
+    case Mos.INFANTRYMAN:
+    case Mos.INFANTRY_OFFICER:
+    case Mos.INDIRECT_FIRE_INFANTRYMAN:
       return "Infantry";
-    case Mos.M13A:
-    case Mos.M13B:
+    case Mos.FIELD_ARTILLERY_OFFICER:
+    case Mos.CANNON_CREWMEMBER:
       return "Artillery";
-    case Mos.M12A:
-    case Mos.M12B:
+    case Mos.COMBAT_ENGINEER_OFFICER:
+    case Mos.COMBAT_ENGINEER:
       return "Engineer";
-    case Mos.M01A:
+    case Mos.OFFICER_GENERALIST:
       return "Aide";
-    case Mos.M31A:
-    case Mos.M31B:
+    case Mos.MP_OFFICER:
+    case Mos.MP_ENLISTED:
       return "MP";
-    case Mos.M19K:
-    case Mos.M19A:
-    case Mos.M19C:
-    case Mos.M19D:
+    case Mos.ARMOR_CREWMAN:
+    case Mos.ARMOR_CAVALRY_OFFICER:
+    case Mos.BRADLEY_CREWMEMBER:
+    case Mos.CAVALRY_SCOUT:
       return "Armor";
     default:
       return false;
@@ -141,79 +141,79 @@ function setShoulderCord(mos) {
 
 function setNeckPins(mos) {
   switch (mos) {
-    case Mos.M153A:
-    case Mos.M155A:
-    case Mos.M15A:
+    case Mos.ROTARY_WING_AVIATOR_WARRANT_OFFICER:
+    case Mos.FIXED_WING_AVIATOR_WARRANT_OFFICER:
+    case Mos.AVIATION_OFFICER:
       return "AviationOfficer";
-    case Mos.M15T:
-    case Mos.M155F:
+    case Mos.ENLISTED_ROTARY_CREWMAN:
+    case Mos.JET_AIRCRAFT_PILOT:
       return "AviationNCO";
-    case Mos.M13A:
+    case Mos.FIELD_ARTILLERY_OFFICER:
       return "ArtilleryOfficer";
-    case Mos.M13B:
+    case Mos.CANNON_CREWMEMBER:
       return "ArtilleryNCO";
-    case Mos.M67A:
+    case Mos.MEDICAL_OFFICER:
       return "MedicalOfficer";
-    case Mos.M68W:
+    case Mos.COMBAT_MEDIC:
       return "MedicalNCO";
-    case Mos.M12A:
+    case Mos.COMBAT_ENGINEER_OFFICER:
       return "EngineerOfficer";
-    case Mos.M12B:
+    case Mos.COMBAT_ENGINEER:
       return "EngineerNCO";
-    case Mos.M01A:
+    case Mos.OFFICER_GENERALIST:
       return "Aide";
-    case Mos.M00Z:
+    case Mos.COMMAND_SERGEANT_MAJOR:
       return "CSM";
-    case Mos.M255N:
-    case Mos.M25A:
+    case Mos.REGIMENTAL_TECHNICAL_AIDE:
+    case Mos.S6_OFFICER:
       return "IMOOfficer";
-    case Mos.M25U:
+    case Mos.S6_ENLISTED:
       return "IMONCO";
-    case Mos.M42B:
-    case Mos.M57A:
-    case Mos.M46A:
+    case Mos.S1_OFFICER:
+    case Mos.S3_OFFICER:
+    case Mos.S5_OFFICER:
       return "S1S3S5";
-    case Mos.M35B:
+    case Mos.S2_NCO:
       return "S2NCO";
-    case Mos.M35A:
+    case Mos.S2_OFFICER:
       return "S2Officer";
-    case Mos.M31A:
+    case Mos.MP_OFFICER:
       return "MPOfficer";
-    case Mos.M31B:
+    case Mos.MP_ENLISTED:
       return "MPNCO";
-    case Mos.M19A:
+    case Mos.ARMOR_CAVALRY_OFFICER:
       return "ArmorOfficer";
-    case Mos.M19K:
-    case Mos.M19C:
-    case Mos.M19D:
+    case Mos.ARMOR_CREWMAN:
+    case Mos.BRADLEY_CREWMEMBER:
+    case Mos.CAVALRY_SCOUT:
       return "ArmorNCO";
-    case Mos.M27A:
+    case Mos.JAG_OFFICER:
       return "JAGOfficer";
-    case Mos.M27D:
+    case Mos.JAG_ENLISTED:
       return "JAGNCO";
-    case Mos.M51A:
-    case Mos.M50A:
+    case Mos.DEVCOM_LEAD:
+    case Mos.RDC_OFFICER:
       return "RDCOfficer";
-    case Mos.M11A:
-    case Mos.M13A:
-    case Mos.M47A:
-    case Mos.M79A:
-    case Mos.M79Z:
-    case Mos.M26Z:
-    case Mos.M47Q:
-    case Mos.M47C:
+    case Mos.INFANTRY_OFFICER:
+    case Mos.FIELD_ARTILLERY_OFFICER:
+    case Mos.S7_OFFICER:
+    case Mos.RRD_OFFICER:
+    case Mos.RTC_OFFICER:
+    case Mos.WAG_OFFICER:
+    case Mos.ODS_OFFICER:
+    case Mos.NCOA_OFFICER:
       return "InfantryOfficer";
-    case Mos.M11B:
-    case Mos.M11C:
-    case Mos.M42A:
-    case Mos.M57B:
-    case Mos.M46S:
-    case Mos.M79R:
-    case Mos.M79X:
-    case Mos.M51S:
-    case Mos.M49A:
-    case Mos.M26B:
-    case Mos.M47T:
+    case Mos.INFANTRYMAN:
+    case Mos.INDIRECT_FIRE_INFANTRYMAN:
+    case Mos.S1_ENLISTED:
+    case Mos.S3_ENLISTED:
+    case Mos.S5_ENLISTED:
+    case Mos.RRD_ENLISTED:
+    case Mos.RTC_ENLISTED:
+    case Mos.DEVCOM_SUPPORT_COORDINATOR:
+    case Mos.FCC_ANALYST:
+    case Mos.WAG_ENLISTED:
+    case Mos.NCOA_ENLISTED:
       return "InfantryNCO";
     default:
       return false;

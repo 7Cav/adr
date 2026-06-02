@@ -1,63 +1,94 @@
-// Military Occupational Specialty codes. Keys are the code prefixed with `M`
-// (codes start with a digit and can't be bare identifiers); values are the
-// exact API strings. Covers every code referenced in AwardClasses.jsx and
-// GetUserInfo.jsx.
+// Military Occupational Specialty codes. Keys are the official 7cav S1 MOS
+// name (UPPER_SNAKE); values are the exact code string used by the API and the
+// rest of the app. Names sourced from the 7th Cavalry wiki "Approved MOS List":
+// https://wiki.7cav.us/wiki/Military_Occupational_Specialty_(MOS)
+//
+// S2 has three entries by design: S2_OFFICER (35A), S2_NCO (35B) and
+// S2_ENLISTED (35F). 35B is not on the wiki list (which only shows 35F for S2
+// Enlisted) but is kept because the roster still uses it.
 export const Mos = Object.freeze({
-  M00Z: "00Z",
-  M01A: "01A",
-  M11A: "11A",
-  M11B: "11B",
-  M11C: "11C",
-  M12A: "12A",
-  M12B: "12B",
-  M13A: "13A",
-  M13B: "13B",
-  M15A: "15A",
-  M15T: "15T",
-  M153A: "153A",
-  M155A: "155A",
-  M155F: "155F",
-  M19A: "19A",
-  M19C: "19C",
-  M19D: "19D",
-  M19K: "19K",
-  M25A: "25A",
-  M25U: "25U",
-  M255N: "255N",
-  M26B: "26B",
-  M26Z: "26Z",
-  M27A: "27A",
-  M27D: "27D",
-  M31A: "31A",
-  M31B: "31B",
-  M35A: "35A",
-  M35B: "35B",
-  M42A: "42A",
-  M42B: "42B",
-  M46A: "46A",
-  M46S: "46S",
-  M47A: "47A",
-  M47C: "47C",
-  M47Q: "47Q",
-  M47T: "47T",
-  M49A: "49A",
-  M50A: "50A",
-  M51A: "51A",
-  M51S: "51S",
-  M57A: "57A",
-  M57B: "57B",
-  M67A: "67A",
-  M68W: "68W",
-  M79A: "79A",
-  M79R: "79R",
-  M79X: "79X",
-  M79Z: "79Z",
+  // Aviation
+  AVIATION_OFFICER: "15A",
+  ROTARY_WING_AVIATOR_WARRANT_OFFICER: "153A",
+  FIXED_WING_AVIATOR_WARRANT_OFFICER: "155A",
+  JET_AIRCRAFT_PILOT: "155F",
+  ENLISTED_ROTARY_CREWMAN: "15T",
+  // Infantry
+  INFANTRY_OFFICER: "11A",
+  INFANTRYMAN: "11B",
+  INDIRECT_FIRE_INFANTRYMAN: "11C",
+  // Medical
+  MEDICAL_OFFICER: "67A",
+  COMBAT_MEDIC: "68W",
+  // Armor / Cavalry
+  ARMOR_CAVALRY_OFFICER: "19A",
+  BRADLEY_CREWMEMBER: "19C",
+  CAVALRY_SCOUT: "19D",
+  ARMOR_CREWMAN: "19K",
+  // Engineer
+  COMBAT_ENGINEER_OFFICER: "12A",
+  COMBAT_ENGINEER: "12B",
+  // Field Artillery
+  FIELD_ARTILLERY_OFFICER: "13A",
+  CANNON_CREWMEMBER: "13B",
+  // Command
+  COMMAND_SERGEANT_MAJOR: "00Z",
+  OFFICER_GENERALIST: "01A",
+  // Staff — S1
+  S1_OFFICER: "42B",
+  S1_ENLISTED: "42A",
+  // Staff — S2
+  S2_OFFICER: "35A",
+  S2_NCO: "35B",
+  S2_ENLISTED: "35F",
+  // Staff — S3
+  S3_OFFICER: "57A",
+  S3_ENLISTED: "57B",
+  // Staff — S5
+  S5_OFFICER: "46A",
+  S5_ENLISTED: "46S",
+  // Staff — S6
+  S6_OFFICER: "25A",
+  S6_ENLISTED: "25U",
+  REGIMENTAL_TECHNICAL_AIDE: "255N",
+  // Staff — S7
+  S7_OFFICER: "47A",
+  // Military Police
+  MP_OFFICER: "31A",
+  MP_ENLISTED: "31B",
+  // JAG
+  JAG_OFFICER: "27A",
+  JAG_ENLISTED: "27D",
+  // RRD
+  RRD_OFFICER: "79A",
+  RRD_ENLISTED: "79R",
+  // RTC
+  RTC_OFFICER: "79Z",
+  RTC_ENLISTED: "79X",
+  // WAG
+  WAG_OFFICER: "26Z",
+  WAG_ENLISTED: "26B",
+  // Other commands / schools
+  ODS_OFFICER: "47Q",
+  NCOA_OFFICER: "47C",
+  NCOA_ENLISTED: "47T",
+  FCC_ANALYST: "49A",
+  RDC_OFFICER: "50A",
+  DEVCOM_LEAD: "51A",
+  DEVCOM_SUPPORT_COORDINATOR: "51S",
 });
 
 // Semantic groupings used by BadgeCombat badge logic in AwardClasses.jsx.
-// Membership is the exact set the original if-chains tested — do not add codes.
+// Membership matches the post-#129 aviation behavior (155F counts as aviation,
+// only 15T is aircrew). Do not change membership without checking that logic.
 export const MosGroup = Object.freeze({
-  AVIATION: [Mos.M153A, Mos.M155A, Mos.M15A, Mos.M15T, Mos.M155F],
-  MEDICAL: [Mos.M68W, Mos.M67A],
-  AIRCREW: [Mos.M15T],
+  AVIATION: [
+    Mos.ROTARY_WING_AVIATOR_WARRANT_OFFICER,
+    Mos.FIXED_WING_AVIATOR_WARRANT_OFFICER,
+    Mos.AVIATION_OFFICER,
+    Mos.ENLISTED_ROTARY_CREWMAN,
+    Mos.JET_AIRCRAFT_PILOT,
+  ],
+  MEDICAL: [Mos.COMBAT_MEDIC, Mos.MEDICAL_OFFICER],
+  AIRCREW: [Mos.ENLISTED_ROTARY_CREWMAN],
 });

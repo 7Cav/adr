@@ -1,6 +1,5 @@
 import {
   AwardAttachmentType,
-  Mos,
   MosGroup,
   AwardNameFragment,
   hasValorDevice,
@@ -227,7 +226,7 @@ export class BadgeCombat extends Badge {
     //we need to give 15T an exception so that they stop at aircrew badges.
 
     if (this.isAviation) {
-      if (this.userMos == Mos.M15T) {
+      if (MosGroup.AIRCREW.includes(this.userMos)) {
         this.maxAllowed = 8;
       } else {
         this.maxAllowed = 11;
