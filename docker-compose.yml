@@ -1,0 +1,78 @@
+services:
+  server:
+    restart: always
+    #image: 7cav/apps_beta_server:latest
+    build:
+      dockerfile: "./server.Dockerfile"
+      context: "./server"
+    container_name: cavapps-server
+    #labels:
+    #- com.centurylinklabs.watchtower.enable=true
+    ports:
+      - "4000:4000"
+    environment:
+      API_TOKEN: ${API_TOKEN}
+      CLIENT_TOKEN: ${CLIENT_TOKEN}
+    working_dir: /server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - edge
+      - cavapps-network
+
+  client:
+    restart: always
+    #image: 7cav/apps_beta_client:latest
+    build:
+      context: ./client
+      dockerfile: ./client.Dockerfile
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+      - /client/.next
+    container_name: cavapps-client
+    #labels:
+    #- com.centurylinklabs.watchtower.enable=true
+    environment:
+      DEVMODE: "true"
+      NEXT_PUBLIC_CLIENT_TOKEN: ${CLIENT_TOKEN}
+      COMBAT_API_URL: http://server:4000/roster/combat
+      RESERVE_API_URL: http://server:4000/roster/reserves
+      CACHE_TIMESTAMP_URL: http://server:4000/cache-timestamp
+      GROUP_API_URL: http://server:4000/roster/groups
+      NEXT_PUBLIC_INDIVIDUAL_API_URL: http://localhost:4000/roster/individual
+    working_dir: /client
+    ports:
+      - "3000:3000"
+    depends_on:
+      server:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      until wget -q --spider http://server:4000; do
+        echo 'Waiting for server...';
+        sleep 5;
+      done;
+      if [ \"$$DEVMODE\" = \"true\" ]; then
+        echo 'Starting in dev mode...';
+        export WATCHPACK_POLLING=true;
+        npm install;
+        npm run dev;
+      else
+        echo 'Starting in production mode...';
+        npm run build && npm run start;
+      fi"
+    networks:
+      - edge
+      - cavapps-network
+
+networks:
+  edge:
+    external: true
+    name: edge
+  cavapps-network:
+    driver: bridge
