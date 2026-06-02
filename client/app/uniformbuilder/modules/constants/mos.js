@@ -57,7 +57,7 @@ export const Mos = Object.freeze({
 // Semantic groupings used by BadgeCombat badge logic in AwardClasses.jsx.
 // Membership is the exact set the original if-chains tested — do not add codes.
 export const MosGroup = Object.freeze({
-  AVIATION: [Mos.M153A, Mos.M155A, Mos.M15A, Mos.M15T],
+  AVIATION: [Mos.M153A, Mos.M155A, Mos.M15A, Mos.M15T, Mos.M155F],
   MEDICAL: [Mos.M68W, Mos.M67A],
-  AIRCREW: [Mos.M15T, Mos.M155F],
+  AIRCREW: [Mos.M15T],
 });

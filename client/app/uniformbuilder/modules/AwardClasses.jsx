@@ -1,3 +1,12 @@
+import {
+  AwardAttachmentType,
+  Mos,
+  MosGroup,
+  AwardNameFragment,
+  hasValorDevice,
+  stripValorDevice,
+} from "./constants";
+
 export class Award {
   awardTitle = null;
   //awardDetail = null;
@@ -19,7 +28,7 @@ export class Ribbon extends Award {
 
     const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
 
-    if (!(registryDetails.awardAttachmentType == undefined)) {
+    if (registryDetails.awardAttachmentType != undefined) {
       this.ribbonAttachmentType = registryDetails.awardAttachmentType;
     }
     this.awardPriority = registryDetails.awardPriority;
@@ -57,16 +66,16 @@ export class MedalWithValor extends Medal {
   constructor(data, AwardRegistry) {
     super(data, AwardRegistry);
 
-    if (this.awardTitle.includes("with Valor Device")) {
+    if (hasValorDevice(this.awardTitle)) {
       this.overrideAwardTitle(data.awardName);
     }
   }
 
   overrideAwardTitle(awardName) {
-    const baseAwardName = awardName.replace(" with Valor Device", "");
+    const baseAwardName = stripValorDevice(awardName);
     this.awardTitle = baseAwardName;
     this.hasValorDevice = true;
-    this.ribbonAttachmentType = "oakClustersValor";
+    this.ribbonAttachmentType = AwardAttachmentType.OAK_CLUSTERS_VALOR;
     this.maxAwardcount = 14;
   }
 }
@@ -130,7 +139,7 @@ export class MedalTiered extends Medal {
 
   updateTieredMedal(detail) {
     //Stackup logic
-    if (this.ribbonAttachmentType == "gcNotches") {
+    if (this.ribbonAttachmentType == AwardAttachmentType.GC_NOTCHES) {
       switch (detail) {
         case "Gold Knot":
           this.highestTierAchieved = 3;
@@ -157,7 +166,7 @@ export class MedalTiered extends Medal {
     }
 
     //Server upgrade ribbon logic
-    if (this.ribbonAttachmentType == "stars") {
+    if (this.ribbonAttachmentType == AwardAttachmentType.STARS) {
       switch (detail) {
         case "Gold Star":
           this.highestTierAchieved = 2;
@@ -197,17 +206,11 @@ export class BadgeCombat extends Badge {
     this.awardPriority = registryDetails.awardPriority;
 
     this.userMos = userMos;
-    if (
-      this.userMos == "153A" ||
-      this.userMos == "155A" ||
-      this.userMos == "15A" ||
-      this.userMos == "15T" ||
-      this.userMos == "155F"
-    ) {
+    if (MosGroup.AVIATION.includes(this.userMos)) {
       this.isAviation = true;
     }
 
-    if (this.userMos == "68W" || this.userMos == "67A") {
+    if (MosGroup.MEDICAL.includes(this.userMos)) {
       this.isMedical = true;
     }
 
@@ -224,7 +227,7 @@ export class BadgeCombat extends Badge {
     //we need to give 15T an exception so that they stop at aircrew badges.
 
     if (this.isAviation) {
-      if (this.userMos == "15T") {
+      if (this.userMos == Mos.M15T) {
         this.maxAllowed = 8;
       } else {
         this.maxAllowed = 11;
@@ -233,7 +236,6 @@ export class BadgeCombat extends Badge {
     }
 
     this.maxAllowed = 5;
-    return;
   }
 
   getImageNum(num) {
@@ -278,15 +280,15 @@ export class BadgeCombat extends Badge {
       newAwardPriority <= this.maxAllowed
     ) {
       if (
-        newAwardData.awardName == "Flight Medic Badge" &&
-        this.isMedical == false
+        newAwardData.awardName == AwardNameFragment.FLIGHT_MEDIC_BADGE &&
+        !this.isMedical
       ) {
         return;
       }
 
       if (
-        newAwardData.awardName.includes("Aviator") &&
-        this.isAviation == false
+        newAwardData.awardName.includes(AwardNameFragment.AVIATOR) &&
+        !this.isAviation
       ) {
         return;
       }
@@ -294,8 +296,6 @@ export class BadgeCombat extends Badge {
       this.awardTitle = newAwardData.awardName;
       this.awardPriority = newAwardPriority;
       this.imageNum = this.getImageNum(newAwardPriority);
-    } else {
-      return;
     }
   }
 }
@@ -313,7 +313,7 @@ export class UnitCitation extends Award {
 
     const registryDetails = AwardRegistry.getAwardDetails(data.awardName);
 
-    if (!(registryDetails.awardAttachmentType == undefined)) {
+    if (registryDetails.awardAttachmentType != undefined) {
       this.ribbonAttachmentType = registryDetails.awardAttachmentType;
     }
     this.awardPriority = registryDetails.awardPriority;

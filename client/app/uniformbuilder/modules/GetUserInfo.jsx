@@ -3,6 +3,7 @@ import GetCitationCoordArray from "./getCitationCoordArray";
 import GetCombatBadgeCoords from "./getCombatBadgeCoords";
 import GetYearsInServiceCoordArray from "./getYearsInServiceCoordArray";
 import GetTabCoordArray from "./getTabCoordArray";
+import { Mos } from "./constants";
 
 export default function GetUserInfo(
   dataActive,
@@ -110,28 +111,28 @@ function getRankGrade(rankId) {
 
 function setShoulderCord(mos) {
   switch (mos) {
-    case "68W":
-    case "67A":
+    case Mos.M68W:
+    case Mos.M67A:
       return "Medical";
-    case "11B":
-    case "11A":
-    case "11C":
+    case Mos.M11B:
+    case Mos.M11A:
+    case Mos.M11C:
       return "Infantry";
-    case "13A":
-    case "13B":
+    case Mos.M13A:
+    case Mos.M13B:
       return "Artillery";
-    case "12A":
-    case "12B":
+    case Mos.M12A:
+    case Mos.M12B:
       return "Engineer";
-    case "01A":
+    case Mos.M01A:
       return "Aide";
-    case "31A":
-    case "31B":
+    case Mos.M31A:
+    case Mos.M31B:
       return "MP";
-    case "19K":
-    case "19A":
-    case "19C":
-    case "19D":
+    case Mos.M19K:
+    case Mos.M19A:
+    case Mos.M19C:
+    case Mos.M19D:
       return "Armor";
     default:
       return false;
@@ -140,79 +141,79 @@ function setShoulderCord(mos) {
 
 function setNeckPins(mos) {
   switch (mos) {
-    case "153A":
-    case "155A":
-    case "15A":
+    case Mos.M153A:
+    case Mos.M155A:
+    case Mos.M15A:
       return "AviationOfficer";
-    case "15T":
-    case "155F":
+    case Mos.M15T:
+    case Mos.M155F:
       return "AviationNCO";
-    case "13A":
+    case Mos.M13A:
       return "ArtilleryOfficer";
-    case "13B":
+    case Mos.M13B:
       return "ArtilleryNCO";
-    case "67A":
+    case Mos.M67A:
       return "MedicalOfficer";
-    case "68W":
+    case Mos.M68W:
       return "MedicalNCO";
-    case "12A":
+    case Mos.M12A:
       return "EngineerOfficer";
-    case "12B":
+    case Mos.M12B:
       return "EngineerNCO";
-    case "01A":
+    case Mos.M01A:
       return "Aide";
-    case "00Z":
+    case Mos.M00Z:
       return "CSM";
-    case "255N":
-    case "25A":
+    case Mos.M255N:
+    case Mos.M25A:
       return "IMOOfficer";
-    case "25U":
+    case Mos.M25U:
       return "IMONCO";
-    case "42B":
-    case "57A":
-    case "46A":
+    case Mos.M42B:
+    case Mos.M57A:
+    case Mos.M46A:
       return "S1S3S5";
-    case "35B":
+    case Mos.M35B:
       return "S2NCO";
-    case "35A":
+    case Mos.M35A:
       return "S2Officer";
-    case "31A":
+    case Mos.M31A:
       return "MPOfficer";
-    case "31B":
+    case Mos.M31B:
       return "MPNCO";
-    case "19A":
+    case Mos.M19A:
       return "ArmorOfficer";
-    case "19K":
-    case "19C":
-    case "19D":
+    case Mos.M19K:
+    case Mos.M19C:
+    case Mos.M19D:
       return "ArmorNCO";
-    case "27A":
+    case Mos.M27A:
       return "JAGOfficer";
-    case "27D":
+    case Mos.M27D:
       return "JAGNCO";
-    case "51A":
-    case "50A":
+    case Mos.M51A:
+    case Mos.M50A:
       return "RDCOfficer";
-    case "11A":
-    case "13A":
-    case "47A":
-    case "79A":
-    case "79Z":
-    case "26Z":
-    case "47Q":
-    case "47C":
+    case Mos.M11A:
+    case Mos.M13A:
+    case Mos.M47A:
+    case Mos.M79A:
+    case Mos.M79Z:
+    case Mos.M26Z:
+    case Mos.M47Q:
+    case Mos.M47C:
       return "InfantryOfficer";
-    case "11B":
-    case "11C":
-    case "42A":
-    case "57B":
-    case "46S":
-    case "79R":
-    case "79X":
-    case "51S":
-    case "49A":
-    case "26B":
-    case "47T":
+    case Mos.M11B:
+    case Mos.M11C:
+    case Mos.M42A:
+    case Mos.M57B:
+    case Mos.M46S:
+    case Mos.M79R:
+    case Mos.M79X:
+    case Mos.M51S:
+    case Mos.M49A:
+    case Mos.M26B:
+    case Mos.M47T:
       return "InfantryNCO";
     default:
       return false;
