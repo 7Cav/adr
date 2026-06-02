@@ -1,0 +1,63 @@
+// Military Occupational Specialty codes. Keys are the code prefixed with `M`
+// (codes start with a digit and can't be bare identifiers); values are the
+// exact API strings. Covers every code referenced in AwardClasses.jsx and
+// GetUserInfo.jsx.
+export const Mos = Object.freeze({
+  M00Z: "00Z",
+  M01A: "01A",
+  M11A: "11A",
+  M11B: "11B",
+  M11C: "11C",
+  M12A: "12A",
+  M12B: "12B",
+  M13A: "13A",
+  M13B: "13B",
+  M15A: "15A",
+  M15T: "15T",
+  M153A: "153A",
+  M155A: "155A",
+  M155F: "155F",
+  M19A: "19A",
+  M19C: "19C",
+  M19D: "19D",
+  M19K: "19K",
+  M25A: "25A",
+  M25U: "25U",
+  M255N: "255N",
+  M26B: "26B",
+  M26Z: "26Z",
+  M27A: "27A",
+  M27D: "27D",
+  M31A: "31A",
+  M31B: "31B",
+  M35A: "35A",
+  M35B: "35B",
+  M42A: "42A",
+  M42B: "42B",
+  M46A: "46A",
+  M46S: "46S",
+  M47A: "47A",
+  M47C: "47C",
+  M47Q: "47Q",
+  M47T: "47T",
+  M49A: "49A",
+  M50A: "50A",
+  M51A: "51A",
+  M51S: "51S",
+  M57A: "57A",
+  M57B: "57B",
+  M67A: "67A",
+  M68W: "68W",
+  M79A: "79A",
+  M79R: "79R",
+  M79X: "79X",
+  M79Z: "79Z",
+});
+
+// Semantic groupings used by BadgeCombat badge logic in AwardClasses.jsx.
+// Membership is the exact set the original if-chains tested — do not add codes.
+export const MosGroup = Object.freeze({
+  AVIATION: [Mos.M153A, Mos.M155A, Mos.M15A, Mos.M15T],
+  MEDICAL: [Mos.M68W, Mos.M67A],
+  AIRCREW: [Mos.M15T, Mos.M155F],
+});
