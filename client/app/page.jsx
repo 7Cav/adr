@@ -20,6 +20,9 @@ export default function Home() {
         <Link href="/uniformbuilder">
           <button className="button">Uniform Builder</button>
         </Link>
+        <Link href="/rosterhistory">
+          <button className="button">Roster History</button>
+        </Link>
       </div>
     </div>
   );
