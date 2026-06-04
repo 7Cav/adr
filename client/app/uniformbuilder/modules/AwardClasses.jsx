@@ -216,13 +216,19 @@ export class BadgeCombat extends Badge {
   }
 
   setMaxAllowed() {
-    if (this.isMedical == true) {
+    if (this.isMedical) {
       this.maxAllowed = 6;
       return;
     }
 
-    if (this.isAviation == true) {
-      this.maxAllowed = 8;
+    //we need to give 15T an exception so that they stop at aircrew badges.
+
+    if (this.isAviation) {
+      if (this.userMos == "15T") {
+        this.maxAllowed = 8;
+      } else {
+        this.maxAllowed = 11;
+      }
       return;
     }
 
@@ -231,23 +237,13 @@ export class BadgeCombat extends Badge {
   }
 
   getImageNum(num) {
+    // in the images folder, the numbers are defined as follows:
     // 1 - 5 EIB thru CIB4
     // 6 FMB
     // 7 - 9 aviator wings
     // 10 - 12 aircrew wings
 
-    if (this.isAviation && this.userMos != "15T") {
-      switch (num) {
-        case 6:
-          return 7;
-        case 7:
-          return 8;
-        case 8:
-          return 9;
-      }
-    }
-
-    if (this.isAviation && this.userMos == "15T") {
+    if (this.isAviation) {
       switch (num) {
         case 6:
           return 10;
@@ -255,6 +251,12 @@ export class BadgeCombat extends Badge {
           return 11;
         case 8:
           return 12;
+        case 9:
+          return 7;
+        case 10:
+          return 8;
+        case 11:
+          return 9;
       }
     }
 

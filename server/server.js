@@ -6,6 +6,9 @@ const cors = require("cors");
 const port = 4000;
 const CLIENT_TOKEN = process.env.CLIENT_TOKEN;
 const { cacheTime, initializeCache } = require("./controllers/cacheManager");
+const { initDatabase } = require("./db/database");
+const diffRoutes = require("./routes/diffRoutes");
+const { startPoller } = require("./controllers/diffPoller");
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -68,6 +71,9 @@ app.use(
 );
 // Apply token checking middleware only to these routes
 app.use("/roster", checkToken, middleware);
+// All diff routes (read views + operator /admin endpoints) sit behind the same
+// token check as /roster; the client sends NEXT_PUBLIC_CLIENT_TOKEN.
+app.use(checkToken, diffRoutes);
 app.get("/", (req, res) => {
   res.send(
     "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/",
@@ -78,12 +84,27 @@ app.get("/cache-timestamp", (req, res) => {
   res.json({ cacheTime });
 });
 
+// Terminal error handler — backstop for anything a route's own try/catch misses
+// (incl. sync throws and the CORS origin rejection). Without this, an uncaught
+// error hangs the request with no response or log.
+app.use((err, req, res, next) => {
+  console.error(
+    `${req.method} ${req.originalUrl} unhandled:`,
+    err.stack || err.message || err,
+  );
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: "internal error" });
+});
+
 // Async function to initialize the server
 const startServer = async () => {
   try {
     console.log("Initializing cache...");
     await initializeCache(); // Ensure cache initialization completes before proceeding
     console.log("Cache initialized successfully.");
+
+    await initDatabase();
+    startPoller(process.env.DIFF_POLL_SCHEDULE || "*/15 * * * *");
 
     app.listen(port, () => {
       console.log(`Roster Server listening on ${port}`);
