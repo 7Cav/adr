@@ -25,7 +25,11 @@ export default async function searchForUser(query) {
 
   try {
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    if (!Array.isArray(data)) {
+      console.error("User search returned non-array payload", data);
+      return [];
+    }
+    return data;
   } catch (error) {
     throw new Error(`Invalid JSON response: ${error.message}`);
   }
