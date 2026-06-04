@@ -2,6 +2,11 @@ const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
 const BASE_URL = process.env.NEXT_PUBLIC_USERCACHE_API_URL;
 
 export default async function searchForUser(query) {
+  if (!BASE_URL)
+    throw new Error("NEXT_PUBLIC_USERCACHE_API_URL is not configured");
+  if (!CLIENT_TOKEN)
+    throw new Error("NEXT_PUBLIC_CLIENT_TOKEN is not configured");
+
   const url = new URL(BASE_URL);
 
   url.searchParams.append("q", query);
@@ -20,7 +25,7 @@ export default async function searchForUser(query) {
 
   try {
     const data = await response.json();
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     throw new Error(`Invalid JSON response: ${error.message}`);
   }

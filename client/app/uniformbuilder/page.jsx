@@ -66,20 +66,27 @@ export default function Skunkworks() {
   };
 
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (userName.length >= 3 && userName !== submittedUserName) {
-        try {
-          const data = await searchForUser(userName);
-          setSuggestions(data);
-        } catch (err) {
+    if (!(userName.length >= 3 && userName !== submittedUserName)) {
+      setSuggestions([]);
+      return;
+    }
+    let ignore = false;
+    const t = setTimeout(async () => {
+      try {
+        const data = await searchForUser(userName);
+        if (!ignore) setSuggestions(Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (!ignore) {
           console.error("Suggestion fetch failed", err);
+          setSuggestions([]);
         }
-      } else {
-        setSuggestions([]);
       }
+    }, 200);
+    return () => {
+      ignore = true;
+      clearTimeout(t);
     };
-    fetchSuggestions();
-  }, [userName]);
+  }, [userName, submittedUserName]);
 
   useEffect(() => {
     if (submittedUserName) {
@@ -88,7 +95,6 @@ export default function Skunkworks() {
         setLoading(true);
         setError(null);
         try {
-          console.log(submittedUserName);
           const data = await GetCanvasObject(submittedUserName);
           setCanvasData(data);
         } catch (err) {
