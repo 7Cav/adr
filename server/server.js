@@ -88,7 +88,10 @@ app.get("/cache-timestamp", (req, res) => {
 // (incl. sync throws and the CORS origin rejection). Without this, an uncaught
 // error hangs the request with no response or log.
 app.use((err, req, res, next) => {
-  console.error(`${req.method} ${req.originalUrl} unhandled:`, err.stack || err.message || err);
+  console.error(
+    `${req.method} ${req.originalUrl} unhandled:`,
+    err.stack || err.message || err,
+  );
   if (res.headersSent) return next(err);
   res.status(500).json({ error: "internal error" });
 });

@@ -113,9 +113,7 @@ exports.down = (pgm) => {
   pgm.sql(
     `CREATE INDEX idx_snapshots_fetched     ON snapshots(fetched_at DESC)`,
   );
-  pgm.sql(
-    `CREATE INDEX idx_snapshots_roster_type ON snapshots(roster_type)`,
-  );
+  pgm.sql(`CREATE INDEX idx_snapshots_roster_type ON snapshots(roster_type)`);
 
   pgm.sql(`
     CREATE TABLE diff_events (
@@ -134,9 +132,7 @@ exports.down = (pgm) => {
       created_at     timestamptz NOT NULL DEFAULT NOW()
     )
   `);
-  pgm.sql(
-    `CREATE INDEX idx_diff_events_snapshot ON diff_events(snapshot_id)`,
-  );
+  pgm.sql(`CREATE INDEX idx_diff_events_snapshot ON diff_events(snapshot_id)`);
   pgm.sql(`CREATE INDEX idx_diff_events_type     ON diff_events(event_type)`);
   pgm.sql(
     `CREATE INDEX idx_diff_events_created  ON diff_events(created_at DESC)`,

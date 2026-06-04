@@ -217,7 +217,9 @@ async function writeUserTable(usernames) {
   // atomic — withTransaction handles BEGIN/COMMIT/ROLLBACK + release. The
   // error propagates (after rollback) for the caller's .catch() to log.
   await withTransaction(async (client) => {
-    await client.query(`CREATE TABLE IF NOT EXISTS search_index (username TEXT)`);
+    await client.query(
+      `CREATE TABLE IF NOT EXISTS search_index (username TEXT)`,
+    );
     await client.query(`TRUNCATE TABLE search_index`);
     await client.query(
       "INSERT INTO search_index (username) SELECT * FROM UNNEST($1::text[])",

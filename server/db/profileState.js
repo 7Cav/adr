@@ -208,9 +208,7 @@ async function reconcileChildSet(
 
   for (const id of profileIds) {
     const currentUids = new Set(
-      (currProfiles[id][arrayKey] ?? [])
-        .map((x) => x[uidKey])
-        .filter(Boolean),
+      (currProfiles[id][arrayKey] ?? []).map((x) => x[uidKey]).filter(Boolean),
     );
     const existingUids = existingByProfile[id] ?? new Set();
 

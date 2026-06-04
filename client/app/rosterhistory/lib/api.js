@@ -1,72 +1,75 @@
-'use client'
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const BASE = process.env.NEXT_PUBLIC_DIFF_API_URL || 'http://localhost:4000'
-const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN
+const BASE = process.env.NEXT_PUBLIC_DIFF_API_URL || "http://localhost:4000";
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN;
 
 async function get(path) {
   const res = await fetch(BASE + path, {
     headers: { Authorization: CLIENT_TOKEN },
-  })
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-  return res.json()
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
 }
 
 export function useDiffList() {
   return useQuery({
-    queryKey: ['diffs'],
-    queryFn: () => get('/diffs'),
-  })
+    queryKey: ["diffs"],
+    queryFn: () => get("/diffs"),
+  });
 }
 
 export function useDiffByDate(date) {
   return useQuery({
-    queryKey: ['diff', date],
+    queryKey: ["diff", date],
     queryFn: () => get(`/diffs/${date}`),
     enabled: !!date,
-  })
+  });
 }
 
 export function useDiffRange(from, to, enabled = true) {
   return useQuery({
-    queryKey: ['diff-range', from, to],
-    queryFn: () => get(from ? `/diffs/range?from=${from}&to=${to}` : `/diffs/range?to=${to}`),
+    queryKey: ["diff-range", from, to],
+    queryFn: () =>
+      get(
+        from ? `/diffs/range?from=${from}&to=${to}` : `/diffs/range?to=${to}`,
+      ),
     enabled,
-  })
+  });
 }
 
 export function useRanks() {
   return useQuery({
-    queryKey: ['ranks'],
-    queryFn: () => get('/ranks'),
+    queryKey: ["ranks"],
+    queryFn: () => get("/ranks"),
     staleTime: 60 * 60 * 1000,
-  })
+  });
 }
 
 export function useTriggerSnapshot() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async () => {
       const res = await fetch(`${BASE}/admin/snapshot`, {
-        method: 'POST',
+        method: "POST",
         headers: { Authorization: CLIENT_TOKEN },
-      })
+      });
       if (!res.ok) {
         // Surface 429 (already running) distinctly; carry status for callers.
-        const body = await res.json().catch(() => ({}))
+        const body = await res.json().catch(() => ({}));
         const message =
           res.status === 429
-            ? 'A snapshot is already running — try again shortly.'
-            : body.error || `Snapshot failed (${res.status})`
-        const err = new Error(message)
-        err.status = res.status
-        throw err
+            ? "A snapshot is already running — try again shortly."
+            : body.error || `Snapshot failed (${res.status})`;
+        const err = new Error(message);
+        err.status = res.status;
+        throw err;
       }
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
-      setTimeout(() => qc.invalidateQueries({ queryKey: ['diffs'] }), 3000)
+      setTimeout(() => qc.invalidateQueries({ queryKey: ["diffs"] }), 3000);
     },
-  })
+  });
 }

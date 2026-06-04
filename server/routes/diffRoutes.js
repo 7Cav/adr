@@ -79,7 +79,9 @@ router.get("/diffs/:date", async (req, res) => {
 // GET /ranks — rank-ordering table (rankShort + rankDisplayOrder) the frontend
 // uses to sort events by seniority. Derived from the static 7Cav rank table.
 router.get("/ranks", (req, res) => {
-  res.set("Cache-Control", "public, max-age=3600").json({ ranks: RANKS_PAYLOAD });
+  res
+    .set("Cache-Control", "public, max-age=3600")
+    .json({ ranks: RANKS_PAYLOAD });
 });
 
 // POST /admin/snapshot — trigger a manual snapshot fetch for all roster types
