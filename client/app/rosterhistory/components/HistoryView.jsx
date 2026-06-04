@@ -44,6 +44,7 @@ const EMPTY_UNIT_FILTER = { battalion: null, company: null, platoon: null }
 
 export function HistoryView() {
   const { data: summaries } = useDiffList()
+  // (error/refetch for the active data source is destructured below)
   const [activeFilters, setActiveFilters] = useState(new Set(ALL_EVENT_TYPES))
   const [excludedRecordTypes, setExcludedRecordTypes] = useState(new Set())
   const [activeRosterTypes, setActiveRosterTypes] = useState(new Set(ALL_ROSTER_TYPES))
@@ -55,8 +56,20 @@ export function HistoryView() {
 
   const to = format(new Date(), 'yyyy-MM-dd')
   const from = selectedRange ? format(subDays(new Date(), selectedRange - 1), 'yyyy-MM-dd') : null
-  const { data: rangeData, isLoading: rangeLoading } = useDiffRange(from, to, true)
-  const { data: dayData, isLoading: dayLoading } = useDiffByDate(selectedDay)
+  const {
+    data: rangeData,
+    isLoading: rangeLoading,
+    isError: rangeError,
+    error: rangeErrorObj,
+    refetch: refetchRange,
+  } = useDiffRange(from, to, true)
+  const {
+    data: dayData,
+    isLoading: dayLoading,
+    isError: dayError,
+    error: dayErrorObj,
+    refetch: refetchDay,
+  } = useDiffByDate(selectedDay)
 
   const rankOrder = useMemo(() => {
     const m = new Map()
@@ -67,6 +80,9 @@ export function HistoryView() {
   // Switch data source based on whether a day is drilled into
   const activeData = selectedDay ? dayData : rangeData
   const isLoading = selectedDay ? dayLoading : rangeLoading
+  const isError = selectedDay ? dayError : rangeError
+  const activeError = selectedDay ? dayErrorObj : rangeErrorObj
+  const refetchActive = selectedDay ? refetchDay : refetchRange
 
   const presentRosterTypes = useMemo(() => {
     const s = new Set()
@@ -353,9 +369,21 @@ export function HistoryView() {
             <SummaryBar counts={activeData.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />
           )}
 
-          {isLoading && <p className="text-muted-foreground text-sm">Loading…</p>}
+          {isError && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center" role="alert">
+              <p className="font-medium text-destructive">Couldn't load change history</p>
+              <p className="text-sm mt-1 text-muted-foreground">
+                {activeError?.message ?? 'The history service may be unavailable.'}
+              </p>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => refetchActive()}>
+                Retry
+              </Button>
+            </div>
+          )}
 
-          {!isLoading && totalVisible === 0 && (
+          {!isError && isLoading && <p className="text-muted-foreground text-sm">Loading…</p>}
+
+          {!isError && !isLoading && totalVisible === 0 && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
               <p>No changes {selectedDay ? 'recorded for this date.' : 'in the selected range.'}</p>
             </div>

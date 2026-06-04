@@ -203,29 +203,29 @@ async function eventsForDateRange(fromStr, toStr, rosterType = null) {
 async function writeUserTable(usernames) {
   console.log("Updating username cache...");
 
-  const db = getPool();
+  if (!Array.isArray(usernames) || usernames.length === 0) {
+    console.error(
+      `writeUserTable: expected a non-empty array of users, got`,
+      usernames,
+    );
+    return;
+  }
 
   const flattenedUsers = usernames.map((u) => u.username);
 
-  try {
-    await db.query(`BEGIN TRANSACTION`);
-    await db.query(`CREATE TABLE IF NOT EXISTS search_index (username TEXT)`);
-    await db.query(`TRUNCATE TABLE search_index`);
-    await db.query(
+  // Run the whole transaction on a single checked-out client so it stays
+  // atomic — withTransaction handles BEGIN/COMMIT/ROLLBACK + release. The
+  // error propagates (after rollback) for the caller's .catch() to log.
+  await withTransaction(async (client) => {
+    await client.query(`CREATE TABLE IF NOT EXISTS search_index (username TEXT)`);
+    await client.query(`TRUNCATE TABLE search_index`);
+    await client.query(
       "INSERT INTO search_index (username) SELECT * FROM UNNEST($1::text[])",
       [flattenedUsers],
     );
-    await db.query(`COMMIT`);
-    console.log(`Sucessfully updated username cache`);
-  } catch (error) {
-    if (db) {
-      db.query(`ROLLBACK`);
-    }
-    console.log(
-      `Error when attempting to update username cache: `,
-      error.message,
-    );
-  }
+  });
+
+  console.log(`Sucessfully updated username cache`);
 }
 
 async function searchUserTable(query) {

@@ -49,7 +49,13 @@ export function TodayView() {
     return () => clearInterval(cooldownRef.current)
   }, [cooldownUntil])
 
-  const { data: summaries, isLoading: listLoading } = useDiffList()
+  const {
+    data: summaries,
+    isLoading: listLoading,
+    isError: listError,
+    error: listErrorObj,
+    refetch: refetchList,
+  } = useDiffList()
   const { data: ranksData } = useRanks()
 
   const rankOrder = useMemo(() => {
@@ -63,7 +69,13 @@ export function TodayView() {
     ? format(parseISO(summaries[0].fetched_at), 'yyyy-MM-dd')
     : null
 
-  const { data: diff, isLoading: diffLoading } = useDiffByDate(effectiveDate)
+  const {
+    data: diff,
+    isLoading: diffLoading,
+    isError: diffError,
+    error: diffErrorObj,
+    refetch: refetchDiff,
+  } = useDiffByDate(effectiveDate)
 
   const presentRosterTypes = useMemo(() => {
     const s = new Set()
@@ -191,6 +203,12 @@ export function TodayView() {
             {trigger.isPending ? 'Fetching…' : cooldownUntil != null ? `Wait ${cooldownSecs}s` : 'Fetch Now'}
           </Button>
 
+          {trigger.isError && (
+            <p className="text-destructive text-sm" role="alert">
+              {trigger.error?.message ?? 'Snapshot failed.'}
+            </p>
+          )}
+
           {diff?.events?.length > 0 && (
             <Button variant="outline" size="sm" onClick={handleExport} title="Export as CSV">
               <Download size={14} />
@@ -242,9 +260,29 @@ export function TodayView() {
             <SummaryBar counts={diff.counts} activeFilters={activeFilters} onToggle={toggleFilter} recordTypeCounts={recordTypeCounts} excludedRecordTypes={excludedRecordTypes} onToggleRecordType={toggleRecordType} />
           )}
 
+          {(listError || diffError) && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-6 text-center" role="alert">
+              <p className="font-medium text-destructive">Couldn't load roster changes</p>
+              <p className="text-sm mt-1 text-muted-foreground">
+                {(listErrorObj ?? diffErrorObj)?.message ?? 'The history service may be unavailable.'}
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={() => {
+                  if (listError) refetchList()
+                  if (diffError) refetchDiff()
+                }}
+              >
+                Retry
+              </Button>
+            </div>
+          )}
+
           {(listLoading || diffLoading) && <p className="text-muted-foreground text-sm">Loading…</p>}
 
-          {!listLoading && summaries?.length === 0 && (
+          {!listError && !diffError && !listLoading && summaries?.length === 0 && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
               <p className="font-medium">No snapshots yet</p>
               <p className="text-sm mt-1">Click "Fetch Now" to pull the first roster snapshot.</p>

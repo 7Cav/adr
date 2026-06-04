@@ -181,7 +181,7 @@ async function runSnapshot() {
 
 async function makeUserCache() {
   const currentUsers = await fetchUsernames();
-  db.writeUserTable(currentUsers);
+  await db.writeUserTable(currentUsers);
   console.log("searchPoller: run complete");
 }
 
@@ -192,15 +192,25 @@ function startPoller(schedule) {
     );
     schedule = "*/15 * * * *";
   }
-  cron.schedule(schedule, runSnapshot);
+  cron.schedule(schedule, () =>
+    runSnapshot().catch((err) =>
+      console.error("diffPoller: scheduled run failed:", err.message || err),
+    ),
+  );
   console.log(`diffPoller: started with schedule "${schedule}"`);
   runSnapshot().catch((err) =>
     console.error("diffPoller: initial run failed:", err.message || err),
   );
 
-  cron.schedule(schedule, makeUserCache);
+  cron.schedule(schedule, () =>
+    makeUserCache().catch((err) =>
+      console.error("searchPoller: scheduled run failed:", err.message || err),
+    ),
+  );
   console.log(`searchPoller: started with schedule "${schedule}"`);
-  makeUserCache();
+  makeUserCache().catch((err) =>
+    console.error("searchPoller: initial run failed:", err.message || err),
+  );
 }
 
 module.exports = { startPoller, runSnapshot };

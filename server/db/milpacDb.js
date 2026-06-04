@@ -180,8 +180,12 @@ async function fetchUsernames() {
 
     return usernames;
   } catch (error) {
-    console.log(`userCache fetch error: `, error.message);
+    console.error(`userCache fetch error: `, error.message);
+    // Re-throw so the genuine MariaDB error surfaces to makeUserCache's
+    // .catch(), rather than falling off the end and returning undefined
+    // (which would trigger a misleading downstream TypeError in writeUserTable).
+    throw error;
   }
 }
 
-module.exports = { fetchRosterProfiles, fetchUsernames };
+module.exports = { fetchRosterProfiles, fetchUsernames, RANK_SHORT };

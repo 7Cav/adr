@@ -2,6 +2,16 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/database");
 const { runSnapshot } = require("../controllers/diffPoller");
+const { RANK_SHORT } = require("../db/milpacDb");
+
+// Build the rank-ordering payload the frontend's groupEvents.js consumes
+// (Map<rankShort, rankDisplayOrder>, lower = more senior). The 7Cav rank_id
+// already encodes seniority order, so we reuse it directly as the display
+// order. Computed once at module load — RANK_SHORT is a static table.
+const RANKS_PAYLOAD = Object.entries(RANK_SHORT).map(([rankId, rankShort]) => ({
+  rankShort,
+  rankDisplayOrder: parseInt(rankId, 10),
+}));
 
 const VALID_ROSTER_TYPES = new Set([
   "ROSTER_TYPE_COMBAT",
@@ -34,6 +44,11 @@ router.get("/diffs", async (req, res) => {
 router.get("/diffs/range", async (req, res) => {
   const { from, to } = req.query;
   if (!to) return res.status(400).json({ error: "to query param required" });
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  if (!DATE_RE.test(to))
+    return res.status(400).json({ error: "to must be YYYY-MM-DD" });
+  if (from != null && !DATE_RE.test(from))
+    return res.status(400).json({ error: "from must be YYYY-MM-DD" });
   const rosterType = parseRosterType(req.query);
   if (rosterType === "INVALID")
     return res.status(400).json({ error: "invalid roster_type" });
@@ -61,10 +76,10 @@ router.get("/diffs/:date", async (req, res) => {
   }
 });
 
-// GET /ranks — rank images are now constructed directly from the DB; this endpoint
-// returns an empty ranks array for backward compatibility with any cached clients.
+// GET /ranks — rank-ordering table (rankShort + rankDisplayOrder) the frontend
+// uses to sort events by seniority. Derived from the static 7Cav rank table.
 router.get("/ranks", (req, res) => {
-  res.set("Cache-Control", "public, max-age=3600").json({ ranks: [] });
+  res.set("Cache-Control", "public, max-age=3600").json({ ranks: RANKS_PAYLOAD });
 });
 
 // POST /admin/snapshot — trigger a manual snapshot fetch for all roster types
@@ -75,9 +90,13 @@ router.post("/admin/snapshot", (req, res) => {
     return res.status(429).json({ error: "snapshot already in progress" });
   }
   snapshotRunning = true;
-  runSnapshot().finally(() => {
-    snapshotRunning = false;
-  });
+  runSnapshot()
+    .catch((err) =>
+      console.error("admin/snapshot: manual run failed:", err.message || err),
+    )
+    .finally(() => {
+      snapshotRunning = false;
+    });
   res.json({ status: "snapshot triggered" });
 });
 
@@ -97,17 +116,20 @@ router.get("/admin/runs", async (req, res) => {
 router.get("/userSearch", async (req, res) => {
   const searchTerm = req.query.q;
 
-  if (!searchTerm || searchTerm.length < 3) {
+  // Require a plain string of at least 3 chars. Array params (?q[]=) would
+  // otherwise pass the length check and then throw inside .replace().
+  if (typeof searchTerm !== "string" || searchTerm.length < 3) {
     return res.json([]);
   }
 
-  let foundUsers = await db.searchUserTable(searchTerm);
-  console.log(foundUsers);
-
-  if (!foundUsers) {
-    res.status(500).json({ error: "Search failed" });
-  } else {
-    res.json(foundUsers);
+  try {
+    const foundUsers = await db.searchUserTable(searchTerm);
+    if (!foundUsers) {
+      return res.status(500).json({ error: "Search failed" });
+    }
+    return res.json(foundUsers);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 

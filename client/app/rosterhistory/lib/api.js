@@ -3,9 +3,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const BASE = process.env.NEXT_PUBLIC_DIFF_API_URL || 'http://localhost:4000'
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_CLIENT_TOKEN
 
 async function get(path) {
-  const res = await fetch(BASE + path)
+  const res = await fetch(BASE + path, {
+    headers: { Authorization: CLIENT_TOKEN },
+  })
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
   return res.json()
 }
@@ -44,7 +47,24 @@ export function useRanks() {
 export function useTriggerSnapshot() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => fetch(`${BASE}/admin/snapshot`, { method: 'POST' }).then((r) => r.json()),
+    mutationFn: async () => {
+      const res = await fetch(`${BASE}/admin/snapshot`, {
+        method: 'POST',
+        headers: { Authorization: CLIENT_TOKEN },
+      })
+      if (!res.ok) {
+        // Surface 429 (already running) distinctly; carry status for callers.
+        const body = await res.json().catch(() => ({}))
+        const message =
+          res.status === 429
+            ? 'A snapshot is already running — try again shortly.'
+            : body.error || `Snapshot failed (${res.status})`
+        const err = new Error(message)
+        err.status = res.status
+        throw err
+      }
+      return res.json()
+    },
     onSuccess: () => {
       setTimeout(() => qc.invalidateQueries({ queryKey: ['diffs'] }), 3000)
     },
