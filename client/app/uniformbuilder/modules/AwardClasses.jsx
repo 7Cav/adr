@@ -221,7 +221,7 @@ export class BadgeCombat extends Badge {
       return;
     }
 
-    //we need to give 15T a SPECIAL case, because a very SPECIAL general wants it like that.
+    //we need to give 15T an exception so that they stop at aircrew badges.
 
     if (this.isAviation) {
       if (this.userMos == "15T") {
