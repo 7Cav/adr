@@ -110,7 +110,8 @@ export function HistoryView() {
 
   // Events with every filter EXCEPT the unit predicate applied. Used to
   // decide whether an active unit filter is the actual cause of an empty
-  // view (vs. event-type/roster-type filters having emptied it already).
+  // view (vs. event-type/record-type/roster-type filters having emptied it
+  // already).
   const preUnitFilteredEvents = useMemo(
     () =>
       (activeData?.events ?? []).filter((e) => {
@@ -180,10 +181,13 @@ export function HistoryView() {
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
 
-  // True when an active unit filter is the genuine cause of emptiness:
-  // events survive every other filter, but none match the selected unit.
+  // True when an active unit filter is the genuine cause of an empty view:
+  // nothing is visible, yet events survive every other filter — so the unit
+  // predicate is what emptied it.
   const unitFilterIsCause =
-    Boolean(unitFilter.battalion) && preUnitFilteredEvents.length > 0;
+    totalVisible === 0 &&
+    Boolean(unitFilter.battalion) &&
+    preUnitFilteredEvents.length > 0;
 
   // Aggregate snapshots into heatmap buckets. Bucket size scales with range:
   // ≤90d → daily, ≤365d → weekly, >365d or All → monthly
@@ -520,8 +524,9 @@ export function HistoryView() {
               unit-scoped empty state (unitFilterIsCause). Invariant: this
               relies on UnitFilterBar receiving the same typeFilteredEvents
               used to compute totalVisible (plus preUnitFilteredCount for the
-              cause check) — if those ever diverge, restore a fallback
-              message here. */}
+              cause check), and on groupAndSortEvents not dropping events
+              (totalVisible === typeFilteredEvents.length) — if either ever
+              diverges, restore a fallback message here. */}
           {!isError &&
             !isLoading &&
             totalVisible === 0 &&

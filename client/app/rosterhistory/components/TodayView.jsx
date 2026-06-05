@@ -94,7 +94,8 @@ export function TodayView() {
 
   // Events with every filter EXCEPT the unit predicate applied. Used to
   // decide whether an active unit filter is the actual cause of an empty
-  // view (vs. event-type/roster-type filters having emptied it already).
+  // view (vs. event-type/record-type/roster-type filters having emptied it
+  // already).
   const preUnitFilteredEvents = useMemo(
     () =>
       (diff?.events ?? []).filter((e) => {
@@ -164,10 +165,13 @@ export function TodayView() {
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
 
-  // True when an active unit filter is the genuine cause of emptiness:
-  // events survive every other filter, but none match the selected unit.
+  // True when an active unit filter is the genuine cause of an empty view:
+  // nothing is visible, yet events survive every other filter — so the unit
+  // predicate is what emptied it.
   const unitFilterIsCause =
-    Boolean(unitFilter.battalion) && preUnitFilteredEvents.length > 0;
+    totalVisible === 0 &&
+    Boolean(unitFilter.battalion) &&
+    preUnitFilteredEvents.length > 0;
 
   function toggleFilter(type) {
     setActiveFilters((prev) => {
@@ -384,12 +388,13 @@ export function TodayView() {
               </div>
             )}
 
-          {/* Skip the generic messages only when UnitFilterBar renders its
-              own unit-scoped empty state (unitFilterIsCause). Invariant: this
+          {/* Skip this message only when UnitFilterBar renders its own
+              unit-scoped empty state (unitFilterIsCause). Invariant: this
               relies on UnitFilterBar receiving the same typeFilteredEvents
               used to compute totalVisible (plus preUnitFilteredCount for the
-              cause check) — if those ever diverge, restore a fallback
-              message here. */}
+              cause check), and on groupAndSortEvents not dropping events
+              (totalVisible === typeFilteredEvents.length) — if either ever
+              diverges, restore a fallback message here. */}
           {diff &&
             totalVisible === 0 &&
             diff.events.length > 0 &&
@@ -399,7 +404,7 @@ export function TodayView() {
               </p>
             )}
 
-          {diff?.events?.length === 0 && !unitFilterIsCause && (
+          {diff?.events?.length === 0 && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
               <p>No changes recorded for this date.</p>
             </div>
