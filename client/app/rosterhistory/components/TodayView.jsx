@@ -306,12 +306,14 @@ export function TodayView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          <UnitFilterBar
-            events={typeFilteredEvents}
-            unitFilter={unitFilter}
-            onSelect={handleUnitSelect}
-            onClear={handleUnitClear}
-          />
+          {!diffLoading && (
+            <UnitFilterBar
+              events={typeFilteredEvents}
+              unitFilter={unitFilter}
+              onSelect={handleUnitSelect}
+              onClear={handleUnitClear}
+            />
+          )}
 
           {diff?.counts && (
             <SummaryBar
@@ -366,13 +368,18 @@ export function TodayView() {
               </div>
             )}
 
-          {diff && totalVisible === 0 && diff.events.length > 0 && (
-            <p className="text-muted-foreground text-sm">
-              All event types filtered out.
-            </p>
-          )}
+          {/* When a unit filter matched nothing, UnitFilterBar renders its own
+              explanatory empty state — skip the generic messages. */}
+          {diff &&
+            totalVisible === 0 &&
+            diff.events.length > 0 &&
+            !unitFilter.battalion && (
+              <p className="text-muted-foreground text-sm">
+                All event types filtered out.
+              </p>
+            )}
 
-          {diff?.events?.length === 0 && (
+          {diff?.events?.length === 0 && !unitFilter.battalion && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
               <p>No changes recorded for this date.</p>
             </div>

@@ -459,12 +459,14 @@ export function HistoryView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          <UnitFilterBar
-            events={typeFilteredEvents}
-            unitFilter={unitFilter}
-            onSelect={handleUnitSelect}
-            onClear={handleUnitClear}
-          />
+          {!isLoading && (
+            <UnitFilterBar
+              events={typeFilteredEvents}
+              unitFilter={unitFilter}
+              onSelect={handleUnitSelect}
+              onClear={handleUnitClear}
+            />
+          )}
 
           {activeData?.counts && (
             <SummaryBar
@@ -504,16 +506,21 @@ export function HistoryView() {
             <p className="text-muted-foreground text-sm">Loading…</p>
           )}
 
-          {!isError && !isLoading && totalVisible === 0 && (
-            <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
-              <p>
-                No changes{" "}
-                {selectedDay
-                  ? "recorded for this date."
-                  : "in the selected range."}
-              </p>
-            </div>
-          )}
+          {/* When a unit filter matched nothing, UnitFilterBar renders its own
+              explanatory empty state — skip the generic message. */}
+          {!isError &&
+            !isLoading &&
+            totalVisible === 0 &&
+            !unitFilter.battalion && (
+              <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
+                <p>
+                  No changes{" "}
+                  {selectedDay
+                    ? "recorded for this date."
+                    : "in the selected range."}
+                </p>
+              </div>
+            )}
 
           {notable.length > 0 && (
             <div className="space-y-2">
