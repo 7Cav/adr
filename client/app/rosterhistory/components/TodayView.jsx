@@ -92,7 +92,11 @@ export function TodayView() {
     return s;
   }, [diff]);
 
-  const typeFilteredEvents = useMemo(
+  // Events with every filter EXCEPT the unit predicate applied. Used to
+  // decide whether an active unit filter is the actual cause of an empty
+  // view (vs. event-type/record-type/roster-type filters having emptied it
+  // already).
+  const preUnitFilteredEvents = useMemo(
     () =>
       (diff?.events ?? []).filter((e) => {
         if (!activeFilters.has(e.event_type)) return false;
@@ -103,19 +107,26 @@ export function TodayView() {
           return false;
         if (e.roster_type && !activeRosterTypes.has(e.roster_type))
           return false;
-        if (unitFilter.battalion) {
-          const u = parseUnit(e.position_title || "");
-          if (!u || u.battalion !== unitFilter.battalion) return false;
-          if (unitFilter.company) {
-            const co = u.company ?? "HQ";
-            if (co !== unitFilter.company) return false;
-          }
-          if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
-            return false;
-        }
         return true;
       }),
-    [diff, activeFilters, excludedRecordTypes, activeRosterTypes, unitFilter],
+    [diff, activeFilters, excludedRecordTypes, activeRosterTypes],
+  );
+
+  const typeFilteredEvents = useMemo(
+    () =>
+      preUnitFilteredEvents.filter((e) => {
+        if (!unitFilter.battalion) return true;
+        const u = parseUnit(e.position_title || "");
+        if (!u || u.battalion !== unitFilter.battalion) return false;
+        if (unitFilter.company) {
+          const co = u.company ?? "HQ";
+          if (co !== unitFilter.company) return false;
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
+          return false;
+        return true;
+      }),
+    [preUnitFilteredEvents, unitFilter],
   );
 
   const recordTypeCounts = useMemo(() => {
@@ -153,6 +164,14 @@ export function TodayView() {
 
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
+
+  // True when an active unit filter is the genuine cause of an empty view:
+  // nothing is visible, yet events survive every other filter — so the unit
+  // predicate is what emptied it.
+  const unitFilterIsCause =
+    totalVisible === 0 &&
+    Boolean(unitFilter.battalion) &&
+    preUnitFilteredEvents.length > 0;
 
   function toggleFilter(type) {
     setActiveFilters((prev) => {
@@ -306,12 +325,15 @@ export function TodayView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          <UnitFilterBar
-            events={typeFilteredEvents}
-            unitFilter={unitFilter}
-            onSelect={handleUnitSelect}
-            onClear={handleUnitClear}
-          />
+          {!diffLoading && !listError && !diffError && (
+            <UnitFilterBar
+              events={typeFilteredEvents}
+              unitFilter={unitFilter}
+              onSelect={handleUnitSelect}
+              onClear={handleUnitClear}
+              preUnitFilteredCount={preUnitFilteredEvents.length}
+            />
+          )}
 
           {diff?.counts && (
             <SummaryBar
@@ -366,11 +388,21 @@ export function TodayView() {
               </div>
             )}
 
-          {diff && totalVisible === 0 && diff.events.length > 0 && (
-            <p className="text-muted-foreground text-sm">
-              All event types filtered out.
-            </p>
-          )}
+          {/* Skip this message only when UnitFilterBar renders its own
+              unit-scoped empty state (unitFilterIsCause). Invariant: this
+              relies on UnitFilterBar receiving the same typeFilteredEvents
+              used to compute totalVisible (plus preUnitFilteredCount for the
+              cause check), and on groupAndSortEvents not dropping events
+              (totalVisible === typeFilteredEvents.length) — if either ever
+              diverges, restore a fallback message here. */}
+          {diff &&
+            totalVisible === 0 &&
+            diff.events.length > 0 &&
+            !unitFilterIsCause && (
+              <p className="text-muted-foreground text-sm">
+                All event types filtered out.
+              </p>
+            )}
 
           {diff?.events?.length === 0 && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
