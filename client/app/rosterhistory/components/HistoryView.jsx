@@ -11,6 +11,12 @@ import {
 import { Download, Search, X, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDiffList, useDiffRange, useDiffByDate, useRanks } from "../lib/api";
 import { DiffEventCard } from "./DiffEventCard";
@@ -369,24 +375,31 @@ export function HistoryView() {
                 : "day"}{" "}
             to drill down
           </p>
-          <div className="flex flex-wrap gap-1">
-            {heatmapData.map((entry) => {
-              const count = totalCount(entry);
-              const isSelected = entry.date === selectedDay;
-              return (
-                <button
-                  key={entry.date}
-                  title={`${entry.label}: ${count} change${count !== 1 ? "s" : ""}`}
-                  onClick={() => handleDotClick(entry)}
-                  className={cn(
-                    "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    heatIntensity(count, maxCount),
-                    isSelected && "ring-2 ring-primary scale-125",
-                  )}
-                />
-              );
-            })}
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <div className="flex flex-wrap gap-1">
+              {heatmapData.map((entry) => {
+                const count = totalCount(entry);
+                const isSelected = entry.date === selectedDay;
+                return (
+                  <Tooltip key={entry.date}>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => handleDotClick(entry)}
+                        className={cn(
+                          "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          heatIntensity(count, maxCount),
+                          isSelected && "ring-2 ring-primary scale-125",
+                        )}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {`${entry.label}: ${count} change${count !== 1 ? "s" : ""}`}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
             <span>Less</span>
             {[
