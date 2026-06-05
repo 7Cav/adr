@@ -38,7 +38,13 @@ function UnitChip({ label, active, onClick, onClear }) {
   );
 }
 
-export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
+export function UnitFilterBar({
+  events,
+  unitFilter,
+  onSelect,
+  onClear,
+  preUnitFilteredCount,
+}) {
   const unitMap = useMemo(() => {
     const battalions = new Map();
 
@@ -69,9 +75,15 @@ export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
   const hasActiveFilter = Boolean(unitFilter.battalion);
 
   if (unitMap.size === 0) {
-    // No units in view. If a unit filter is active it filtered everything
-    // out — explain that instead of silently disappearing.
+    // No units in view. If a unit filter is active, no events in the current
+    // data match it — explain that instead of silently disappearing.
     if (!hasActiveFilter) return null;
+
+    // Only blame the unit filter when it is genuinely the cause: if the
+    // events were already empty before the unit predicate was applied
+    // (e.g. all event types toggled off), the parent's generic message is
+    // the accurate one — render nothing here so it can show.
+    if (preUnitFilteredCount === 0) return null;
 
     const filterLabel = [
       unitFilter.battalion,
@@ -87,10 +99,10 @@ export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
         <p className="text-sm">
           No recorded changes for{" "}
           <span className="font-medium text-foreground">{filterLabel}</span> in
-          the current selection.
+          the current view.
         </p>
         <p className="text-xs mt-1 text-muted-foreground/70">
-          Units only appear here when they have recorded changes.
+          Only units with recorded changes in the current view are listed.
         </p>
         <Button
           variant="outline"

@@ -92,7 +92,10 @@ export function TodayView() {
     return s;
   }, [diff]);
 
-  const typeFilteredEvents = useMemo(
+  // Events with every filter EXCEPT the unit predicate applied. Used to
+  // decide whether an active unit filter is the actual cause of an empty
+  // view (vs. event-type/roster-type filters having emptied it already).
+  const preUnitFilteredEvents = useMemo(
     () =>
       (diff?.events ?? []).filter((e) => {
         if (!activeFilters.has(e.event_type)) return false;
@@ -103,19 +106,26 @@ export function TodayView() {
           return false;
         if (e.roster_type && !activeRosterTypes.has(e.roster_type))
           return false;
-        if (unitFilter.battalion) {
-          const u = parseUnit(e.position_title || "");
-          if (!u || u.battalion !== unitFilter.battalion) return false;
-          if (unitFilter.company) {
-            const co = u.company ?? "HQ";
-            if (co !== unitFilter.company) return false;
-          }
-          if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
-            return false;
-        }
         return true;
       }),
-    [diff, activeFilters, excludedRecordTypes, activeRosterTypes, unitFilter],
+    [diff, activeFilters, excludedRecordTypes, activeRosterTypes],
+  );
+
+  const typeFilteredEvents = useMemo(
+    () =>
+      preUnitFilteredEvents.filter((e) => {
+        if (!unitFilter.battalion) return true;
+        const u = parseUnit(e.position_title || "");
+        if (!u || u.battalion !== unitFilter.battalion) return false;
+        if (unitFilter.company) {
+          const co = u.company ?? "HQ";
+          if (co !== unitFilter.company) return false;
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
+          return false;
+        return true;
+      }),
+    [preUnitFilteredEvents, unitFilter],
   );
 
   const recordTypeCounts = useMemo(() => {
@@ -153,6 +163,11 @@ export function TodayView() {
 
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
+
+  // True when an active unit filter is the genuine cause of emptiness:
+  // events survive every other filter, but none match the selected unit.
+  const unitFilterIsCause =
+    Boolean(unitFilter.battalion) && preUnitFilteredEvents.length > 0;
 
   function toggleFilter(type) {
     setActiveFilters((prev) => {
@@ -306,12 +321,13 @@ export function TodayView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          {!diffLoading && (
+          {!diffLoading && !listError && !diffError && (
             <UnitFilterBar
               events={typeFilteredEvents}
               unitFilter={unitFilter}
               onSelect={handleUnitSelect}
               onClear={handleUnitClear}
+              preUnitFilteredCount={preUnitFilteredEvents.length}
             />
           )}
 
@@ -368,18 +384,22 @@ export function TodayView() {
               </div>
             )}
 
-          {/* When a unit filter matched nothing, UnitFilterBar renders its own
-              explanatory empty state — skip the generic messages. */}
+          {/* Skip the generic messages only when UnitFilterBar renders its
+              own unit-scoped empty state (unitFilterIsCause). Invariant: this
+              relies on UnitFilterBar receiving the same typeFilteredEvents
+              used to compute totalVisible (plus preUnitFilteredCount for the
+              cause check) — if those ever diverge, restore a fallback
+              message here. */}
           {diff &&
             totalVisible === 0 &&
             diff.events.length > 0 &&
-            !unitFilter.battalion && (
+            !unitFilterIsCause && (
               <p className="text-muted-foreground text-sm">
                 All event types filtered out.
               </p>
             )}
 
-          {diff?.events?.length === 0 && !unitFilter.battalion && (
+          {diff?.events?.length === 0 && !unitFilterIsCause && (
             <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
               <p>No changes recorded for this date.</p>
             </div>

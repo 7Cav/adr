@@ -108,7 +108,10 @@ export function HistoryView() {
     return s;
   }, [activeData]);
 
-  const typeFilteredEvents = useMemo(
+  // Events with every filter EXCEPT the unit predicate applied. Used to
+  // decide whether an active unit filter is the actual cause of an empty
+  // view (vs. event-type/roster-type filters having emptied it already).
+  const preUnitFilteredEvents = useMemo(
     () =>
       (activeData?.events ?? []).filter((e) => {
         if (!activeFilters.has(e.event_type)) return false;
@@ -119,25 +122,26 @@ export function HistoryView() {
           return false;
         if (e.roster_type && !activeRosterTypes.has(e.roster_type))
           return false;
-        if (unitFilter.battalion) {
-          const u = parseUnit(e.position_title || "");
-          if (!u || u.battalion !== unitFilter.battalion) return false;
-          if (unitFilter.company) {
-            const co = u.company ?? "HQ";
-            if (co !== unitFilter.company) return false;
-          }
-          if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
-            return false;
-        }
         return true;
       }),
-    [
-      activeData,
-      activeFilters,
-      excludedRecordTypes,
-      activeRosterTypes,
-      unitFilter,
-    ],
+    [activeData, activeFilters, excludedRecordTypes, activeRosterTypes],
+  );
+
+  const typeFilteredEvents = useMemo(
+    () =>
+      preUnitFilteredEvents.filter((e) => {
+        if (!unitFilter.battalion) return true;
+        const u = parseUnit(e.position_title || "");
+        if (!u || u.battalion !== unitFilter.battalion) return false;
+        if (unitFilter.company) {
+          const co = u.company ?? "HQ";
+          if (co !== unitFilter.company) return false;
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
+          return false;
+        return true;
+      }),
+    [preUnitFilteredEvents, unitFilter],
   );
 
   const recordTypeCounts = useMemo(() => {
@@ -175,6 +179,11 @@ export function HistoryView() {
 
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
+
+  // True when an active unit filter is the genuine cause of emptiness:
+  // events survive every other filter, but none match the selected unit.
+  const unitFilterIsCause =
+    Boolean(unitFilter.battalion) && preUnitFilteredEvents.length > 0;
 
   // Aggregate snapshots into heatmap buckets. Bucket size scales with range:
   // ≤90d → daily, ≤365d → weekly, >365d or All → monthly
@@ -380,11 +389,13 @@ export function HistoryView() {
               {heatmapData.map((entry) => {
                 const count = totalCount(entry);
                 const isSelected = entry.date === selectedDay;
+                const cellLabel = `${entry.label}: ${count} change${count !== 1 ? "s" : ""}`;
                 return (
                   <Tooltip key={entry.date}>
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => handleDotClick(entry)}
+                        aria-label={cellLabel}
                         className={cn(
                           "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                           heatIntensity(count, maxCount),
@@ -392,9 +403,7 @@ export function HistoryView() {
                         )}
                       />
                     </TooltipTrigger>
-                    <TooltipContent>
-                      {`${entry.label}: ${count} change${count !== 1 ? "s" : ""}`}
-                    </TooltipContent>
+                    <TooltipContent>{cellLabel}</TooltipContent>
                   </Tooltip>
                 );
               })}
@@ -459,12 +468,13 @@ export function HistoryView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          {!isLoading && (
+          {!isLoading && !isError && (
             <UnitFilterBar
               events={typeFilteredEvents}
               unitFilter={unitFilter}
               onSelect={handleUnitSelect}
               onClear={handleUnitClear}
+              preUnitFilteredCount={preUnitFilteredEvents.length}
             />
           )}
 
@@ -506,12 +516,16 @@ export function HistoryView() {
             <p className="text-muted-foreground text-sm">Loading…</p>
           )}
 
-          {/* When a unit filter matched nothing, UnitFilterBar renders its own
-              explanatory empty state — skip the generic message. */}
+          {/* Skip the generic message only when UnitFilterBar renders its own
+              unit-scoped empty state (unitFilterIsCause). Invariant: this
+              relies on UnitFilterBar receiving the same typeFilteredEvents
+              used to compute totalVisible (plus preUnitFilteredCount for the
+              cause check) — if those ever diverge, restore a fallback
+              message here. */}
           {!isError &&
             !isLoading &&
             totalVisible === 0 &&
-            !unitFilter.battalion && (
+            !unitFilterIsCause && (
               <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
                 <p>
                   No changes{" "}
