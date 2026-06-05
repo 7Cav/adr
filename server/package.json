@@ -21,7 +21,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "mysql2": "^3.11.0",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.2.1",
     "node-pg-migrate": "^8.0.4",
     "pg": "^8.11.3"
   }
