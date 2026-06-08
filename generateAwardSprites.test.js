@@ -324,6 +324,48 @@ async function main() {
   assert.deepStrictEqual(await rowColor(sheet, 56), [30, 0, 0]);
   ok("splice: original last band shifted down below both inserts", true);
 
+  // --- spliceSheet: replace overwrites in place, no shift, no growth ---
+  const repl = path.join(dir, "repl.png");
+  await makeSheet(repl, 43, 14, [
+    [10, 0, 0],
+    [20, 0, 0],
+    [30, 0, 0],
+  ]); // rows 0,1,2 — 42px
+  await spliceSheet(repl, [
+    {
+      y: 14,
+      tileHeight: 14,
+      png: await colorTile(43, 14, [99, 0, 0]),
+      name: "R",
+      replace: true,
+    },
+  ]);
+  const replMeta = await sharp(repl).metadata();
+  ok("splice(replace): height unchanged (42 -> 42)", replMeta.height === 42);
+  assert.deepStrictEqual(await rowColor(repl, 0), [10, 0, 0]);
+  ok("splice(replace): row above untouched", true);
+  assert.deepStrictEqual(await rowColor(repl, 14), [99, 0, 0]);
+  ok("splice(replace): target row overwritten in place", true);
+  assert.deepStrictEqual(await rowColor(repl, 28), [30, 0, 0]);
+  ok("splice(replace): row below NOT shifted", true);
+
+  // --- spliceSheet: replace past the sheet end is rejected ---
+  let replThrew = false;
+  try {
+    await spliceSheet(repl, [
+      {
+        y: 56,
+        tileHeight: 14,
+        png: await colorTile(43, 14, [1, 1, 1]),
+        name: "R2",
+        replace: true,
+      },
+    ]);
+  } catch (e) {
+    replThrew = e.message.includes("no existing tile to overwrite");
+  }
+  ok("splice(replace): replacing a nonexistent row throws", replThrew);
+
   // --- run: no-op manifest leaves sheets byte-identical ---
   const paths = makePaths(dir);
   await makeSheet(paths.ribbonSheet, 43, 14, [
@@ -426,6 +468,46 @@ async function main() {
   ok(
     "run: sheet untouched after validation failure",
     ribGuard.equals(fs.readFileSync(paths.ribbonSheet)),
+  );
+
+  // --- run: replace:true overwrites both tiles in place without growing ---
+  // Bar Medal: ribbon y=28 (priority 2), medal y=0 (priority 2). Sheets are
+  // pre-sized so the rows already exist; replace must not change height.
+  await makeSheet(paths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+    [3, 0, 0],
+  ]);
+  await makeSheet(paths.medalSheet, 70, 120, [
+    [0, 1, 0],
+    [0, 2, 0],
+  ]);
+  fs.writeFileSync(
+    path.join(dir, "rR.png"),
+    await colorTile(43, 13, [8, 8, 8]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "mR.png"),
+    await colorTile(72, 148, [8, 8, 8]),
+  );
+  fs.writeFileSync(
+    paths.manifest,
+    JSON.stringify(
+      [{ name: "Bar Medal", ribbon: "rR.png", medal: "mR.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const ribHR = (await sharp(paths.ribbonSheet).metadata()).height;
+  const medHR = (await sharp(paths.medalSheet).metadata()).height;
+  await run(paths, silent());
+  ok(
+    "run(replace): ribbon sheet height unchanged",
+    (await sharp(paths.ribbonSheet).metadata()).height === ribHR,
+  );
+  ok(
+    "run(replace): medal sheet height unchanged",
+    (await sharp(paths.medalSheet).metadata()).height === medHR,
   );
 
   // --- run: an ignored extra source is NOT deleted (only placed tiles) ---

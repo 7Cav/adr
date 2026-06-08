@@ -31,6 +31,7 @@ the sprite sheets and opens a pull request for review.
    - Supply `ribbon` if the award has an `awardPriority`, and `medal` if it has
      a `medalPriority`. Service ribbons have both; pure ribbons have only
      `ribbon`.
+
 4. **Push.** CI validates the manifest against the registry, splices the tiles
    into the sprite sheets at the registry-derived rows, removes the consumed
    PNGs, empties the manifest, and opens a PR containing only the regenerated
@@ -39,14 +40,29 @@ the sprite sheets and opens a pull request for review.
 CI never edits the registry, never touches the `.xcf` GIMP sources, and never
 auto-merges.
 
-## ⚠️ This flow is insert-only — it cannot replace existing art
+## Adding new art vs. fixing existing art
 
-CI always **inserts** a tile at the registry-derived row; it has no way to tell
-that an award already has a tile there. Adding an award that is **already on the
-sheet** to `manifest.json` splices a duplicate tile and shifts every row below
-it down — corrupting the sheet rather than fixing the art.
+Two modes, selected per entry:
 
-Only queue awards that are **new to the sheet** (a brand-new `awardPriority` /
-`medalPriority`, with the registry renumbered as in step 1). To fix or replace
-the art of an award that already exists, edit the `.xcf` GIMP source and export
-the sheet by hand — do not route it through this folder.
+- **New award (default) — insert.** Omit `replace` (or set it to `false`). CI
+  splices the tile in at the registry-derived row and shifts every row below it
+  down by one tile. Use this only for an award that is **new to the sheet**, and
+  renumber the registry as in step 1 so the priorities below it move too.
+- **Existing award — replace.** Set `"replace": true`. CI overwrites the tile
+  already at that award's registry row in place — no shift, no height change —
+  so re-uploading art for an award that already has a tile fixes it instead of
+  inserting a duplicate.
+
+  ```json
+  [
+    {
+      "name": "Combat Action Badge",
+      "medal": "CAB_v2.png",
+      "replace": true
+    }
+  ]
+  ```
+
+  Do **not** renumber the registry for a replace — the award keeps its existing
+  priority. Replacing a row that doesn't exist yet (a priority past the end of
+  the sheet) fails the run; use an insert for a genuinely new award.

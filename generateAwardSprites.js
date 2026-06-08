@@ -10,7 +10,10 @@
  * in-bounds insert shifts every lower row down by its tile height (N inserts
  * shift the bottom band down by N tiles); an insert past the current end pads
  * the sub-tile remainder with transparency and appends without shifting
- * anything. Consumed sources and their manifest entries are then removed.
+ * anything. An entry flagged `replace: true` overwrites the tile already at
+ * that row in place — no shift, no growth — to fix the art of an award that
+ * already has a tile. Consumed sources and their manifest entries are then
+ * removed.
  *
  * Geometry (load-bearing):
  *   Ribbon: tile 43x14, row y = awardPriority * 14
@@ -252,6 +255,12 @@ async function normalizeMedal(srcPath) {
  * row lands at or beyond the current end — a new bottom-most award, given the
  * sub-tile remainder — the sheet is padded with transparency up to `y` so the
  * tile sits at its exact consumer-read position.
+ *
+ * An entry with `replace: true` overwrites the tile already at `y` in place:
+ * no shift, no height change. It is used to fix the art of an award that
+ * already has a tile, and errors if `y` isn't a full existing row. Replaces and
+ * inserts can be mixed in one call; ascending order keeps every `y` (which is
+ * always the final registry row) pointing at the right bytes.
  */
 async function buildSplicedSheet(sheetPath, inserts) {
   if (inserts.length === 0) return null;
@@ -262,7 +271,7 @@ async function buildSplicedSheet(sheetPath, inserts) {
   for (const ins of sorted) {
     if (ins.y < 0) {
       throw new Error(
-        `insert row y=${ins.y} is negative for "${ins.name}" (${sheetPath})`,
+        `${ins.replace ? "replace" : "insert"} row y=${ins.y} is negative for "${ins.name}" (${sheetPath})`,
       );
     }
     const rawTile = await tileToRaw(ins.png, channels);
@@ -271,6 +280,16 @@ async function buildSplicedSheet(sheetPath, inserts) {
       throw new Error(
         `normalized tile for "${ins.name}" is ${rawTile.length} bytes, expected ${expected} (${width}x${ins.tileHeight}x${channels})`,
       );
+    }
+    if (ins.replace) {
+      // Overwrite the existing tile at `y` in place — no shift, no growth.
+      if (ins.y + ins.tileHeight > height) {
+        throw new Error(
+          `replace for "${ins.name}" targets row y=${ins.y} but the sheet is only ${height}px tall; there is no existing tile to overwrite (use an insert for a new award)`,
+        );
+      }
+      rawTile.copy(data, ins.y * width * channels);
+      continue; // height unchanged
     }
     if (ins.y <= height) {
       // In-bounds splice: shift everything below `y` down one tile.
@@ -330,6 +349,12 @@ function validateManifest(manifest, registryText, uploadDir) {
       return;
     }
     seen.add(entry.name);
+    if (entry.replace !== undefined && typeof entry.replace !== "boolean") {
+      errors.push(
+        `${label}: "${entry.name}" has a non-boolean "replace" (must be true or false)`,
+      );
+      return;
+    }
     const award = parseAward(registryText, entry.name);
     if (!award) {
       errors.push(
@@ -419,6 +444,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
 
   for (const entry of manifest) {
     const award = parseAward(registryText, entry.name);
+    const replace = entry.replace === true;
     if (onRibbonSheet(award)) {
       const { png, warnings: w } = await normalizeRibbon(
         path.join(paths.uploadDir, entry.ribbon),
@@ -429,6 +455,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
         tileHeight: RIBBON.tileHeight,
         png,
         name: entry.name,
+        replace,
       });
       // Only mark a source consumed once its tile is actually going into a
       // sheet — never delete art for a tile that wasn't placed.
@@ -444,6 +471,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
         tileHeight: MEDAL.tileHeight,
         png,
         name: entry.name,
+        replace,
       });
       consumed.add(entry.medal);
     }
