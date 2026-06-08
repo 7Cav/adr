@@ -1,0 +1,59 @@
+name: AWARD_SPRITES
+
+on:
+  push:
+    paths:
+      - "uniform-uploads/**"
+    branches-ignore:
+      - "award-sprites/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: award-sprites-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate_sprites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate sprite sheets
+        run: npm run sprites:generate
+
+      - name: Verify formatting
+        run: npm run format:check
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: award-sprites/${{ github.ref_name }}
+          base: ${{ github.ref_name }}
+          add-paths: |
+            client/public/skunkworks/**
+            uniform-uploads/**
+          commit-message: "chore(uniformbuilder): regenerate award sprite sheets"
+          title: "chore(uniformbuilder): regenerate award sprite sheets"
+          body: |
+            Automated sprite-sheet regeneration from `uniform-uploads/`.
+
+            This PR contains only the regenerated sprite-sheet PNG(s) and the
+            upload-folder cleanup (consumed source art removed, manifest
+            emptied). Placement was read from `AwardRegistry.jsx`.
+
+            Review that the new award renders correctly in both racks and that
+            nothing below the insert point shifted, then merge.
