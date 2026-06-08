@@ -55,20 +55,21 @@ export class AwardRegistry {
     this.awards.set("Hell Let Loose Service Ribbon", {awardPriority: 43, medalPriority: 39, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Hell Let Loose Console Service Ribbon", {awardPriority: 44, medalPriority: 40, awardAttachmentType: "oakClustersService", awardType: "Medal"});
     this.awards.set("Battlefield 6 Service Ribbon", {awardPriority: 45, medalPriority: 41, awardAttachmentType: "oakClustersService", awardType: "Medal"});
-    this.awards.set("Recruiting Ribbon", {awardPriority: 46, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
-    this.awards.set("D-Day Commemorative Medal", {awardPriority: 47, medalPriority: 42, awardType: "Medal"});
-    this.awards.set("Ranger Selection Ribbon", {awardPriority: 48, awardType: "Ribbon"});
-    this.awards.set("Sniper Ribbon", {awardPriority: 49, medalPriority: 43, awardType: "Medal"});
-    this.awards.set("Basic Assault Course Ribbon", {awardPriority: 50, awardType: "Ribbon"});
+    this.awards.set("Foxhole Service Ribbon", {awardPriority: 46, medalPriority: 42, awardAttachmentType: "oakClustersService", awardType: "Medal"});
+    this.awards.set("Recruiting Ribbon", {awardPriority: 47, awardAttachmentType: "starsDonation", awardType: "RibbonDonationLogic"}); // May Also require Special Case
+    this.awards.set("D-Day Commemorative Medal", {awardPriority: 48, medalPriority: 43, awardType: "Medal"});
+    this.awards.set("Ranger Selection Ribbon", {awardPriority: 49, awardType: "Ribbon"});
+    this.awards.set("Sniper Ribbon", {awardPriority: 50, medalPriority: 44, awardType: "Medal"});
+    this.awards.set("Basic Assault Course Ribbon", {awardPriority: 51, awardType: "Ribbon"});
 
     // ___ DISCONTINUED RIBBONS/MEDALS WITHOUT PRECIDENCE ___
     // These ones are a bit of an unknown precidence wise. Indeed we have some discon awards above, however precidence is known
-    // Anything here is shown as is, and there is no inherent precicence for these. 
+    // Anything here is shown as is, and there is no inherent precicence for these.
 
-    this.awards.set("Cadre Course Ribbon", {awardPriority: 51, awardType: "Ribbon"});
-    this.awards.set("Womens Army Corp Service Medal", {awardPriority: 52, medalPriority:44, awardType: "Medal"})
-    this.awards.set("D Day Participation Ribbon", {awardPriority: 53, awardType: "Ribbon"})
-    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 54, medalPriority:45, awardAttachmentType: "oakClusters", awardType: "Medal"})
+    this.awards.set("Cadre Course Ribbon", {awardPriority: 52, awardType: "Ribbon"});
+    this.awards.set("Womens Army Corp Service Medal", {awardPriority: 53, medalPriority:45, awardType: "Medal"})
+    this.awards.set("D Day Participation Ribbon", {awardPriority: 54, awardType: "Ribbon"})
+    this.awards.set("European/African/Middle Eastern Campaign Medal", {awardPriority: 55, medalPriority:46, awardAttachmentType: "oakClusters", awardType: "Medal"})
     
 
     //____ UNIT CITATIONS ____
