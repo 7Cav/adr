@@ -15,6 +15,7 @@ const sharp = require("sharp");
 
 const {
   parseAward,
+  unparsedFields,
   onRibbonSheet,
   onMedalSheet,
   validateManifest,
@@ -31,6 +32,8 @@ const REGISTRY = `
     this.awards.set("Bar Medal", {awardPriority: 2, medalPriority:2, awardType: "Medal"});
     this.awards.set(\`Baz "Q" Service Ribbon\`, {awardPriority: 4, medalPriority: 3, awardType: "Medal"});
     this.awards.set("Ranger Tab", {awardPriority: 1, awardType: "Tab"});
+    this.awards.set("Nested Medal", {awardPriority: 5, style: {x: 1}, medalPriority: 4, awardType: "Medal"});
+    this.awards.set("Broken Medal", {awardPriority: 6, medalPriority: WIP, awardType: "Medal"});
   }
 `;
 
@@ -110,6 +113,25 @@ async function main() {
   assert.strictEqual(parseAward(REGISTRY, "Nope"), null);
   ok("parseAward: absent name returns null", true);
 
+  // Brace-balanced extraction: a nested object before the priorities must not
+  // truncate the entry and drop its trailing fields.
+  assert.deepStrictEqual(parseAward(REGISTRY, "Nested Medal"), {
+    awardPriority: 5,
+    medalPriority: 4,
+    awardType: "Medal",
+  });
+  ok("parseAward: nested object before priorities does not truncate", true);
+
+  // --- unparsedFields: present-but-unparsed field is flagged ---
+  assert.deepStrictEqual(unparsedFields(REGISTRY, "Broken Medal"), [
+    "medalPriority",
+  ]);
+  ok("unparsed: present-but-unparseable medalPriority is flagged", true);
+  assert.deepStrictEqual(unparsedFields(REGISTRY, "Bar Medal"), []);
+  ok("unparsed: clean entry flags nothing", true);
+  assert.deepStrictEqual(unparsedFields(REGISTRY, "Nope"), []);
+  ok("unparsed: absent name flags nothing", true);
+
   // --- membership gating ---
   ok(
     "membership: Tab is on neither sheet",
@@ -144,6 +166,18 @@ async function main() {
     dir,
   );
   ok("validate: name absent from registry errors", r.errors.length === 1);
+
+  r = validateManifest(
+    [{ name: "Broken Medal", ribbon: "ribbon.png", medal: "medal.png" }],
+    REGISTRY,
+    dir,
+  );
+  ok(
+    "validate: present-but-unparsed field is a hard error, not a non-member",
+    r.errors.some(
+      (e) => e.includes("could not be parsed") && e.includes("medalPriority"),
+    ),
+  );
 
   r = validateManifest(
     [{ name: "Bar Medal", ribbon: "ribbon.png" }],
@@ -392,6 +426,38 @@ async function main() {
   ok(
     "run: sheet untouched after validation failure",
     ribGuard.equals(fs.readFileSync(paths.ribbonSheet)),
+  );
+
+  // --- run: an ignored extra source is NOT deleted (only placed tiles) ---
+  await makeSheet(paths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+  ]);
+  await makeSheet(paths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(dir, "rib3.png"),
+    await colorTile(43, 13, [7, 7, 7]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "extra.png"),
+    await colorTile(72, 148, [7, 7, 7]),
+  );
+  fs.writeFileSync(
+    paths.manifest,
+    JSON.stringify(
+      [{ name: "Foo Ribbon", ribbon: "rib3.png", medal: "extra.png" }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await run(paths, silent());
+  ok(
+    "run: placed ribbon source removed",
+    !fs.existsSync(path.join(dir, "rib3.png")),
+  );
+  ok(
+    "run: ignored extra (unplaced) source is kept, not deleted",
+    fs.existsSync(path.join(dir, "extra.png")),
   );
 
   fs.rmSync(dir, { recursive: true, force: true });

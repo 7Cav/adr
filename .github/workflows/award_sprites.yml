@@ -32,13 +32,40 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run generator tests
+        run: npm test
+
       - name: Generate sprite sheets
-        run: npm run sprites:generate
+        id: generate
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run sprites:generate 2>&1 | tee sprite-gen.log
+          WARNINGS=$(grep '^WARN:' sprite-gen.log || true)
+          [ -z "$WARNINGS" ] && WARNINGS="(none)"
+          {
+            echo "warnings<<SPRITE_EOF"
+            echo "$WARNINGS"
+            echo "SPRITE_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Detect sprite-sheet changes
+        id: changes
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain client/public/skunkworks/)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No sprite-sheet changes (e.g. README/manifest-only push); skipping PR."
+          fi
 
       - name: Verify formatting
+        if: steps.changes.outputs.changed == 'true'
         run: npm run format:check
 
       - name: Open pull request
+        if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           branch: award-sprites/${{ github.ref_name }}
@@ -54,6 +81,13 @@ jobs:
             This PR contains only the regenerated sprite-sheet PNG(s) and the
             upload-folder cleanup (consumed source art removed, manifest
             emptied). Placement was read from `AwardRegistry.jsx`.
+
+            **Generator warnings** (e.g. a medal placed with a transparent gap,
+            or a ribbon stretched from a wrong-sized source):
+
+            ```
+            ${{ steps.generate.outputs.warnings }}
+            ```
 
             Review that the new award renders correctly in both racks and that
             nothing below the insert point shifted, then merge.

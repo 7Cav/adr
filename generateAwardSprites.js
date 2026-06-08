@@ -6,11 +6,13 @@
  * Reads `uniform-uploads/manifest.json`, validates every entry against
  * `AwardRegistry.jsx` (the human-owned source of truth for placement),
  * normalizes each source PNG to its target tile geometry, and splices the
- * tile into the correct sprite sheet(s) at the registry-derived row — shifting
- * every lower row down by exactly one tile height. Consumed sources and their
- * manifest entries are then removed.
+ * tile into the correct sprite sheet(s) at the registry-derived row. An
+ * in-bounds insert shifts every lower row down by its tile height (N inserts
+ * shift the bottom band down by N tiles); an insert past the current end pads
+ * the sub-tile remainder with transparency and appends without shifting
+ * anything. Consumed sources and their manifest entries are then removed.
  *
- * Geometry (load-bearing — see spritesheet-geometry.md):
+ * Geometry (load-bearing):
  *   Ribbon: tile 43x14, row y = awardPriority * 14
  *   Medal:  tile 70x120, row y = (medalPriority - 2) * 120
  *
@@ -85,37 +87,91 @@ function onMedalSheet(award) {
   );
 }
 
+// Field matchers, shared by the parser and the present-but-unparsed check so
+// the two can never drift on what counts as a valid value.
+const FIELD_RE = {
+  awardPriority: /awardPriority\s*:\s*(\d+)/,
+  medalPriority: /medalPriority\s*:\s*(\d+)/,
+  awardType: /awardType\s*:\s*["'`]([A-Za-z]+)["'`]/,
+};
+
 /**
- * Parse a single award's placement out of the registry SOURCE TEXT (never
- * executed). Matches `this.awards.set(<"name"|`name`>, { ... })` for the exact
- * literal name and reads its priorities. Returns null when the name is absent.
+ * Extract the brace-balanced object-literal body for a single award out of the
+ * registry SOURCE TEXT (never executed). Matches `this.awards.set(<"name"
+ * |`name`>, { ... })` for the exact literal name and returns the text between
+ * the matching braces, or null when the name is absent. Brace-balanced (rather
+ * than stopping at the first `}`) so an entry containing a nested object is
+ * captured in full instead of being truncated mid-entry.
+ */
+function extractAwardBody(registryText, name) {
+  const escaped = escapeRegExp(name);
+  const head = new RegExp(
+    'this\\.awards\\.set\\(\\s*[`"]' + escaped + '[`"]\\s*,\\s*\\{',
+  );
+  const m = registryText.match(head);
+  if (!m) return null;
+  const start = m.index + m[0].length; // first char after the opening "{"
+  let depth = 1;
+  let i = start;
+  for (; i < registryText.length && depth > 0; i++) {
+    const ch = registryText[i];
+    if (ch === "{") depth++;
+    else if (ch === "}") depth--;
+  }
+  if (depth !== 0) return null; // unbalanced — treat as not found
+  return registryText.slice(start, i - 1);
+}
+
+/**
+ * Parse a single award's placement out of the registry source text. Returns
+ * null when the name is absent, otherwise an object with whatever of
+ * `awardPriority`/`medalPriority`/`awardType` parsed. A field that is present
+ * in the registry but fails to parse comes back absent here — callers must run
+ * {@link unparsedFields} to reject that case rather than treat it as "field
+ * not set," or a placement can be silently dropped.
  */
 function parseAward(registryText, name) {
-  const escaped = escapeRegExp(name);
-  const re = new RegExp(
-    'this\\.awards\\.set\\(\\s*[`"]' + escaped + '[`"]\\s*,\\s*\\{([^}]*)\\}',
-  );
-  const match = registryText.match(re);
-  if (!match) return null;
-  const body = match[1];
+  const body = extractAwardBody(registryText, name);
+  if (body === null) return null;
   const award = {};
-  const ap = body.match(/awardPriority\s*:\s*(\d+)/);
-  const mp = body.match(/medalPriority\s*:\s*(\d+)/);
-  const at = body.match(/awardType\s*:\s*["'`]([A-Za-z]+)["'`]/);
+  const ap = body.match(FIELD_RE.awardPriority);
+  const mp = body.match(FIELD_RE.medalPriority);
+  const at = body.match(FIELD_RE.awardType);
   if (ap) award.awardPriority = Number(ap[1]);
   if (mp) award.medalPriority = Number(mp[1]);
   if (at) award.awardType = at[1];
   return award;
 }
 
-/** Read a sheet's raw pixels, matching its existing color mode (RGB vs RGBA). */
+/**
+ * Names of fields that appear (as a `key:`) in the award's registry body but
+ * whose value did not parse — the dangerous case the parser would otherwise
+ * drop silently. Returns [] when the name is absent or every present field
+ * parsed cleanly.
+ */
+function unparsedFields(registryText, name) {
+  const body = extractAwardBody(registryText, name);
+  if (body === null) return [];
+  return Object.keys(FIELD_RE).filter(
+    (key) =>
+      new RegExp("\\b" + key + "\\s*:").test(body) && !FIELD_RE[key].test(body),
+  );
+}
+
+/**
+ * Read a sheet's raw RGBA pixels. Both production sheets are RGBA; we assert it
+ * rather than silently handling RGB so a future flatten-on-export fails loud
+ * here instead of running an untested 3-channel path.
+ */
 async function readSheet(sheetPath) {
   const meta = await sharp(sheetPath).metadata();
-  const channels = meta.hasAlpha ? 4 : 3;
-  const pipe = meta.hasAlpha
-    ? sharp(sheetPath).ensureAlpha()
-    : sharp(sheetPath).removeAlpha();
-  const data = await pipe.raw().toBuffer();
+  if (!meta.hasAlpha) {
+    throw new Error(
+      `sheet ${path.basename(sheetPath)} has no alpha channel; sprite sheets must be RGBA`,
+    );
+  }
+  const channels = 4;
+  const data = await sharp(sheetPath).ensureAlpha().raw().toBuffer();
   return { data, width: meta.width, height: meta.height, channels };
 }
 
@@ -281,6 +337,23 @@ function validateManifest(manifest, registryText, uploadDir) {
       );
       return;
     }
+    // A field that is present in the registry but didn't parse must abort,
+    // separate from "name absent" and "not a sheet member": otherwise an award
+    // whose (say) medalPriority failed to parse looks like a non-member, its
+    // medal tile is silently never placed, yet its source is still consumed.
+    const unparsed = unparsedFields(registryText, entry.name);
+    if (unparsed.length > 0) {
+      errors.push(
+        `${label}: "${entry.name}" has registry field(s) that are present but could not be parsed (${unparsed.join(", ")}); fix the entry in AwardRegistry.jsx`,
+      );
+      return;
+    }
+    if (award.awardType === undefined) {
+      errors.push(
+        `${label}: "${entry.name}" has no parseable awardType in AwardRegistry.jsx`,
+      );
+      return;
+    }
     const needRibbon = onRibbonSheet(award);
     const needMedal = onMedalSheet(award);
     if (!needRibbon && !needMedal) {
@@ -357,6 +430,9 @@ async function run(paths = DEFAULT_PATHS, log = console) {
         png,
         name: entry.name,
       });
+      // Only mark a source consumed once its tile is actually going into a
+      // sheet — never delete art for a tile that wasn't placed.
+      consumed.add(entry.ribbon);
     }
     if (onMedalSheet(award)) {
       const { png, warnings: w } = await normalizeMedal(
@@ -364,25 +440,31 @@ async function run(paths = DEFAULT_PATHS, log = console) {
       );
       allWarnings.push(...w);
       medalInserts.push({
-        y: (award.medalPriority - 2) * MEDAL.tileHeight,
+        y: (award.medalPriority - MEDAL_MIN_PRIORITY) * MEDAL.tileHeight,
         tileHeight: MEDAL.tileHeight,
         png,
         name: entry.name,
       });
-    }
-    // Every source file referenced by a processed entry is cleaned up — even
-    // an ignored extra source — so nothing lingers to re-trigger the workflow.
-    for (const kind of ["ribbon", "medal"]) {
-      if (typeof entry[kind] === "string") consumed.add(entry[kind]);
+      consumed.add(entry.medal);
     }
   }
 
-  // Compute both spliced sheets fully before writing either, so a decode/IO
-  // failure on the second sheet can't leave the first overwritten.
+  // Compute both spliced sheets fully before writing either, then encode each
+  // to a temp file and only rename into place once BOTH encodes have succeeded.
+  // That way a decode/encode failure on the second sheet can't leave the first
+  // already overwritten — the renames are the only mutation, and they run last.
   const ribbonPlan = await buildSplicedSheet(paths.ribbonSheet, ribbonInserts);
   const medalPlan = await buildSplicedSheet(paths.medalSheet, medalInserts);
-  if (ribbonPlan) await writeSheet(paths.ribbonSheet, ribbonPlan);
-  if (medalPlan) await writeSheet(paths.medalSheet, medalPlan);
+  const pending = [];
+  if (ribbonPlan) pending.push([paths.ribbonSheet, ribbonPlan]);
+  if (medalPlan) pending.push([paths.medalSheet, medalPlan]);
+  const renames = [];
+  for (const [dest, plan] of pending) {
+    const tmp = dest + ".tmp.png";
+    await writeSheet(tmp, plan);
+    renames.push([tmp, dest]);
+  }
+  renames.forEach(([tmp, dest]) => fs.renameSync(tmp, dest));
 
   // Consume sources and empty the manifest of processed entries.
   consumed.forEach((file) => {
@@ -430,7 +512,9 @@ module.exports = {
   RIBBON_SHEET_TYPES,
   MEDAL_SHEET_TYPES,
   escapeRegExp,
+  extractAwardBody,
   parseAward,
+  unparsedFields,
   onRibbonSheet,
   onMedalSheet,
   readSheet,

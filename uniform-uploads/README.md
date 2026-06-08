@@ -38,3 +38,15 @@ the sprite sheets and opens a pull request for review.
 
 CI never edits the registry, never touches the `.xcf` GIMP sources, and never
 auto-merges.
+
+## ⚠️ This flow is insert-only — it cannot replace existing art
+
+CI always **inserts** a tile at the registry-derived row; it has no way to tell
+that an award already has a tile there. Adding an award that is **already on the
+sheet** to `manifest.json` splices a duplicate tile and shifts every row below
+it down — corrupting the sheet rather than fixing the art.
+
+Only queue awards that are **new to the sheet** (a brand-new `awardPriority` /
+`medalPriority`, with the registry renumbered as in step 1). To fix or replace
+the art of an award that already exists, edit the `.xcf` GIMP source and export
+the sheet by hand — do not route it through this folder.
