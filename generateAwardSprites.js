@@ -258,12 +258,27 @@ async function normalizeMedal(srcPath) {
  *
  * An entry with `replace: true` overwrites the tile already at `y` in place:
  * no shift, no height change. It is used to fix the art of an award that
- * already has a tile, and errors if `y` isn't a full existing row. Replaces and
- * inserts can be mixed in one call; ascending order keeps every `y` (which is
- * always the final registry row) pointing at the right bytes.
+ * already has a tile, and errors if `y` isn't a full existing row.
+ *
+ * Replaces and inserts must NOT be mixed in one call: a replace copies into an
+ * absolute byte offset derived from the registry row, but an insert grows the
+ * buffer and shifts every lower row down, so a replace sorted after an insert
+ * would land on the shifted neighbour instead of its target — overwriting the
+ * wrong award while the intended one stays broken, with the run still exiting
+ * 0. We reject the mix here (and in validateManifest) rather than try to
+ * reconcile the two offset spaces.
  */
 async function buildSplicedSheet(sheetPath, inserts) {
   if (inserts.length === 0) return null;
+  const hasReplace = inserts.some((i) => i.replace);
+  const hasInsert = inserts.some((i) => !i.replace);
+  if (hasReplace && hasInsert) {
+    throw new Error(
+      `cannot mix a replace and an insert on the same sheet in one run (${sheetPath}); ` +
+        `an insert shifts the buffer and would send the replace to the wrong row — ` +
+        `split them across separate runs`,
+    );
+  }
   const sheet = await readSheet(sheetPath);
   let { data, height } = sheet;
   const { width, channels } = sheet;
@@ -338,6 +353,11 @@ function validateManifest(manifest, registryText, uploadDir) {
     return { errors, warnings };
   }
   const seen = new Set();
+  // Per-sheet record of which placement modes appear (true = replace, false =
+  // insert). A sheet that sees both in one run is rejected below: mixing them
+  // corrupts the wrong row (see buildSplicedSheet).
+  const ribbonModes = new Set();
+  const medalModes = new Set();
   manifest.forEach((entry, i) => {
     const label = `entry ${i}`;
     if (!entry || typeof entry.name !== "string" || entry.name === "") {
@@ -406,6 +426,21 @@ function validateManifest(manifest, registryText, uploadDir) {
     };
     check("ribbon", needRibbon);
     check("medal", needMedal);
+    const isReplace = entry.replace === true;
+    if (needRibbon) ribbonModes.add(isReplace);
+    if (needMedal) medalModes.add(isReplace);
+  });
+  [
+    ["ribbon", ribbonModes],
+    ["medal", medalModes],
+  ].forEach(([sheet, modes]) => {
+    if (modes.has(true) && modes.has(false)) {
+      errors.push(
+        `the ${sheet} sheet has both a replace and an insert in one run; ` +
+          `an insert shifts the buffer and would send the replace to the wrong row — ` +
+          `process them in separate uploads`,
+      );
+    }
   });
   return { errors, warnings };
 }
@@ -486,13 +521,36 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const pending = [];
   if (ribbonPlan) pending.push([paths.ribbonSheet, ribbonPlan]);
   if (medalPlan) pending.push([paths.medalSheet, medalPlan]);
-  const renames = [];
-  for (const [dest, plan] of pending) {
-    const tmp = dest + ".tmp.png";
-    await writeSheet(tmp, plan);
-    renames.push([tmp, dest]);
+  const tmpFor = (dest) => dest + ".tmp.png";
+  try {
+    const renames = [];
+    for (const [dest, plan] of pending) {
+      const tmp = tmpFor(dest);
+      await writeSheet(tmp, plan);
+      renames.push([tmp, dest]);
+    }
+    // The renames are the only mutation and run last. Two destinations can't be
+    // made truly atomic: if the second rename throws (e.g. an EXDEV cross-device
+    // move between a /tmp build dir and the repo), sheet one is already replaced
+    // and sheet two is stale. The manifest is NOT emptied in that case, so the
+    // next run re-processes the same entries against the already-modified sheet
+    // and would double-apply — a partial-rename crash must be reconciled by hand
+    // (restore both sheets from git, then re-run).
+    renames.forEach(([tmp, dest]) => fs.renameSync(tmp, dest));
+  } finally {
+    // Best-effort: remove any tmp that didn't get renamed (write failure or a
+    // partial-rename crash) so a failed run never litters the repo with orphans.
+    pending.forEach(([dest]) => {
+      const tmp = tmpFor(dest);
+      if (fs.existsSync(tmp)) {
+        try {
+          fs.unlinkSync(tmp);
+        } catch {
+          /* nothing more we can do */
+        }
+      }
+    });
   }
-  renames.forEach(([tmp, dest]) => fs.renameSync(tmp, dest));
 
   // Consume sources and empty the manifest of processed entries.
   consumed.forEach((file) => {

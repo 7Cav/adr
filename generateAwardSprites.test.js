@@ -34,6 +34,7 @@ const REGISTRY = `
     this.awards.set("Ranger Tab", {awardPriority: 1, awardType: "Tab"});
     this.awards.set("Nested Medal", {awardPriority: 5, style: {x: 1}, medalPriority: 4, awardType: "Medal"});
     this.awards.set("Broken Medal", {awardPriority: 6, medalPriority: WIP, awardType: "Medal"});
+    this.awards.set("Typeless Medal", {awardPriority: 7, medalPriority: 6});
   }
 `;
 
@@ -180,6 +181,17 @@ async function main() {
   );
 
   r = validateManifest(
+    [{ name: "Typeless Medal", ribbon: "ribbon.png", medal: "medal.png" }],
+    REGISTRY,
+    dir,
+  );
+  ok(
+    "validate: priorities present but no awardType errors distinctly (not 'does not belong')",
+    r.errors.some((e) => e.includes("no parseable awardType")) &&
+      !r.errors.some((e) => e.includes("does not belong")),
+  );
+
+  r = validateManifest(
     [{ name: "Bar Medal", ribbon: "ribbon.png" }],
     REGISTRY,
     dir,
@@ -237,6 +249,35 @@ async function main() {
   ok(
     "validate: duplicate manifest entry errors",
     r.errors.some((e) => e.includes("duplicate")),
+  );
+
+  // Both entries land on the ribbon sheet; mixing a replace with an insert in
+  // one run would shift the buffer out from under the replace, so it's rejected.
+  r = validateManifest(
+    [
+      { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
+      { name: "Lifetime Medal", ribbon: "ribbon.png" },
+    ],
+    REGISTRY,
+    dir,
+  );
+  ok(
+    "validate: mixing a replace and an insert on the same sheet errors",
+    r.errors.some((e) => e.includes("both a replace and an insert")),
+  );
+
+  // Two replaces on the same sheet is fine — no insert means no shift.
+  r = validateManifest(
+    [
+      { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
+      { name: "Lifetime Medal", ribbon: "ribbon.png", replace: true },
+    ],
+    REGISTRY,
+    dir,
+  );
+  ok(
+    "validate: two replaces on the same sheet (no insert) is allowed",
+    !r.errors.some((e) => e.includes("both a replace and an insert")),
   );
 
   // --- spliceSheet: two new tiles interleave at their final registry rows ---
@@ -365,6 +406,42 @@ async function main() {
     replThrew = e.message.includes("no existing tile to overwrite");
   }
   ok("splice(replace): replacing a nonexistent row throws", replThrew);
+
+  // --- spliceSheet: mixing a replace and an insert in one call is rejected ---
+  // The insert would shift the buffer out from under the replace's absolute
+  // offset, landing it on the wrong row. Guard fires before any byte is touched.
+  const mix = path.join(dir, "mix.png");
+  await makeSheet(mix, 43, 14, [
+    [10, 0, 0],
+    [20, 0, 0],
+    [30, 0, 0],
+  ]);
+  const mixBefore = fs.readFileSync(mix);
+  let mixThrew = false;
+  try {
+    await spliceSheet(mix, [
+      {
+        y: 14,
+        tileHeight: 14,
+        png: await colorTile(43, 14, [1, 0, 0]),
+        name: "ins",
+      },
+      {
+        y: 28,
+        tileHeight: 14,
+        png: await colorTile(43, 14, [2, 0, 0]),
+        name: "rep",
+        replace: true,
+      },
+    ]);
+  } catch (e) {
+    mixThrew = e.message.includes("mix a replace and an insert");
+  }
+  ok("splice: mixing a replace and an insert throws", mixThrew);
+  ok(
+    "splice: sheet untouched after a rejected replace+insert mix",
+    mixBefore.equals(fs.readFileSync(mix)),
+  );
 
   // --- run: no-op manifest leaves sheets byte-identical ---
   const paths = makePaths(dir);
