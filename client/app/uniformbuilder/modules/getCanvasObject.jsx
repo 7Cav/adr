@@ -13,6 +13,12 @@ import {
   Tab,
 } from "./AwardClasses";
 import GetUserInfo from "./GetUserInfo";
+import {
+  AwardType,
+  AwardAttachmentType,
+  hasValorDevice,
+  stripValorDevice,
+} from "./constants";
 
 export default async function GetCanvasObject(userName) {
   const data = await GetIndividual(userName);
@@ -30,28 +36,21 @@ export default async function GetCanvasObject(userName) {
     //Check to see if the API medal is one with valor. If so, flag it w/ hasValorDevice.
     //Set the key of the Award to be the Award Name.
 
-    let key;
-    let hasValorDevice = false;
+    const awardName = data.awards[i].awardName;
+    const valorDevice = hasValorDevice(awardName);
+    const key = valorDevice ? stripValorDevice(awardName) : awardName;
+
     let useCombatBadgeLogic = false;
     let combatBadgeKey;
 
-    if (data.awards[i].awardName.includes("with Valor Device")) {
-      key = data.awards[i].awardName.replace(" with Valor Device", "");
-      hasValorDevice = true;
-    } else {
-      key = data.awards[i].awardName;
-    }
-
     const awardType = AwardRegistryInstance.getAwardDetails(key).awardType;
 
-    if (awardType == "BadgeCombat") {
+    if (
+      awardType == AwardType.BadgeCombat ||
+      awardType == AwardType.WeaponQual
+    ) {
       useCombatBadgeLogic = true;
-      combatBadgeKey = "BadgeCombat";
-    }
-
-    if (awardType == "WeaponQual") {
-      useCombatBadgeLogic = true;
-      combatBadgeKey = "WeaponQual";
+      combatBadgeKey = awardType;
     }
 
     //If there is already an award with the key, add the valor device to the existing obj if true and increment AttachmentCount
@@ -63,11 +62,11 @@ export default async function GetCanvasObject(userName) {
 
     if (
       awardMap.has(key) ||
-      (useCombatBadgeLogic == true && awardMap.has(combatBadgeKey))
+      (useCombatBadgeLogic && awardMap.has(combatBadgeKey))
     ) {
       let existingAward;
 
-      if (useCombatBadgeLogic == true) {
+      if (useCombatBadgeLogic) {
         existingAward = awardMap.get(combatBadgeKey);
       } else {
         existingAward = awardMap.get(key);
@@ -78,9 +77,10 @@ export default async function GetCanvasObject(userName) {
       }
 
       if (existingAward instanceof MedalWithValor) {
-        if (hasValorDevice == true) {
+        if (valorDevice) {
           existingAward.hasValorDevice = true;
-          existingAward.ribbonAttachmentType = "oakClustersValor";
+          existingAward.ribbonAttachmentType =
+            AwardAttachmentType.OAK_CLUSTERS_VALOR;
         }
       }
 
@@ -111,12 +111,12 @@ export default async function GetCanvasObject(userName) {
       //This can probably be written better, but thats a later problem
       if (AwardRegistryInstance.isInRegistry(key)) {
         switch (awardDetails.awardType) {
-          case "Ribbon":
+          case AwardType.Ribbon:
             const newRibbon = new Ribbon(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newRibbon);
             totalRibbonCount++;
             break;
-          case "RibbonDonationLogic":
+          case AwardType.RibbonDonationLogic:
             const newRibbonDonation = new RibbonDonationLogic(
               data.awards[i],
               AwardRegistryInstance,
@@ -124,12 +124,12 @@ export default async function GetCanvasObject(userName) {
             awardMap.set(key, newRibbonDonation);
             totalRibbonCount++;
             break;
-          case "Medal":
+          case AwardType.Medal:
             const newMedal = new Medal(data.awards[i], AwardRegistryInstance);
             awardMap.set(key, newMedal);
             totalRibbonCount++;
             break;
-          case "MedalTiered":
+          case AwardType.MedalTiered:
             const newTiered = new MedalTiered(
               data.awards[i],
               AwardRegistryInstance,
@@ -137,7 +137,7 @@ export default async function GetCanvasObject(userName) {
             awardMap.set(key, newTiered);
             totalRibbonCount++;
             break;
-          case "MedalWithValor":
+          case AwardType.MedalWithValor:
             const newMedalWithValor = new MedalWithValor(
               data.awards[i],
               AwardRegistryInstance,
@@ -145,7 +145,7 @@ export default async function GetCanvasObject(userName) {
             awardMap.set(key, newMedalWithValor);
             totalRibbonCount++;
             break;
-          case "UnitCitation":
+          case AwardType.UnitCitation:
             const newUnitCitation = new UnitCitation(
               data.awards[i],
               AwardRegistryInstance,
@@ -153,30 +153,27 @@ export default async function GetCanvasObject(userName) {
             awardMap.set(key, newUnitCitation);
             totalUnitCitationCount++;
             break;
-          case "BadgeCombat":
+          case AwardType.BadgeCombat:
             const newBadgeCombat = new BadgeCombat(
               data.awards[i],
               data.mos,
               AwardRegistryInstance,
             );
-            awardMap.set("BadgeCombat", newBadgeCombat);
+            awardMap.set(AwardType.BadgeCombat, newBadgeCombat);
             break;
-          case "WeaponQual":
+          case AwardType.WeaponQual:
             const newWeaponQual = new WeaponQual(
               data.awards[i],
               AwardRegistryInstance,
             );
-            awardMap.set("WeaponQual", newWeaponQual);
+            awardMap.set(AwardType.WeaponQual, newWeaponQual);
             break;
-          case "Tab":
+          case AwardType.Tab:
             const newTab = new Tab(data.awards[i], AwardRegistryInstance);
             tabCount++;
             awardMap.set(key, newTab);
             break;
         }
-      } else {
-        // const newAward = new Award(data.awards[i]);
-        // awardMap.set(key, newAward);
       }
     }
   }
@@ -221,9 +218,7 @@ export default async function GetCanvasObject(userName) {
     }
   }
 
-  if (weaponQual == null) {
-    weaponQual = 0;
-  }
+  weaponQual = weaponQual ?? 0;
 
   arr.push(ribbons.sort((a, b) => a.awardPriority - b.awardPriority));
   arr.push(unitCitations.sort((a, b) => a.awardPriority - b.awardPriority));
@@ -231,9 +226,6 @@ export default async function GetCanvasObject(userName) {
   arr.push(combatBadge);
   arr.push(weaponQual);
   arr.push(tabs.sort((a, b) => a.awardPriority - b.awardPriority));
-
-  console.log(arr);
-  console.log(data.mos);
 
   return arr;
 }
