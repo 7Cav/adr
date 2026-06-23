@@ -133,7 +133,7 @@ export function DiffEventCard({ event }) {
       </div>
 
       {open && hasDetail && (
-        <p className="pb-2.5 pl-[3.25rem] pr-3 text-xs opacity-70 leading-relaxed">
+        <p className="pb-2.5 pl-13 pr-3 text-xs opacity-70 leading-relaxed">
           {event.detail}
         </p>
       )}
