@@ -401,7 +401,7 @@ export function HistoryView() {
                         onClick={() => handleDotClick(entry)}
                         aria-label={cellLabel}
                         className={cn(
-                          "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
                           heatIntensity(count, maxCount),
                           isSelected && "ring-2 ring-primary scale-125",
                         )}
