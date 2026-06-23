@@ -29,10 +29,10 @@ The live deployment can be found at https://apps.7cav.us/ and the backend at htt
 
 CavApps is a monorepo with two parts:
 
-- **`server/`** — an Express caching proxy ("BFF") that fetches roster data from the 7th Cavalry API and serves it from memory.
+- **`server/`** — an Express caching proxy ("BFF") that fetches roster data from the 7th Cavalry API and serves it from memory. It also keeps a Postgres database for roster-history diffs and the user-search cache.
 - **`client/`** — a Next.js 13 (App Router) app with three tools: the Active Duty Roster (ADR), Roster Statistics, and the Uniform Builder.
 
-The client never talks to the 7th Cavalry API directly — it only talks to the server.
+The client never talks to the 7th Cavalry API directly — it only talks to the server. The Docker setup below brings the Postgres database up for you, so there's nothing extra to install.
 
 ### Authorization
 
@@ -49,19 +49,20 @@ To get your `API_TOKEN`:
 2. Open your [Connected Accounts](https://7cav.us/account/connected-accounts/) and click "view account" for `auth.7cav.us`.
 3. Log into Keycloak and copy the provided API token.
 
-> **Heads up on `.env` formatting:** use `KEY=value` with **no spaces around the `=`** and no surrounding quotes. A line like `API_TOKEN ='abc'` (note the space) makes the variable name `API_TOKEN ` (with a trailing space), so Docker Compose treats `API_TOKEN` as unset and the server fails to start with a `401 Unauthorized`.
+> **Heads up on `.env` formatting:** use `KEY=value` with **no spaces around the `=`** and no surrounding quotes. A line like `API_TOKEN ='abc'` (note the space) makes the variable name `API_TOKEN ` (with a trailing space), so Docker Compose treats `API_TOKEN` as unset and the server fails to load the roster on startup, then crash-loops instead of coming up.
 
 ### Quick Start with Docker (recommended)
 
 This is the fastest way to get a working dev environment — it builds and runs both the server and client for you, with hot-reload on the client.
 
 1. Install [Docker](https://docs.docker.com/get-docker/) (Docker Desktop on macOS/Windows).
-2. In the project root, create a `.env` file:
+2. In the project root, copy the example env file and fill in your tokens:
 
-   ```dotenv
-   API_TOKEN=your-7cav-api-token-here
-   CLIENT_TOKEN=any-shared-secret-you-choose
+   ```bash
+   cp .env.example .env
    ```
+
+   At a minimum set `API_TOKEN` and `CLIENT_TOKEN`. Everything else has a sensible local default — the Postgres database is created for you, and the XenForo settings can stay blank (see the notes in `.env.example`).
 
 3. Bring the stack up:
 
@@ -75,6 +76,8 @@ That's it. The override file (`docker-compose.dev.yml`) provisions the `edge` ne
 - Server (BFF): http://localhost:4000
 
 The server must successfully load roster data on startup or it will exit and restart — if it keeps restarting, double-check your `API_TOKEN` (see the formatting note above).
+
+> **Two features need the forum database.** The roster-history diff viewer and the member search box read from the live XenForo (forum) MariaDB, which you won't have locally. The diff viewer just stays empty; the member search returns an error if you use it, since its index is never built. The rest of the app works fine. To enable them, set the `XENFORO_DB_*` values in your `.env` to a reachable XenForo database.
 
 Stop the stack with `Ctrl+C`, or from another terminal:
 
@@ -94,17 +97,26 @@ If you'd rather run the apps directly on your machine instead of in Docker:
 
 ### Manual Setup (without Docker)
 
-You'll run the server and client in two separate terminals.
+You'll run the server and client in two separate terminals. The server also needs a Postgres database — if you don't already have one, the easiest path is to run just that container from the compose file:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up postgres
+```
+
+That gives you a database reachable at `postgres://cavapps:cavapps@localhost:5432/cavapps`. (This URL and the `DATABASE_URL` below assume the default `PG_PASSWORD=cavapps`; update both if you set your own.) The Docker Quick Start above avoids all of this; only use manual setup if you specifically need the apps running outside Docker.
 
 **1. Server** (`server/`):
 
 ```bash
 cd server
 npm install
-API_TOKEN=your-7cav-api-token CLIENT_TOKEN=any-shared-secret node server.js
+API_TOKEN=your-7cav-api-token \
+CLIENT_TOKEN=any-shared-secret \
+DATABASE_URL=postgres://cavapps:cavapps@localhost:5432/cavapps?sslmode=disable \
+node server.js
 ```
 
-The server listens on `http://localhost:4000`. Visiting it in a browser confirms it's up. (It reads `API_TOKEN` and `CLIENT_TOKEN` from the environment — export them in your shell or use a tool like [`dotenv`](https://www.npmjs.com/package/dotenv) / a `.env` loader of your choice.)
+The server listens on `http://localhost:4000`. Visiting it in a browser confirms it's up. It reads these values from the environment — export them in your shell or use a tool like [`dotenv`](https://www.npmjs.com/package/dotenv) / a `.env` loader of your choice. It runs its database migrations on startup and exits if `DATABASE_URL` isn't reachable.
 
 **2. Client** (`client/`):
 
@@ -117,6 +129,8 @@ RESERVE_API_URL=http://localhost:4000/roster/reserves
 GROUP_API_URL=http://localhost:4000/roster/groups
 CACHE_TIMESTAMP_URL=http://localhost:4000/cache-timestamp
 NEXT_PUBLIC_INDIVIDUAL_API_URL=http://localhost:4000/roster/individual
+NEXT_PUBLIC_DIFF_API_URL=http://localhost:4000
+NEXT_PUBLIC_USERCACHE_API_URL=http://localhost:4000/userSearch
 ```
 
 `NEXT_PUBLIC_CLIENT_TOKEN` **must match** the server's `CLIENT_TOKEN`. Then:
@@ -278,14 +292,13 @@ In `CavApps-Test/client/`:
 npm install
 ```
 
-Next, create a `.env` file in the project root with your tokens (see [Authorization](#authorization)):
+Next, create a `.env` file in the project root from the template and fill in your tokens (see [Authorization](#authorization)):
 
-```dotenv
-API_TOKEN=your-7cav-api-token-here
-CLIENT_TOKEN=any-shared-secret-you-choose
+```bash
+cp .env.example .env
 ```
 
-The production `docker-compose.yml` wires the client to reach the server over the internal Docker network (`http://server:4000/...`), so you do **not** need to set the per-URL client variables by hand for a Docker deployment — they're defined in the compose file.
+The `docker-compose.yml` wires the client to reach the server over the internal Docker network (`http://server:4000/...`), so you do **not** need to set the per-URL client variables by hand for a Docker deployment — they're defined in the compose file. It also brings up the Postgres database the server depends on.
 
 Then, from the project root:
 
