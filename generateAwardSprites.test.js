@@ -407,6 +407,54 @@ async function main() {
   }
   ok("splice(replace): replacing a nonexistent row throws", replThrew);
 
+  // --- spliceSheet: replace into the partial final row (sub-tile remainder) ---
+  // The bottom-most award lives in the sheet's leftover < tileHeight band — the
+  // real ribbon sheet is 769px = 54*14 + 13, so its last row is only 13px tall.
+  // A replace there must succeed: the guard gates on the row's start, and the
+  // copy clamps to the bytes that exist. Two full 14px rows + a 13px remainder.
+  const partial = path.join(dir, "partial.png");
+  await sharp({
+    create: {
+      width: 43,
+      height: 41,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+  })
+    .composite([
+      { input: await colorTile(43, 14, [10, 0, 0]), top: 0, left: 0 },
+      { input: await colorTile(43, 14, [20, 0, 0]), top: 14, left: 0 },
+      { input: await colorTile(43, 13, [30, 0, 0]), top: 28, left: 0 }, // 13px
+    ])
+    .png()
+    .toFile(partial);
+  let partialThrew = false;
+  try {
+    await spliceSheet(partial, [
+      {
+        y: 28,
+        tileHeight: 14,
+        png: await colorTile(43, 14, [99, 0, 0]),
+        name: "EAME Campaign Medal",
+        replace: true,
+      },
+    ]);
+  } catch (e) {
+    partialThrew = true;
+  }
+  ok("splice(replace): partial final row is NOT rejected", !partialThrew);
+  const partialMeta = await sharp(partial).metadata();
+  ok(
+    "splice(replace): partial-row replace leaves height unchanged (41 -> 41)",
+    partialMeta.height === 41,
+  );
+  assert.deepStrictEqual(await rowColor(partial, 0), [10, 0, 0]);
+  ok("splice(replace): row above partial final row untouched", true);
+  assert.deepStrictEqual(await rowColor(partial, 14), [20, 0, 0]);
+  ok("splice(replace): second row above partial final row untouched", true);
+  assert.deepStrictEqual(await rowColor(partial, 28), [99, 0, 0]);
+  ok("splice(replace): partial final row overwritten in place", true);
+
   // --- spliceSheet: mixing a replace and an insert in one call is rejected ---
   // The insert would shift the buffer out from under the replace's absolute
   // offset, landing it on the wrong row. Guard fires before any byte is touched.

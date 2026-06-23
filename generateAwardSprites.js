@@ -258,7 +258,9 @@ async function normalizeMedal(srcPath) {
  *
  * An entry with `replace: true` overwrites the tile already at `y` in place:
  * no shift, no height change. It is used to fix the art of an award that
- * already has a tile, and errors if `y` isn't a full existing row.
+ * already has a tile, and errors only if `y` is at or past the sheet end (no
+ * row to overwrite). The bottom-most award's partial final row is a valid
+ * target — the copy clamps to the bytes remaining there.
  *
  * Replaces and inserts must NOT be mixed in one call: a replace copies into an
  * absolute byte offset derived from the registry row, but an insert grows the
@@ -298,7 +300,11 @@ async function buildSplicedSheet(sheetPath, inserts) {
     }
     if (ins.replace) {
       // Overwrite the existing tile at `y` in place — no shift, no growth.
-      if (ins.y + ins.tileHeight > height) {
+      // Gate on the row's *start*, not its full height: the bottom-most award
+      // sits in the sheet's sub-tile remainder (the real ribbon sheet is 769px
+      // = 54*14 + 13, so its last row is only 13px), and `rawTile.copy` clamps
+      // to the bytes actually left, writing the partial row without overrun.
+      if (ins.y >= height) {
         throw new Error(
           `replace for "${ins.name}" targets row y=${ins.y} but the sheet is only ${height}px tall; there is no existing tile to overwrite (use an insert for a new award)`,
         );
