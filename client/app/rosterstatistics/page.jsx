@@ -1,17 +1,15 @@
-import dynamic from "next/dynamic";
 import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
 import GetApiTimestamp from "../reusableModules/getApiTimestamp";
 import lists from "../reusableModules/BilletBank";
+import Statistics from "./modules/StatisticsClient";
 import "./page.css";
 
-// ssr: false cause apex charts
-const Statistics = dynamic(
-  () => import("../rosterstatistics/modules/statistics"),
-  {
-    ssr: false,
-  },
-);
+// This route reads the live roster on every request and must never be
+// prerendered. Since Next 15, no-store fetches no longer mark a route dynamic
+// on their own, so opt in explicitly. Without this the build prerenders against
+// the live API and fails.
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Roster Statistics",

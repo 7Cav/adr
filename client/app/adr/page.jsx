@@ -8,6 +8,12 @@ import Logo from "../theme/adrLogo";
 import "./page.css";
 import "../globals.css";
 
+// This route reads the live roster on every request and must never be
+// prerendered. Since Next 15, no-store fetches no longer mark a route dynamic
+// on their own, so opt in explicitly. Without this the build prerenders against
+// the live API and fails.
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Active Duty Roster",
 };
