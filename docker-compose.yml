@@ -1,5 +1,7 @@
 # CavApps stack — builds the server and client from source so your local changes
-# are what runs. For local development always layer the dev override on top:
+# are what runs. The client is bind-mounted and hot-reloads; the server is baked
+# into its image at build time, so server changes need a rebuild (--build), not
+# just a restart. For local development always layer the dev override on top:
 #
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 #
@@ -46,11 +48,13 @@ services:
       CLIENT_TOKEN: ${CLIENT_TOKEN}
       DATABASE_URL: postgres://cavapps:${PG_PASSWORD:-cavapps}@postgres:5432/cavapps?sslmode=disable
       DIFF_POLL_SCHEDULE: ${DIFF_POLL_SCHEDULE:-*/15 * * * *}
-      # Optional: the roster-history diff viewer and user search read from the
-      # live XenForo (forum) MariaDB. Leave these blank for local dev — the core
-      # roster works without them; only those two features stay empty (the poller
-      # logs a connection error each tick and moves on). Fill them in if you have
-      # a reachable XenForo database (e.g. an SSH tunnel or a read replica).
+      # Optional: the roster-history diff viewer and member search read from the
+      # live XenForo (forum) MariaDB. Leave these blank for local dev; the core
+      # roster works without them. Without XenForo the diff poller just logs a
+      # connection error each tick and moves on (the diff viewer stays empty),
+      # and the user-search index is never built, so the member-search box
+      # returns an error rather than results. Fill them in if you have a
+      # reachable XenForo database (e.g. an SSH tunnel or a read replica).
       XENFORO_DB_HOST: ${XENFORO_DB_HOST:-}
       XENFORO_DB_PORT: ${XENFORO_DB_PORT:-3306}
       XENFORO_DB_USER: ${XENFORO_DB_USER:-}

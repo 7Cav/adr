@@ -49,7 +49,7 @@ To get your `API_TOKEN`:
 2. Open your [Connected Accounts](https://7cav.us/account/connected-accounts/) and click "view account" for `auth.7cav.us`.
 3. Log into Keycloak and copy the provided API token.
 
-> **Heads up on `.env` formatting:** use `KEY=value` with **no spaces around the `=`** and no surrounding quotes. A line like `API_TOKEN ='abc'` (note the space) makes the variable name `API_TOKEN ` (with a trailing space), so Docker Compose treats `API_TOKEN` as unset and the server fails to start with a `401 Unauthorized`.
+> **Heads up on `.env` formatting:** use `KEY=value` with **no spaces around the `=`** and no surrounding quotes. A line like `API_TOKEN ='abc'` (note the space) makes the variable name `API_TOKEN ` (with a trailing space), so Docker Compose treats `API_TOKEN` as unset and the server fails to load the roster on startup, then crash-loops instead of coming up.
 
 ### Quick Start with Docker (recommended)
 
@@ -77,7 +77,7 @@ That's it. The override file (`docker-compose.dev.yml`) provisions the `edge` ne
 
 The server must successfully load roster data on startup or it will exit and restart — if it keeps restarting, double-check your `API_TOKEN` (see the formatting note above).
 
-> **Two features need the forum database.** The roster-history diff viewer and the member search box read from the live XenForo (forum) MariaDB, which you won't have locally. They simply stay empty — the rest of the app works fine. To enable them, set the `XENFORO_DB_*` values in your `.env` to a reachable XenForo database.
+> **Two features need the forum database.** The roster-history diff viewer and the member search box read from the live XenForo (forum) MariaDB, which you won't have locally. The diff viewer just stays empty; the member search returns an error if you use it, since its index is never built. The rest of the app works fine. To enable them, set the `XENFORO_DB_*` values in your `.env` to a reachable XenForo database.
 
 Stop the stack with `Ctrl+C`, or from another terminal:
 
@@ -103,7 +103,7 @@ You'll run the server and client in two separate terminals. The server also need
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up postgres
 ```
 
-That gives you a database reachable at `postgres://cavapps:cavapps@localhost:5432/cavapps`. (The Docker Quick Start above avoids all of this — only use manual setup if you specifically need the apps running outside Docker.)
+That gives you a database reachable at `postgres://cavapps:cavapps@localhost:5432/cavapps`. (This URL and the `DATABASE_URL` below assume the default `PG_PASSWORD=cavapps`; update both if you set your own.) The Docker Quick Start above avoids all of this; only use manual setup if you specifically need the apps running outside Docker.
 
 **1. Server** (`server/`):
 
@@ -129,6 +129,8 @@ RESERVE_API_URL=http://localhost:4000/roster/reserves
 GROUP_API_URL=http://localhost:4000/roster/groups
 CACHE_TIMESTAMP_URL=http://localhost:4000/cache-timestamp
 NEXT_PUBLIC_INDIVIDUAL_API_URL=http://localhost:4000/roster/individual
+NEXT_PUBLIC_DIFF_API_URL=http://localhost:4000
+NEXT_PUBLIC_USERCACHE_API_URL=http://localhost:4000/userSearch
 ```
 
 `NEXT_PUBLIC_CLIENT_TOKEN` **must match** the server's `CLIENT_TOKEN`. Then:
