@@ -647,7 +647,8 @@ const threeSeven = {
 
 //ACD
 
-const acdCommand = [ //ACD HQ
+const acdCommand = [
+  //ACD HQ
   "1006",
   "1007",
   "1008",
@@ -660,7 +661,8 @@ const acdCommand = [ //ACD HQ
   "11",
   "12",
 ];
-const alpha4 = [ //A ACD
+const alpha4 = [
+  //A ACD
   "555",
   "556",
   "557",
@@ -711,7 +713,8 @@ const alpha4 = [ //A ACD
   "769",
   "770",
 ];
-const bravo4 = [ //B ACD
+const bravo4 = [
+  //B ACD
   "590",
   "591",
   "592",
@@ -750,7 +753,8 @@ const bravo4 = [ //B ACD
   "625",
   "626",
 ];
-const charlie4 = [ //C ACD
+const charlie4 = [
+  //C ACD
   "656",
   "657",
   "658",
@@ -806,7 +810,8 @@ const charlie4 = [ //C ACD
   "983",
   "984",
 ];
-const delta4 = [ //D ACD
+const delta4 = [
+  //D ACD
   "1174",
   "1175",
   "1176",
@@ -872,7 +877,7 @@ const alphaSP = [
   "718",
   "1146",
   "720",
-]
+];
 const bravoSP = [
   "707",
   "708",
@@ -888,7 +893,7 @@ const bravoSP = [
   "727",
   "728",
   "729",
-]
+];
 const charlieSP = [
   "1130",
   "1132",
@@ -904,7 +909,7 @@ const charlieSP = [
   "1143",
   "1149",
   "1155",
-]
+];
 const deltaSP = [
   "1134",
   "1135",
@@ -920,28 +925,22 @@ const deltaSP = [
   "1145",
   "1152",
   "1158",
-]
+];
 
 const starterPlatoon = {
-    positionIds: [starterPlatoonCommand, alphaSP, bravoSP, charlieSP, deltaSP],
-    positionTitles: [
-        "Development Command Headquarters",
-        "Alpha Platoon DEVCOM",
-        "Bravo Platoon DEVCOM",
-        "Charlie Platoon DEVCOM",
-        "Delta Platoon DEVCOM",
-    ],
-    collapsibleTitle: "DEVCOM",
+  positionIds: [starterPlatoonCommand, alphaSP, bravoSP, charlieSP, deltaSP],
+  positionTitles: [
+    "Development Command Headquarters",
+    "Alpha Platoon DEVCOM",
+    "Bravo Platoon DEVCOM",
+    "Charlie Platoon DEVCOM",
+    "Delta Platoon DEVCOM",
+  ],
+  collapsibleTitle: "DEVCOM",
 };
 
 const acd = {
-  positionIds: [
-    acdCommand,
-    alpha4,
-    bravo4,
-    charlie4,
-    delta4,
-  ],
+  positionIds: [acdCommand, alpha4, bravo4, charlie4, delta4],
   positionTitles: [
     "Reserve and Development Command Headquarters",
     "Alpha Company ACD",

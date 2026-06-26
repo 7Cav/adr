@@ -104,30 +104,30 @@ class Statistics extends Component {
             width: 1.5,
           },
           colors: [
-            "#109640",  // 0  General Staff
-            "#b61217",  // 1  1-7 HQ
-            "#b61217",  // 2  Alpha 1-7
-            "#b61217",  // 3  Bravo 1-7
-            "#b61217",  // 4  Charlie 1-7
-            "#b61217",  // 5  Delta 1-7
-            "#2a487c",  // 6  2-7 HQ
-            "#2a487c",  // 7  Alpha 2-7
-            "#2a487c",  // 8  Bravo 2-7
-            "#2a487c",  // 9  Charlie 2-7
-            "#2a487c",  // 10 Echo 2-7
-            "#5bcefa",  // 11 3-7 HQ
-            "#5bcefa",  // 12 Alpha 3-7
-            "#5bcefa",  // 13 Bravo 3-7
-            "#5bcefa",  // 14 Charlie 3-7
-            "#f3ced5",  // 15 R&DC HQ
-            "#f7a8b8",  // 16 Alpha ACD
-            "#f7a8b8",  // 17 Bravo ACD
-            "#f7a8b8",  // 18 Charlie ACD
-            "#f7a8b8",  // 19 Delta ACD
-            "#ff8989",  // 20 Alpha SP
-            "#ff8989",  // 21 Bravo SP
-            "#ff8989",  // 22 Charlie SP
-            "#ff7575",  // 23 Delta SP
+            "#109640", // 0  General Staff
+            "#b61217", // 1  1-7 HQ
+            "#b61217", // 2  Alpha 1-7
+            "#b61217", // 3  Bravo 1-7
+            "#b61217", // 4  Charlie 1-7
+            "#b61217", // 5  Delta 1-7
+            "#2a487c", // 6  2-7 HQ
+            "#2a487c", // 7  Alpha 2-7
+            "#2a487c", // 8  Bravo 2-7
+            "#2a487c", // 9  Charlie 2-7
+            "#2a487c", // 10 Echo 2-7
+            "#5bcefa", // 11 3-7 HQ
+            "#5bcefa", // 12 Alpha 3-7
+            "#5bcefa", // 13 Bravo 3-7
+            "#5bcefa", // 14 Charlie 3-7
+            "#f3ced5", // 15 R&DC HQ
+            "#f7a8b8", // 16 Alpha ACD
+            "#f7a8b8", // 17 Bravo ACD
+            "#f7a8b8", // 18 Charlie ACD
+            "#f7a8b8", // 19 Delta ACD
+            "#ff8989", // 20 Alpha SP
+            "#ff8989", // 21 Bravo SP
+            "#ff8989", // 22 Charlie SP
+            "#ff7575", // 23 Delta SP
           ],
           plotOptions: {
             pie: {

@@ -1,6 +1,7 @@
 <p align="center"><img src="./client/public/CavAppsLogo.svg" width = 400em></p>
 
 ## Overview
+
 [![Production Deployment](https://github.com/7Cav/adr/actions/workflows/prod_deploy.yml/badge.svg)](https://apps.7cav.us/)
 [![Development Deployment](https://github.com/7Cav/adr/actions/workflows/dev_deploy.yml/badge.svg)](https://beta.apps.7cav.us/)
 
@@ -13,16 +14,16 @@ The live deployment can be found at https://apps.7cav.us/ and the backend at htt
 ## Table of Contents
 
 - [Running Locally](#running-locally)
-    - [Quick Start with Docker (recommended)](#quick-start-with-docker-recommended)
-    - [Requirements](#requirements)
-        - [Authorization](#authorization)
-    - [Manual Setup (without Docker)](#manual-setup-without-docker)
+  - [Quick Start with Docker (recommended)](#quick-start-with-docker-recommended)
+  - [Requirements](#requirements)
+    - [Authorization](#authorization)
+  - [Manual Setup (without Docker)](#manual-setup-without-docker)
 - [Updating the ADR](#updating-the-adr)
-    - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
-    - [Add New Category](#add-new-category)
-    - [Files to Update](#files-to-update)
+  - [Add New Billet in Existing Category](#add-new-billet-in-existing-category)
+  - [Add New Category](#add-new-category)
+  - [Files to Update](#files-to-update)
 - [Server Deployment](#server-deployment)
-    - [Requirements](#requirements-1)
+  - [Requirements](#requirements-1)
 - [Roster Statistics](#roster-statistics)
 - [Future Goals](#future-goals)
 
@@ -39,9 +40,9 @@ The client never talks to the 7th Cavalry API directly — it only talks to the 
 
 You need two tokens:
 
-| Token | Purpose | Where it goes |
-|-------|---------|---------------|
-| `API_TOKEN` | Authenticates the **server** to `api.7cav.us`. A real 7th Cavalry API bearer. | server env |
+| Token          | Purpose                                                                                                             | Where it goes           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `API_TOKEN`    | Authenticates the **server** to `api.7cav.us`. A real 7th Cavalry API bearer.                                       | server env              |
 | `CLIENT_TOKEN` | Shared secret between the **client and server**. Can be any string you choose — it just has to match on both sides. | server env + client env |
 
 To get your `API_TOKEN`:
@@ -193,10 +194,9 @@ To introduce a new category, the `units` array in `page.jsx` located in `cavapps
 #### Step-by-Step Instructions
 
 1. **In `adr/page.jsx`:**
-
-    - Add a new entry to the `units` array with a `title` for the new category.
-    - Populate its `selectors` array with the ID of each billet group that belongs under it. (A group's ID is its position in the `/roster/groups` response.)
-    - Place the entry where you want it to appear. `units` render in array order.
+   - Add a new entry to the `units` array with a `title` for the new category.
+   - Populate its `selectors` array with the ID of each billet group that belongs under it. (A group's ID is its position in the `/roster/groups` response.)
+   - Place the entry where you want it to appear. `units` render in array order.
 
 #### Example:
 
@@ -237,15 +237,14 @@ Because the ADR and Roster Statistics are driven separately, adding a billet or 
 In order to deploy CavApps on a server, you need the following:
 
 - A linux (preferably ubuntu) based server with the following:
-    - Access via SSH
-    - Sudo level permissions
-    - Minimum 2GB RAM
+  - Access via SSH
+  - Sudo level permissions
+  - Minimum 2GB RAM
 - Alongside the following packages:
-
-    - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
-    - nodejs
-    - npm
-    - git
+  - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+  - nodejs
+  - npm
+  - git
 
   ```
   sudo apt install git npm nodejs
@@ -332,16 +331,15 @@ To introduce a new category, both `BilletBank.jsx` and `rosterstatistics/page.js
 #### Step-by-Step Instructions
 
 1. **In `BilletBank.jsx`:**
-
-    - Add a new array for each subcategory and populate it with the requred billet IDs.
-    - Add a new object for the new category and append the subcategories as well as their titles to the new object. additionally, add a `collapsibleTitle` with the name of the new category into the object.
-    - Add the new object to the billetbank object at the bottom of the file, and add the new arrays to the `billetBank` export list below it so the Statistics page can reach them.
+   - Add a new array for each subcategory and populate it with the requred billet IDs.
+   - Add a new object for the new category and append the subcategories as well as their titles to the new object. additionally, add a `collapsibleTitle` with the name of the new category into the object.
+   - Add the new object to the billetbank object at the bottom of the file, and add the new arrays to the `billetBank` export list below it so the Statistics page can reach them.
 
 2. **In `rosterstatistics/page.jsx`:**
-    - Add a new `<Statistics>` block for the category, listing the new arrays in `billetIDs` with a matching `labelArray` of the same length and order.
+   - Add a new `<Statistics>` block for the category, listing the new arrays in `billetIDs` with a matching `labelArray` of the same length and order.
 
 3. **In `rosterstatistics/modules/statistics.jsx`:**
-    - If the category also appears in the regiment-wide chart (the one combining every unit), add a color for each new segment to that chart's `colors` array. It is positional, so add the colors in the same order as the segments. Segments with no color render blank. (The per-battalion charts use a separate cycling palette and need no change.)
+   - If the category also appears in the regiment-wide chart (the one combining every unit), add a color for each new segment to that chart's `colors` array. It is positional, so add the colors in the same order as the segments. Segments with no color render blank. (The per-battalion charts use a separate cycling palette and need no change.)
 
 #### Example:
 
@@ -383,20 +381,20 @@ const billetBankObject = {
 
 ```jsx
 <Statistics
-    billetIDs={[
-        lists.threeSevenCommand,
-        lists.alpha3,
-        lists.bravo3,
-        lists.charlie3,
-    ]}
-    centerLabel="Total 3-7 Strength"
-    labelArray={[
-        "3-7 Headquarters",
-        "Alpha Company",
-        "Bravo Company",
-        "Charlie Company",
-    ]}
-    milpacArray={milpacArray}
+  billetIDs={[
+    lists.threeSevenCommand,
+    lists.alpha3,
+    lists.bravo3,
+    lists.charlie3,
+  ]}
+  centerLabel="Total 3-7 Strength"
+  labelArray={[
+    "3-7 Headquarters",
+    "Alpha Company",
+    "Bravo Company",
+    "Charlie Company",
+  ]}
+  milpacArray={milpacArray}
 />
 ```
 
