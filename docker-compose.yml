@@ -1,4 +1,37 @@
+# CavApps stack — builds the server and client from source so your local changes
+# are what runs. The client is bind-mounted and hot-reloads; the server is baked
+# into its image at build time, so server changes need a rebuild (--build), not
+# just a restart. For local development always layer the dev override on top:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# The override provisions the `edge` network locally (in production that network
+# is managed by the reverse proxy). See README "Running Locally".
+#
+# Secrets and per-environment values come from a `.env` file in this directory.
+# Copy `.env.example` to `.env` and fill in your tokens before bringing it up.
 services:
+  # Postgres backs the roster-history diff store and the user-search cache.
+  # The server runs its migrations on startup and will not boot until this is
+  # reachable, so it comes up first as part of the stack — no setup required.
+  postgres:
+    image: postgres:16-alpine
+    container_name: cavapps-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: cavapps
+      POSTGRES_USER: cavapps
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-cavapps}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cavapps -d cavapps"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cavapps-network
+
   server:
     restart: always
     #image: 7cav/apps_beta_server:latest
@@ -13,7 +46,24 @@ services:
     environment:
       API_TOKEN: ${API_TOKEN}
       CLIENT_TOKEN: ${CLIENT_TOKEN}
+      DATABASE_URL: postgres://cavapps:${PG_PASSWORD:-cavapps}@postgres:5432/cavapps?sslmode=disable
+      DIFF_POLL_SCHEDULE: ${DIFF_POLL_SCHEDULE:-*/15 * * * *}
+      # Optional: the roster-history diff viewer and member search read from the
+      # live XenForo (forum) MariaDB. Leave these blank for local dev; the core
+      # roster works without them. Without XenForo the diff poller just logs a
+      # connection error each tick and moves on (the diff viewer stays empty),
+      # and the user-search index is never built, so the member-search box
+      # returns an error rather than results. Fill them in if you have a
+      # reachable XenForo database (e.g. an SSH tunnel or a read replica).
+      XENFORO_DB_HOST: ${XENFORO_DB_HOST:-}
+      XENFORO_DB_PORT: ${XENFORO_DB_PORT:-3306}
+      XENFORO_DB_USER: ${XENFORO_DB_USER:-}
+      XENFORO_DB_PASSWORD: ${XENFORO_DB_PASSWORD:-}
+      XENFORO_DB_NAME: ${XENFORO_DB_NAME:-xenforo}
     working_dir: /server
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4000"]
       interval: 10s
@@ -40,11 +90,17 @@ services:
     environment:
       DEVMODE: "true"
       NEXT_PUBLIC_CLIENT_TOKEN: ${CLIENT_TOKEN}
+      # Server-side fetches (Next.js route handlers / server components) reach the
+      # server over the internal Docker network.
       COMBAT_API_URL: http://server:4000/roster/combat
       RESERVE_API_URL: http://server:4000/roster/reserves
       CACHE_TIMESTAMP_URL: http://server:4000/cache-timestamp
       GROUP_API_URL: http://server:4000/roster/groups
-      NEXT_PUBLIC_INDIVIDUAL_API_URL: http://localhost:4000/roster/individual
+      # NEXT_PUBLIC_* values are baked into the browser bundle, so they must point
+      # at a URL the browser can reach (localhost), not the internal `server` host.
+      NEXT_PUBLIC_DIFF_API_URL: ${NEXT_PUBLIC_DIFF_API_URL:-http://localhost:4000}
+      NEXT_PUBLIC_USERCACHE_API_URL: ${NEXT_PUBLIC_USERCACHE_API_URL:-http://localhost:4000/userSearch}
+      NEXT_PUBLIC_INDIVIDUAL_API_URL: ${NEXT_PUBLIC_INDIVIDUAL_API_URL:-http://localhost:4000/roster/individual}
     working_dir: /client
     ports:
       - "3000:3000"
@@ -76,3 +132,6 @@ networks:
     name: edge
   cavapps-network:
     driver: bridge
+
+volumes:
+  pgdata:

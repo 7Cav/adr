@@ -37,10 +37,6 @@ const checkToken = (req, res, next) => {
     return next();
   }
 
-  if (req.method === "OPTIONS") {
-    return next();
-  }
-
   const authToken = req.headers["authorization"];
   if (authToken === CLIENT_TOKEN) {
     next();
@@ -69,11 +65,11 @@ app.use(
     origin: corsOptions.origin,
   }),
 );
-// Apply token checking middleware only to these routes
-app.use("/roster", checkToken, middleware);
-// All diff routes (read views + operator /admin endpoints) sit behind the same
-// token check as /roster; the client sends NEXT_PUBLIC_CLIENT_TOKEN.
-app.use(checkToken, diffRoutes);
+// Public, unauthenticated endpoints. These must be registered before the
+// token gate below — the container healthcheck (curl http://localhost:4000)
+// and the client's readiness probe (wget --spider http://server:4000) both
+// hit GET / with no auth header, so it has to answer 200 without the token.
+// /cache-timestamp is likewise public, as it was before the diff routes landed.
 app.get("/", (req, res) => {
   res.send(
     "Server Test Page Loaded Successfully. Any issues? Submit a ticket to S6! Frontend is at https://apps.7cav.us/",
@@ -83,6 +79,12 @@ app.get("/", (req, res) => {
 app.get("/cache-timestamp", (req, res) => {
   res.json({ cacheTime });
 });
+
+// Apply token checking middleware only to these routes
+app.use("/roster", checkToken, middleware);
+// All diff routes (read views + operator /admin endpoints) sit behind the same
+// token check as /roster; the client sends NEXT_PUBLIC_CLIENT_TOKEN.
+app.use(checkToken, diffRoutes);
 
 // Terminal error handler — backstop for anything a route's own try/catch misses
 // (incl. sync throws and the CORS origin rejection). Without this, an uncaught
