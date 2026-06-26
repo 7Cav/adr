@@ -340,6 +340,9 @@ To introduce a new category, both `BilletBank.jsx` and `rosterstatistics/page.js
 2. **In `rosterstatistics/page.jsx`:**
     - Add a new `<Statistics>` block for the category, listing the new arrays in `billetIDs` with a matching `labelArray` of the same length and order.
 
+3. **In `rosterstatistics/modules/statistics.jsx`:**
+    - If the category also appears in the regiment-wide chart (the one combining every unit), add a color for each new segment to that chart's `colors` array. It is positional, so add the colors in the same order as the segments. Segments with no color render blank. (The per-battalion charts use a separate cycling palette and need no change.)
+
 #### Example:
 
 You have been assigned the task of creating an entry for 3rd Battalion. It has 3 companies, Alpha Bravo and Charlie. Each have their own designated billet IDs. In a live setting, each company can have strings that are dozens of entries each in length.
@@ -395,6 +398,19 @@ const billetBankObject = {
     ]}
     milpacArray={milpacArray}
 />
+```
+
+**In `rosterstatistics/modules/statistics.jsx`** (only if 3rd Battalion is shown in the regiment-wide chart, which it is as it is a line billet battalion):
+
+```jsx
+// add one color per new segment, in the same order they appear in that chart's billetIDs
+colors: [
+    // ...existing colors...
+    "#5bcefa",  // 3-7 HQ
+    "#5bcefa",  // Alpha 3-7
+    "#5bcefa",  // Bravo 3-7
+    "#5bcefa",  // Charlie 3-7
+],
 ```
 
 > Note: Ensure that you add these elements in the proper locations to maintain the formatting.
