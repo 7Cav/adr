@@ -648,6 +648,7 @@ const threeSeven = {
 //ACD
 
 const acdCommand = [
+  //ACD HQ
   "1006",
   "1007",
   "1008",
@@ -661,6 +662,7 @@ const acdCommand = [
   "12",
 ];
 const alpha4 = [
+  //A ACD
   "555",
   "556",
   "557",
@@ -712,6 +714,7 @@ const alpha4 = [
   "770",
 ];
 const bravo4 = [
+  //B ACD
   "590",
   "591",
   "592",
@@ -751,6 +754,7 @@ const bravo4 = [
   "626",
 ];
 const charlie4 = [
+  //C ACD
   "656",
   "657",
   "658",
@@ -768,12 +772,9 @@ const charlie4 = [
   "670",
   "671",
   "672",
-  "280",
-  "281",
-  "279",
   "936",
   "937",
-  "430",
+  "938",
   "939",
   "940",
   "942",
@@ -785,7 +786,6 @@ const charlie4 = [
   "948",
   "950",
   "951",
-  "952",
   "953",
   "954",
   "955",
@@ -801,32 +801,152 @@ const charlie4 = [
   "974",
   "975",
   "976",
+  "977",
+  "978",
+  "979",
+  "980",
+  "981",
+  "982",
+  "983",
+  "984",
 ];
-//const starterPlatoon = ["780", "781", "759"];
-//const starterPlatoon2 = ["782", "786", "787"];
-//const starterPlatoon3 = ["790"];
-const futureC = ["753"];
+const delta4 = [
+  //D ACD
+  "1174",
+  "1175",
+  "1176",
+  "1177",
+  "1178",
+  "1179",
+  "1180",
+  "1181",
+  "1185",
+  "1217",
+  "1187",
+  "1188",
+  "1189",
+  "1190",
+  "1191",
+  "1192",
+  "1193",
+  "1195",
+  "1196",
+  "1197",
+  "1198",
+  "1199",
+  "1208",
+  "1202",
+  "1203",
+  "1204",
+  "1209",
+  "1213",
+  "1205",
+  "1210",
+  "1214",
+  "1206",
+  "1211",
+  "1215",
+  "1207",
+  "1212",
+  "1216",
+];
+//DEVCOM
+
+//DEVCOM HQ + leads
+const starterPlatoonCommand = [
+  "1010",
+  "1006",
+  "1007",
+  "1008",
+  "698",
+  "699",
+  "700",
+];
+const alphaSP = [
+  "701",
+  "702",
+  "704",
+  "705",
+  "706",
+  "712",
+  "713",
+  "714",
+  "715",
+  "716",
+  "717",
+  "718",
+  "1146",
+  "720",
+];
+const bravoSP = [
+  "707",
+  "708",
+  "709",
+  "710",
+  "711",
+  "721",
+  "722",
+  "723",
+  "724",
+  "725",
+  "726",
+  "727",
+  "728",
+  "729",
+];
+const charlieSP = [
+  "1130",
+  "1132",
+  "1133",
+  "1131",
+  "1129",
+  "1141",
+  "1147",
+  "1153",
+  "1142",
+  "1148",
+  "1154",
+  "1143",
+  "1149",
+  "1155",
+];
+const deltaSP = [
+  "1134",
+  "1135",
+  "1137",
+  "1138",
+  "1136",
+  "1159",
+  "1150",
+  "1156",
+  "1144",
+  "1151",
+  "1157",
+  "1145",
+  "1152",
+  "1158",
+];
+
+const starterPlatoon = {
+  positionIds: [starterPlatoonCommand, alphaSP, bravoSP, charlieSP, deltaSP],
+  positionTitles: [
+    "Development Command Headquarters",
+    "Alpha Platoon DEVCOM",
+    "Bravo Platoon DEVCOM",
+    "Charlie Platoon DEVCOM",
+    "Delta Platoon DEVCOM",
+  ],
+  collapsibleTitle: "DEVCOM",
+};
 
 const acd = {
-  positionIds: [
-    acdCommand,
-    alpha4,
-    bravo4,
-    charlie4,
-    //starterPlatoon,
-    //starterPlatoon2,
-    //starterPlatoon3,
-    futureC,
-  ],
+  positionIds: [acdCommand, alpha4, bravo4, charlie4, delta4],
   positionTitles: [
     "Reserve and Development Command Headquarters",
-    "Alpha Company/ACD",
-    "Bravo Company/ACD",
-    "Charlie Company/ACD",
-    //"Star Citizen Starter Platoon",
-    //"Star Wars RPG Starter Platoon",
-    //"Counter Strike Starter Platoon",
-    "Future Concepts Center",
+    "Alpha Company ACD",
+    "Bravo Company ACD",
+    "Charlie Company ACD",
+    "Delta Company ACD",
   ],
   collapsibleTitle: "Reserve and Development Command",
 };
@@ -1138,6 +1258,7 @@ const billetBankObject = {
   twoSeven: twoSeven,
   threeSeven: threeSeven,
   acd: acd,
+  starterPlatoon: starterPlatoon,
   // imo: imo,
   secOps: secOps,
   roo: roo,
@@ -1167,10 +1288,12 @@ const billetBank = {
   alpha4,
   bravo4,
   charlie4,
-  futureC,
-  //starterPlatoon,
-  //starterPlatoon2,
-  //starterPlatoon3,
+  delta4,
+  starterPlatoonCommand,
+  alphaSP,
+  bravoSP,
+  charlieSP,
+  deltaSP,
 };
 
 export default billetBank;
