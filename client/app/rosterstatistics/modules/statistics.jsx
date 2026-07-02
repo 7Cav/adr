@@ -53,7 +53,18 @@ class Statistics extends Component {
             colors: ["#222222"],
             width: 1.5,
           },
-          colors: ["#109640", "#b61217", "#2a487c", "#ebc729", "#e68c08"],
+          colors: [
+            "#109640",
+            "#b61217",
+            "#2a487c",
+            "#ebc729",
+            "#e68c08",
+            "#7b3fa0",
+            "#5bcefa",
+            "#f7a8b8",
+            "#2ca089",
+            "#8b5a2b",
+          ],
           plotOptions: {
             pie: {
               donut: {
@@ -104,30 +115,31 @@ class Statistics extends Component {
             width: 1.5,
           },
           colors: [
-            "#109640", // 0  General Staff
-            "#b61217", // 1  1-7 HQ
-            "#b61217", // 2  Alpha 1-7
-            "#b61217", // 3  Bravo 1-7
-            "#b61217", // 4  Charlie 1-7
-            "#b61217", // 5  Delta 1-7
-            "#2a487c", // 6  2-7 HQ
-            "#2a487c", // 7  Alpha 2-7
-            "#2a487c", // 8  Bravo 2-7
-            "#2a487c", // 9  Charlie 2-7
+            "#109640", // 00 General Staff
+            "#b61217", // 01 1-7 HQ
+            "#b61217", // 02 Alpha 1-7
+            "#b61217", // 03 Bravo 1-7
+            "#b61217", // 04 Charlie 1-7
+            "#b61217", // 05 Delta 1-7
+            "#2a487c", // 06 2-7 HQ
+            "#2a487c", // 07 Alpha 2-7
+            "#2a487c", // 08 Bravo 2-7
+            "#2a487c", // 09 Charlie 2-7
             "#2a487c", // 10 Echo 2-7
             "#5bcefa", // 11 3-7 HQ
             "#5bcefa", // 12 Alpha 3-7
             "#5bcefa", // 13 Bravo 3-7
             "#5bcefa", // 14 Charlie 3-7
-            "#f3ced5", // 15 R&DC HQ
-            "#f7a8b8", // 16 Alpha ACD
-            "#f7a8b8", // 17 Bravo ACD
-            "#f7a8b8", // 18 Charlie ACD
-            "#f7a8b8", // 19 Delta ACD
-            "#ff8989", // 20 Alpha SP
-            "#ff8989", // 21 Bravo SP
-            "#ff8989", // 22 Charlie SP
-            "#ff7575", // 23 Delta SP
+            "#ebc729", // 15 R&DC HQ
+            "#e68c08", // 16 Alpha ACD
+            "#e68c08", // 17 Bravo ACD
+            "#e68c08", // 18 Charlie ACD
+            "#e68c08", // 19 Delta ACD
+            "#7b3fa0", // 21 SP Command
+            "#7b3fa0", // 22 Alpha SP
+            "#7b3fa0", // 23 Bravo SP
+            "#7b3fa0", // 24 Charlie SP
+            "#7b3fa0", // 25 Delta SP
           ],
           plotOptions: {
             pie: {

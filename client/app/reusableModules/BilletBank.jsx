@@ -645,15 +645,10 @@ const threeSeven = {
   collapsibleTitle: "Third Battalion",
 };
 
-//ACD
+//ACD + RDC (1005, needs to be moved) + Reserves HQ (11,12, need to be moved)
 
 const acdCommand = [
   //ACD HQ
-  "1006",
-  "1007",
-  "1008",
-  "1009",
-  "1010",
   "1005",
   "552",
   "627",
