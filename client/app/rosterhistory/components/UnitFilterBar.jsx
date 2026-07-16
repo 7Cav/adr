@@ -38,7 +38,13 @@ function UnitChip({ label, active, onClick, onClear }) {
   );
 }
 
-export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
+export function UnitFilterBar({
+  events,
+  unitFilter,
+  onSelect,
+  onClear,
+  preUnitFilteredCount,
+}) {
   const unitMap = useMemo(() => {
     const battalions = new Map();
 
@@ -66,7 +72,50 @@ export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
     return battalions;
   }, [events]);
 
-  if (unitMap.size === 0) return null;
+  const hasActiveFilter = Boolean(unitFilter.battalion);
+
+  if (unitMap.size === 0) {
+    // No units in view. If a unit filter is active, no events in the current
+    // data match it — explain that instead of silently disappearing.
+    if (!hasActiveFilter) return null;
+
+    // Only blame the unit filter when it is genuinely the cause: if the
+    // events were already empty before the unit predicate was applied
+    // (e.g. all event types toggled off), the parent's generic message is
+    // the accurate one — render nothing here so it can show.
+    if (preUnitFilteredCount === 0) return null;
+
+    const filterLabel = [
+      unitFilter.battalion,
+      unitFilter.company &&
+        (unitFilter.company === "HQ" ? "HQ" : `Co. ${unitFilter.company}`),
+      unitFilter.platoon && `Plt. ${unitFilter.platoon}`,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+
+    return (
+      <div className="rounded-lg border border-dashed border-border p-6 text-center text-muted-foreground">
+        <p className="text-sm">
+          No recorded changes for{" "}
+          <span className="font-medium text-foreground">{filterLabel}</span> in
+          the current view.
+        </p>
+        <p className="text-xs mt-1 text-muted-foreground/70">
+          Only units with recorded changes in the current view are listed.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3"
+          onClick={() => onClear("battalion")}
+        >
+          <X size={12} />
+          Clear unit filter
+        </Button>
+      </div>
+    );
+  }
 
   const sortedBattalions = [...unitMap.keys()].sort((a, b) => {
     const ai = LINE_BATTALION_ORDER.indexOf(a);
@@ -165,6 +214,10 @@ export function UnitFilterBar({ events, unitFilter, onSelect, onClear }) {
           </div>
         </>
       )}
+
+      <p className="text-[11px] text-muted-foreground/60">
+        Only units with recorded changes in the current view are listed.
+      </p>
     </div>
   );
 }

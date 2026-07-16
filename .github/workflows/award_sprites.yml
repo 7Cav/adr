@@ -1,0 +1,93 @@
+name: AWARD_SPRITES
+
+on:
+  push:
+    paths:
+      - "uniform-uploads/**"
+    branches-ignore:
+      - "award-sprites/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: award-sprites-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate_sprites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run generator tests
+        run: npm test
+
+      - name: Generate sprite sheets
+        id: generate
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run sprites:generate 2>&1 | tee sprite-gen.log
+          WARNINGS=$(grep '^WARN:' sprite-gen.log || true)
+          [ -z "$WARNINGS" ] && WARNINGS="(none)"
+          {
+            echo "warnings<<SPRITE_EOF"
+            echo "$WARNINGS"
+            echo "SPRITE_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Detect sprite-sheet changes
+        id: changes
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain client/public/skunkworks/)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No sprite-sheet changes (e.g. README/manifest-only push); skipping PR."
+          fi
+
+      - name: Verify formatting
+        if: steps.changes.outputs.changed == 'true'
+        run: npm run format:check
+
+      - name: Open pull request
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: award-sprites/${{ github.ref_name }}
+          base: ${{ github.ref_name }}
+          add-paths: |
+            client/public/skunkworks/**
+            uniform-uploads/**
+          commit-message: "chore(uniformbuilder): regenerate award sprite sheets"
+          title: "chore(uniformbuilder): regenerate award sprite sheets"
+          body: |
+            Automated sprite-sheet regeneration from `uniform-uploads/`.
+
+            This PR contains only the regenerated sprite-sheet PNG(s) and the
+            upload-folder cleanup (consumed source art removed, manifest
+            emptied). Placement was read from `AwardRegistry.jsx`.
+
+            **Generator warnings** (e.g. a medal placed with a transparent gap,
+            or a ribbon stretched from a wrong-sized source):
+
+            ```
+            ${{ steps.generate.outputs.warnings }}
+            ```
+
+            Review that the new award renders correctly in both racks and that
+            nothing below the insert point shifted, then merge.

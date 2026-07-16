@@ -321,31 +321,38 @@ export const AWARD_CATALOG = [
     awardType: AwardType.Medal,
   },
   {
-    name: "Recruiting Ribbon",
+    name: "Foxhole Service Ribbon",
     awardPriority: 46,
+    medalPriority: 42,
+    awardAttachmentType: AwardAttachmentType.OAK_CLUSTERS_SERVICE,
+    awardType: AwardType.Medal,
+  },
+  {
+    name: "Recruiting Ribbon",
+    awardPriority: 47,
     awardAttachmentType: AwardAttachmentType.STARS_DONATION,
     awardType: AwardType.RibbonDonationLogic,
   }, // May Also require Special Case
   {
     name: "D-Day Commemorative Medal",
-    awardPriority: 47,
-    medalPriority: 42,
-    awardType: AwardType.Medal,
-  },
-  {
-    name: "Ranger Selection Ribbon",
     awardPriority: 48,
-    awardType: AwardType.Ribbon,
-  },
-  {
-    name: "Sniper Ribbon",
-    awardPriority: 49,
     medalPriority: 43,
     awardType: AwardType.Medal,
   },
   {
-    name: "Basic Assault Course Ribbon",
+    name: "Ranger Selection Ribbon",
+    awardPriority: 49,
+    awardType: AwardType.Ribbon,
+  },
+  {
+    name: "Sniper Ribbon",
     awardPriority: 50,
+    medalPriority: 44,
+    awardType: AwardType.Medal,
+  },
+  {
+    name: "Basic Assault Course Ribbon",
+    awardPriority: 51,
     awardType: AwardType.Ribbon,
   },
 
@@ -354,24 +361,24 @@ export const AWARD_CATALOG = [
   // Anything here is shown as is, and there is no inherent precicence for these.
   {
     name: "Cadre Course Ribbon",
-    awardPriority: 51,
+    awardPriority: 52,
     awardType: AwardType.Ribbon,
   },
   {
     name: "Womens Army Corp Service Medal",
-    awardPriority: 52,
-    medalPriority: 44,
+    awardPriority: 53,
+    medalPriority: 45,
     awardType: AwardType.Medal,
   },
   {
     name: "D Day Participation Ribbon",
-    awardPriority: 53,
+    awardPriority: 54,
     awardType: AwardType.Ribbon,
   },
   {
     name: "European/African/Middle Eastern Campaign Medal",
-    awardPriority: 54,
-    medalPriority: 45,
+    awardPriority: 55,
+    medalPriority: 46,
     awardAttachmentType: AwardAttachmentType.OAK_CLUSTERS,
     awardType: AwardType.Medal,
   },

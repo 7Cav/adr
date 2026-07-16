@@ -1,17 +1,15 @@
-import dynamic from "next/dynamic";
 import GetCombatRoster from "../reusableModules/getCombatRoster";
 import GetReserveRoster from "../reusableModules/getReserveRoster";
 import GetApiTimestamp from "../reusableModules/getApiTimestamp";
 import lists from "../reusableModules/BilletBank";
+import Statistics from "./modules/StatisticsClient";
 import "./page.css";
 
-// ssr: false cause apex charts
-const Statistics = dynamic(
-  () => import("../rosterstatistics/modules/statistics"),
-  {
-    ssr: false,
-  },
-);
+// This route reads the live roster on every request and must never be
+// prerendered. Since Next 15, no-store fetches no longer mark a route dynamic
+// on their own, so opt in explicitly. Without this the build prerenders against
+// the live API and fails.
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Roster Statistics",
@@ -64,11 +62,13 @@ export default async function RosterStatistics() {
               lists.acdCommand,
               lists.alpha4,
               lists.bravo4,
-              //lists.charlie4,
-              //lists.futureC,
-              //lists.starterPlatoon,
-              //lists.starterPlatoon2,
-              //lists.starterPlatoon3,
+              lists.charlie4,
+              lists.delta4,
+              lists.starterPlatoonCommand,
+              lists.alphaSP,
+              lists.bravoSP,
+              lists.charlieSP,
+              lists.deltaSP,
             ]}
             labelArray={[
               "General Staff",
@@ -89,10 +89,13 @@ export default async function RosterStatistics() {
               "R&DC Headquarters",
               "Alpha Company ACD",
               "Bravo Company ACD",
-              //"Charlie Company ACD",
-              //"Star Citizen SP",
-              //"Star Wars RPG SP",
-              //"Counter Strike 2 SP",
+              "Charlie Company ACD",
+              "Delta Company ACD",
+              "DEVCOM Headquarters",
+              "Alpha Platoon DEVCOM",
+              "Bravo Platoon DEVCOM",
+              "Charlie Platoon DEVCOM",
+              "Delta Platoon DEVCOM",
             ]}
             milpacArray={milpacArray}
             useRegiLogic
@@ -170,15 +173,25 @@ export default async function RosterStatistics() {
               lists.alpha4,
               lists.bravo4,
               lists.charlie4,
-              lists.futureC,
+              lists.delta4,
+              lists.starterPlatoonCommand,
+              lists.alphaSP,
+              lists.bravoSP,
+              lists.charlieSP,
+              lists.deltaSP,
             ]}
             centerLabel="Total R&DC Strength"
             labelArray={[
               "R&DC Headquarters",
-              "Alpha Company/ACD",
-              "Bravo Company/ACD",
-              "Charlie Company/ACD",
-              "Future Concepts Center",
+              "Alpha Company ACD",
+              "Bravo Company ACD",
+              "Charlie Company ACD",
+              "Delta Company ACD",
+              "DEVCOM Headquarters",
+              "Alpha Platoon DEVCOM",
+              "Bravo Platoon DEVCOM",
+              "Charlie Platoon DEVCOM",
+              "Delta Platoon DEVCOM",
             ]}
             milpacArray={milpacArray}
           />

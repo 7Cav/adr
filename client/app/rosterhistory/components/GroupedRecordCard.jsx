@@ -84,7 +84,7 @@ export function GroupedRecordCard({
           <Separator className="bg-current opacity-10" />
           <div className="divide-y divide-current/10">
             {records.map((r, i) => (
-              <div key={i} className="pl-[3.25rem] pr-3 py-2">
+              <div key={i} className="pl-13 pr-3 py-2">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                   <span className="font-medium text-xs opacity-90">
                     {formatRecordType(r.new_value ?? "")}

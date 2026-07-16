@@ -11,6 +11,12 @@ import {
 import { Download, Search, X, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useDiffList, useDiffRange, useDiffByDate, useRanks } from "../lib/api";
 import { DiffEventCard } from "./DiffEventCard";
@@ -102,7 +108,11 @@ export function HistoryView() {
     return s;
   }, [activeData]);
 
-  const typeFilteredEvents = useMemo(
+  // Events with every filter EXCEPT the unit predicate applied. Used to
+  // decide whether an active unit filter is the actual cause of an empty
+  // view (vs. event-type/record-type/roster-type filters having emptied it
+  // already).
+  const preUnitFilteredEvents = useMemo(
     () =>
       (activeData?.events ?? []).filter((e) => {
         if (!activeFilters.has(e.event_type)) return false;
@@ -113,25 +123,26 @@ export function HistoryView() {
           return false;
         if (e.roster_type && !activeRosterTypes.has(e.roster_type))
           return false;
-        if (unitFilter.battalion) {
-          const u = parseUnit(e.position_title || "");
-          if (!u || u.battalion !== unitFilter.battalion) return false;
-          if (unitFilter.company) {
-            const co = u.company ?? "HQ";
-            if (co !== unitFilter.company) return false;
-          }
-          if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
-            return false;
-        }
         return true;
       }),
-    [
-      activeData,
-      activeFilters,
-      excludedRecordTypes,
-      activeRosterTypes,
-      unitFilter,
-    ],
+    [activeData, activeFilters, excludedRecordTypes, activeRosterTypes],
+  );
+
+  const typeFilteredEvents = useMemo(
+    () =>
+      preUnitFilteredEvents.filter((e) => {
+        if (!unitFilter.battalion) return true;
+        const u = parseUnit(e.position_title || "");
+        if (!u || u.battalion !== unitFilter.battalion) return false;
+        if (unitFilter.company) {
+          const co = u.company ?? "HQ";
+          if (co !== unitFilter.company) return false;
+        }
+        if (unitFilter.platoon && u.platoon !== unitFilter.platoon)
+          return false;
+        return true;
+      }),
+    [preUnitFilteredEvents, unitFilter],
   );
 
   const recordTypeCounts = useMemo(() => {
@@ -169,6 +180,14 @@ export function HistoryView() {
 
   const totalVisible =
     notable.length + recordGroups.reduce((n, g) => n + g.records.length, 0);
+
+  // True when an active unit filter is the genuine cause of an empty view:
+  // nothing is visible, yet events survive every other filter — so the unit
+  // predicate is what emptied it.
+  const unitFilterIsCause =
+    totalVisible === 0 &&
+    Boolean(unitFilter.battalion) &&
+    preUnitFilteredEvents.length > 0;
 
   // Aggregate snapshots into heatmap buckets. Bucket size scales with range:
   // ≤90d → daily, ≤365d → weekly, >365d or All → monthly
@@ -369,24 +388,31 @@ export function HistoryView() {
                 : "day"}{" "}
             to drill down
           </p>
-          <div className="flex flex-wrap gap-1">
-            {heatmapData.map((entry) => {
-              const count = totalCount(entry);
-              const isSelected = entry.date === selectedDay;
-              return (
-                <button
-                  key={entry.date}
-                  title={`${entry.label}: ${count} change${count !== 1 ? "s" : ""}`}
-                  onClick={() => handleDotClick(entry)}
-                  className={cn(
-                    "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    heatIntensity(count, maxCount),
-                    isSelected && "ring-2 ring-primary scale-125",
-                  )}
-                />
-              );
-            })}
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <div className="flex flex-wrap gap-1">
+              {heatmapData.map((entry) => {
+                const count = totalCount(entry);
+                const isSelected = entry.date === selectedDay;
+                const cellLabel = `${entry.label}: ${count} change${count !== 1 ? "s" : ""}`;
+                return (
+                  <Tooltip key={entry.date}>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => handleDotClick(entry)}
+                        aria-label={cellLabel}
+                        className={cn(
+                          "h-4 w-4 rounded-sm transition-transform hover:scale-125 hover:ring-2 hover:ring-white/30 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+                          heatIntensity(count, maxCount),
+                          isSelected && "ring-2 ring-primary scale-125",
+                        )}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>{cellLabel}</TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
           <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
             <span>Less</span>
             {[
@@ -446,12 +472,15 @@ export function HistoryView() {
             presentRosterTypes={presentRosterTypes}
           />
 
-          <UnitFilterBar
-            events={typeFilteredEvents}
-            unitFilter={unitFilter}
-            onSelect={handleUnitSelect}
-            onClear={handleUnitClear}
-          />
+          {!isLoading && !isError && (
+            <UnitFilterBar
+              events={typeFilteredEvents}
+              unitFilter={unitFilter}
+              onSelect={handleUnitSelect}
+              onClear={handleUnitClear}
+              preUnitFilteredCount={preUnitFilteredEvents.length}
+            />
+          )}
 
           {activeData?.counts && (
             <SummaryBar
@@ -491,16 +520,26 @@ export function HistoryView() {
             <p className="text-muted-foreground text-sm">Loading…</p>
           )}
 
-          {!isError && !isLoading && totalVisible === 0 && (
-            <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
-              <p>
-                No changes{" "}
-                {selectedDay
-                  ? "recorded for this date."
-                  : "in the selected range."}
-              </p>
-            </div>
-          )}
+          {/* Skip the generic message only when UnitFilterBar renders its own
+              unit-scoped empty state (unitFilterIsCause). Invariant: this
+              relies on UnitFilterBar receiving the same typeFilteredEvents
+              used to compute totalVisible (plus preUnitFilteredCount for the
+              cause check), and on groupAndSortEvents not dropping events
+              (totalVisible === typeFilteredEvents.length) — if either ever
+              diverges, restore a fallback message here. */}
+          {!isError &&
+            !isLoading &&
+            totalVisible === 0 &&
+            !unitFilterIsCause && (
+              <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
+                <p>
+                  No changes{" "}
+                  {selectedDay
+                    ? "recorded for this date."
+                    : "in the selected range."}
+                </p>
+              </div>
+            )}
 
           {notable.length > 0 && (
             <div className="space-y-2">
