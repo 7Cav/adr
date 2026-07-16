@@ -527,10 +527,73 @@ function Canvas(props) {
       const canvas = canvasRef.current;
       const context = canvas.getContext("2d");
 
+      // Grow the canvas so the medal box can extend vertically for extra rows.
+      // Special medals (priority 0/1) are full-canvas overlays, not row medals.
+      const MEDALS_PER_ROW = 12;
+      const MEDAL_ROW_STEP = 70; // vertical step between rows (~50px overlap)
+      // Brick layout: even rows are full width, odd rows are offset half a step
+      // and hold one fewer so they nest in the valleys without overflowing.
+      const medalsInRow = (row) =>
+        row % 2 === 0 ? MEDALS_PER_ROW : MEDALS_PER_ROW - 1;
+      const rowMedalCount = data[3].filter(
+        (m) => m.awardPriority != 0 && m.awardPriority != 1,
+      ).length;
+      let medalRows = 0;
+      for (let remaining = rowMedalCount; remaining > 0; medalRows++) {
+        remaining -= medalsInRow(medalRows);
+      }
+      // The base box interior fits 3 rows; each further row grows the box by one
+      // row step.
+      const medalExtra = Math.max(0, (medalRows - 3) * MEDAL_ROW_STEP);
+      canvas.width = 837;
+      canvas.height = 1025 + medalExtra;
+
       context.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
       const drawLayers = async () => {
-        context.drawImage(images.uniformBase, 0, 0);
+        // Base uniform + medal box. When the box must grow, composite it:
+        // keep the top (uniform + frame + interior down to the bottom bar),
+        // stretch an interior slice to fill the added height, then drop the
+        // bottom wood bar below it.
+        if (medalExtra > 0) {
+          const BAR_TOP = 1002; // top of the bottom wood bar in the source image
+          const BAR_H = 1025 - BAR_TOP;
+          context.drawImage(
+            images.uniformBase,
+            0,
+            0,
+            837,
+            BAR_TOP,
+            0,
+            0,
+            837,
+            BAR_TOP,
+          );
+          context.drawImage(
+            images.uniformBase,
+            0,
+            960,
+            837,
+            40,
+            0,
+            BAR_TOP,
+            837,
+            medalExtra,
+          );
+          context.drawImage(
+            images.uniformBase,
+            0,
+            BAR_TOP,
+            837,
+            BAR_H,
+            0,
+            BAR_TOP + medalExtra,
+            837,
+            BAR_H,
+          );
+        } else {
+          context.drawImage(images.uniformBase, 0, 0);
+        }
 
         // First, draw all ribbons, unit citations and the infantry badge.
         await Promise.all([
@@ -704,145 +767,82 @@ function Canvas(props) {
           setBuilderErrors((prevErrors) => [...prevErrors, err.message]);
         }
 
-        //Calculate medal coords
-        //TODO MOVE THIS WHOLE THING OUT OF THIS DAMN CANVAS FUNCTION
+        // Medal box: brick layout in rows that extend downward into the
+        // (possibly grown) box. Even rows are full width and left-aligned; odd
+        // rows are offset half a step and hold one fewer so they nest. A partial
+        // last row is left-aligned (or brick-offset), not centered.
+        const MEDAL_W = 70;
+        const MEDAL_STEP = MEDAL_W - 5; // horizontal step (slight overlap)
+        const MEDAL_ROW_TOP = 745; // first row top, just below the box frame
+        const MEDAL_START_X = 29; // interior left edge + small pad
+        const MEDAL_BRICK_OFFSET = Math.round(MEDAL_STEP / 2); // ~half a step
 
-        const medalCoords = [];
-        const canvasWidth = canvas.width;
-        const borderWidth = 25;
-        const widthInner = canvasWidth - 2 * borderWidth;
-        const offsetX = borderWidth;
-        const offsetY = 745;
-        const medalWidth = 70;
-        const medalHeight = 120;
-        let medalsPerRow = 12;
-        const medalSpacing = -5;
-        let x = 0;
-        let y = 0;
-        let indexOffset = 0;
-        let secondRowOffset = medalWidth / 2 + medalSpacing / 2;
-        let rowSpacing = medalHeight; // Initial row spacing
-
-        data[3].forEach((medalData, index) => {
-          if (medalData.awardPriority == 0 || medalData.awardPriority == 1) {
-            medalCoords.push({ x: 0, y: 0 });
-            indexOffset++;
-            return;
-          }
-
-          if (data[3].length > 25) {
-            rowSpacing = 70;
-          }
-
-          let currentIndex = index - indexOffset;
-          x = currentIndex % medalsPerRow;
-          y = Math.floor(currentIndex / medalsPerRow);
-
-          // Apply the offset to x for the second row
-          if (y === 1 && data[3].length - indexOffset > 25) {
-            x = (currentIndex - medalsPerRow) % (medalsPerRow - 1);
-          }
-          // Calculate x for the third row
-          if (y === 2) {
-            x =
-              (currentIndex - medalsPerRow - (medalsPerRow - 1)) % medalsPerRow;
-          }
-
-          let _offsetX = Math.floor(
-            offsetX + 4 + x * (medalWidth + medalSpacing),
-          );
-          let _offsetY = offsetY + y * rowSpacing;
-
-          if (y % 2 !== 0 && data[3].length - indexOffset > 24) {
-            _offsetX += secondRowOffset;
-          }
-
-          if (y == 2) {
-            _offsetX += medalWidth;
-          }
-
-          if (currentIndex == 23 && data[3].length - indexOffset >= 25) {
-            // Force x-coordinate to be the same as entry 0
-            _offsetX = medalCoords[1 + indexOffset].x + 5;
-            _offsetY = 885;
-          }
-
-          medalCoords.push({ x: _offsetX, y: _offsetY });
-        });
-
-        // Separate medals into rows
-        const row1Medals = [];
-        const row2Medals = [];
-        const row3Medals = [];
+        // Special medals (priority 0/1) are full-canvas overlays; the rest are
+        // laid out in rows.
+        const rowMedals = [];
         const specialMedals = [];
-        const medalCoordsRow1 = [];
-        const medalCoordsRow2 = [];
-        const medalCoordsRow3 = [];
-
-        data[3].forEach((medal, index) => {
+        data[3].forEach((medal) => {
           if (medal.awardPriority == 0 || medal.awardPriority == 1) {
             specialMedals.push(medal);
-            return;
-          }
-          const medalY = medalCoords[index].y;
-
-          if (medalY === offsetY) {
-            row1Medals.push(medal);
-            medalCoordsRow1.push(medalCoords[index]);
-          } else if (medalY === offsetY + rowSpacing) {
-            row2Medals.push(medal);
-            medalCoordsRow2.push(medalCoords[index]);
           } else {
-            row3Medals.push(medal);
-            medalCoordsRow3.push(medalCoords[index]);
+            rowMedals.push(medal);
           }
         });
-        // Draw medals in reverse row order (row 3, then 2, then 1)
-        await Promise.all([
-          ...specialMedals.map((medalData) =>
+
+        // Brick layout: fill each row to its capacity (even rows full width,
+        // odd rows offset half a step and one shorter) so medallions nest and
+        // stay visible.
+        const medalPlacements = [];
+        let brickRow = 0;
+        let colInRow = 0;
+        for (const medal of rowMedals) {
+          if (colInRow >= medalsInRow(brickRow)) {
+            brickRow++;
+            colInRow = 0;
+          }
+          const rowOffset = brickRow % 2 === 1 ? MEDAL_BRICK_OFFSET : 0;
+          medalPlacements.push({
+            medal,
+            row: brickRow,
+            x: MEDAL_START_X + colInRow * MEDAL_STEP + rowOffset,
+            y: MEDAL_ROW_TOP + brickRow * MEDAL_ROW_STEP,
+          });
+          colInRow++;
+        }
+        const totalMedalRows = rowMedals.length ? brickRow + 1 : 0;
+
+        // Draw special overlays first (behind the rack).
+        await Promise.all(
+          specialMedals.map((medalData) =>
             drawSpecialMedal(medalData, context),
           ),
-        ]);
-        await Promise.all([
-          ...row3Medals.map((medalData, index) =>
-            placeMedal(
-              medalData,
-              images.medalSprites,
-              context,
-              medalCoordsRow3[index].x,
-              medalCoordsRow3[index].y,
-            ),
-          ),
-        ]);
-        await Promise.all([
-          ...row2Medals.map((medalData, index) =>
-            placeMedal(
-              medalData,
-              images.medalSprites,
-              context,
-              medalCoordsRow2[index].x,
-              medalCoordsRow2[index].y,
-            ),
-          ),
-        ]);
+        );
 
-        await Promise.all([
-          ...row1Medals.map((medalData, index) =>
-            placeMedal(
-              medalData,
-              images.medalSprites,
-              context,
-              medalCoordsRow1[index].x,
-              medalCoordsRow1[index].y,
-            ),
-          ),
-        ]);
+        // Draw from the bottom row up so any overlap layers correctly.
+        for (let row = totalMedalRows - 1; row >= 0; row--) {
+          await Promise.all(
+            medalPlacements
+              .filter((p) => p.row === row)
+              .map((p) =>
+                placeMedal(p.medal, images.medalSprites, context, p.x, p.y),
+              ),
+          );
+        }
 
         canvas.toBlob(function (blob) {
+          if (!blob) {
+            setBuilderErrors((prev) => [
+              ...prev,
+              "Failed to generate the download image.",
+            ]);
+            return;
+          }
           canvasDownload.href = URL.createObjectURL(blob);
         });
       };
-      drawLayers();
+      drawLayers().catch((err) =>
+        setBuilderErrors((prev) => [...prev, err.message]),
+      );
     }
   }, [loading, images, data]);
 
