@@ -20,8 +20,8 @@
     "compression": "^1.8.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "mysql2": "^3.22.5",
-    "node-cron": "^4.5.0",
+    "mysql2": "^3.22.6",
+    "node-cron": "^4.6.0",
     "node-pg-migrate": "^8.0.4",
     "pg": "^8.22.0"
   }
