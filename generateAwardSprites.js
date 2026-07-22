@@ -4,9 +4,10 @@
  * Award sprite-sheet generator.
  *
  * Reads `uniform-uploads/manifest.json`, validates every entry against
- * `AwardRegistry.jsx` (the human-owned source of truth for placement),
- * normalizes each source PNG to its target tile geometry, and splices the
- * tile into the correct sprite sheet(s) at the registry-derived row. An
+ * `constants/awardCatalog.js` (the human-owned source of truth for placement,
+ * imported as a module — see loadCatalog), normalizes each source PNG to its
+ * target tile geometry, and splices the tile into the correct sprite sheet(s)
+ * at the catalog-derived row. An
  * in-bounds insert shifts every lower row down by its tile height (N inserts
  * shift the bottom band down by N tiles); an insert past the current end pads
  * the sub-tile remainder with transparency and appends without shifting
@@ -23,12 +24,17 @@
  * in these two sheets (Tabs, weapon quals, unit citations, and badges render
  * from other assets). See RIBBON_SHEET_TYPES / MEDAL_SHEET_TYPES below.
  *
- * Run directly (`node generateAwardSprites.js`) to process the real manifest,
- * or require it as a module to use the exported helpers in tests.
+ * Run via `npm run sprites:generate` to process the real manifest, or require
+ * it as a module to use the exported helpers in tests. Prefer the npm script
+ * over a bare `node generateAwardSprites.js`: it carries the flag that mutes
+ * Node's MODULE_TYPELESS_PACKAGE_JSON notice for the imported catalog, which
+ * is ESM under a package.json that cannot be marked `"type": "module"`
+ * (client/next.config.js is CommonJS and would break).
  */
 
 const fs = require("fs");
 const path = require("path");
+const { pathToFileURL } = require("url");
 const sharp = require("sharp");
 
 const ROOT = __dirname;
@@ -36,9 +42,9 @@ const ROOT = __dirname;
 const DEFAULT_PATHS = {
   uploadDir: path.join(ROOT, "uniform-uploads"),
   manifest: path.join(ROOT, "uniform-uploads", "manifest.json"),
-  registry: path.join(
+  catalog: path.join(
     ROOT,
-    "client/app/uniformbuilder/modules/AwardRegistry.jsx",
+    "client/app/uniformbuilder/modules/constants/awardCatalog.js",
   ),
   ribbonSheet: path.join(
     ROOT,
@@ -67,11 +73,7 @@ const MEDAL_SHEET_TYPES = new Set(["Medal", "MedalTiered", "MedalWithValor"]);
 // priorities 0/1 (the Lifetime medals) are not on it.
 const MEDAL_MIN_PRIORITY = 2;
 
-function escapeRegExp(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-/** Does this parsed award have a tile on the ribbon sheet? */
+/** Does this award have a tile on the ribbon sheet? */
 function onRibbonSheet(award) {
   return (
     !!award &&
@@ -80,7 +82,7 @@ function onRibbonSheet(award) {
   );
 }
 
-/** Does this parsed award have a tile on the medal sheet? */
+/** Does this award have a tile on the medal sheet? */
 function onMedalSheet(award) {
   return (
     !!award &&
@@ -90,74 +92,84 @@ function onMedalSheet(award) {
   );
 }
 
-// Field matchers, shared by the parser and the present-but-unparsed check so
-// the two can never drift on what counts as a valid value.
-const FIELD_RE = {
-  awardPriority: /awardPriority\s*:\s*(\d+)/,
-  medalPriority: /medalPriority\s*:\s*(\d+)/,
-  awardType: /awardType\s*:\s*["'`]([A-Za-z]+)["'`]/,
+/**
+ * Index an AWARD_CATALOG array by award name.
+ *
+ * Throws on a malformed catalog rather than returning a partial index: a
+ * nameless entry or a duplicate name means the app's own AwardRegistry Map is
+ * broken too (it keys on the same field and a duplicate silently wins), so
+ * failing here surfaces it instead of quietly misplacing a tile.
+ */
+function indexCatalog(entries) {
+  if (!Array.isArray(entries)) {
+    throw new Error(
+      `award catalog must export AWARD_CATALOG as an array, got ${typeof entries}`,
+    );
+  }
+  const byName = new Map();
+  entries.forEach((entry, i) => {
+    if (!entry || typeof entry.name !== "string" || entry.name === "") {
+      throw new Error(`award catalog entry ${i} has no usable "name"`);
+    }
+    if (byName.has(entry.name)) {
+      throw new Error(
+        `award catalog has a duplicate name "${entry.name}" (entry ${i})`,
+      );
+    }
+    byName.set(entry.name, entry);
+  });
+  return byName;
+}
+
+/**
+ * Import the award catalog and index it by name.
+ *
+ * The catalog is imported, not parsed as text: it is the same module the
+ * uniform builder renders from, so the generator and the app can never
+ * disagree about where an award sits. That coupling is the point — a refactor
+ * that moves or renames this data now breaks the import loudly instead of
+ * leaving a text matcher quietly finding nothing.
+ *
+ * Imported by file URL so absolute Windows paths resolve; `await import` of an
+ * ES module is why every caller of this is async.
+ */
+async function loadCatalog(catalogPath) {
+  const mod = await import(pathToFileURL(catalogPath).href);
+  return indexCatalog(mod.AWARD_CATALOG);
+}
+
+/** Look up one award's details by name, or null when it is not in the catalog. */
+function lookupAward(catalog, name) {
+  return catalog.get(name) ?? null;
+}
+
+// What each placement field must hold to be usable. One table so the check can
+// never drift field-by-field, and so adding a field is one line here.
+const FIELD_IS_USABLE = {
+  awardPriority: (v) => Number.isInteger(v) && v >= 0,
+  medalPriority: (v) => Number.isInteger(v) && v >= 0,
+  awardType: (v) => typeof v === "string" && v !== "",
 };
 
 /**
- * Extract the brace-balanced object-literal body for a single award out of the
- * registry SOURCE TEXT (never executed). Matches `this.awards.set(<"name"
- * |`name`>, { ... })` for the exact literal name and returns the text between
- * the matching braces, or null when the name is absent. Brace-balanced (rather
- * than stopping at the first `}`) so an entry containing a nested object is
- * captured in full instead of being truncated mid-entry.
+ * Names of placement fields the award states but fills with a value the
+ * splicer cannot use as a row index or a sheet-membership key.
+ *
+ * Guards the dangerous case: a field set to something unusable would otherwise
+ * read as "field not set," making the award look like a non-member of that
+ * sheet — its tile never placed, reported only as the misleading "does not
+ * belong to this sheet".
+ *
+ * Keyed on whether the field is WRITTEN, not on `!== undefined`. An entry that
+ * spells out `medalPriority: undefined` — which is what a typo'd or deleted
+ * enum reference evaluates to — has declared an intent to sit on the medal
+ * sheet and must be rejected, whereas an entry that simply omits the key is a
+ * legitimate ribbon-only award. Collapsing those two would splice the ribbon
+ * tile, skip the medal tile, and still exit 0.
  */
-function extractAwardBody(registryText, name) {
-  const escaped = escapeRegExp(name);
-  const head = new RegExp(
-    'this\\.awards\\.set\\(\\s*[`"]' + escaped + '[`"]\\s*,\\s*\\{',
-  );
-  const m = registryText.match(head);
-  if (!m) return null;
-  const start = m.index + m[0].length; // first char after the opening "{"
-  let depth = 1;
-  let i = start;
-  for (; i < registryText.length && depth > 0; i++) {
-    const ch = registryText[i];
-    if (ch === "{") depth++;
-    else if (ch === "}") depth--;
-  }
-  if (depth !== 0) return null; // unbalanced — treat as not found
-  return registryText.slice(start, i - 1);
-}
-
-/**
- * Parse a single award's placement out of the registry source text. Returns
- * null when the name is absent, otherwise an object with whatever of
- * `awardPriority`/`medalPriority`/`awardType` parsed. A field that is present
- * in the registry but fails to parse comes back absent here — callers must run
- * {@link unparsedFields} to reject that case rather than treat it as "field
- * not set," or a placement can be silently dropped.
- */
-function parseAward(registryText, name) {
-  const body = extractAwardBody(registryText, name);
-  if (body === null) return null;
-  const award = {};
-  const ap = body.match(FIELD_RE.awardPriority);
-  const mp = body.match(FIELD_RE.medalPriority);
-  const at = body.match(FIELD_RE.awardType);
-  if (ap) award.awardPriority = Number(ap[1]);
-  if (mp) award.medalPriority = Number(mp[1]);
-  if (at) award.awardType = at[1];
-  return award;
-}
-
-/**
- * Names of fields that appear (as a `key:`) in the award's registry body but
- * whose value did not parse — the dangerous case the parser would otherwise
- * drop silently. Returns [] when the name is absent or every present field
- * parsed cleanly.
- */
-function unparsedFields(registryText, name) {
-  const body = extractAwardBody(registryText, name);
-  if (body === null) return [];
-  return Object.keys(FIELD_RE).filter(
-    (key) =>
-      new RegExp("\\b" + key + "\\s*:").test(body) && !FIELD_RE[key].test(body),
+function malformedFields(award) {
+  return Object.keys(FIELD_IS_USABLE).filter(
+    (key) => Object.hasOwn(award, key) && !FIELD_IS_USABLE[key](award[key]),
   );
 }
 
@@ -348,10 +360,11 @@ async function spliceSheet(sheetPath, inserts) {
 }
 
 /**
- * Validate the manifest against the registry. Returns { errors, warnings }.
- * `errors` non-empty means the run must abort before any image is written.
+ * Validate the manifest against the award catalog (a name-indexed Map from
+ * {@link loadCatalog}). Returns { errors, warnings }; `errors` non-empty means
+ * the run must abort before any image is written.
  */
-function validateManifest(manifest, registryText, uploadDir) {
+function validateManifest(manifest, catalog, uploadDir) {
   const errors = [];
   const warnings = [];
   if (!Array.isArray(manifest)) {
@@ -381,27 +394,27 @@ function validateManifest(manifest, registryText, uploadDir) {
       );
       return;
     }
-    const award = parseAward(registryText, entry.name);
+    const award = lookupAward(catalog, entry.name);
     if (!award) {
       errors.push(
-        `${label}: "${entry.name}" is not present in AwardRegistry.jsx`,
+        `${label}: "${entry.name}" is not present in the award catalog (awardCatalog.js)`,
       );
       return;
     }
-    // A field that is present in the registry but didn't parse must abort,
-    // separate from "name absent" and "not a sheet member": otherwise an award
-    // whose (say) medalPriority failed to parse looks like a non-member, its
-    // medal tile is silently never placed, yet its source is still consumed.
-    const unparsed = unparsedFields(registryText, entry.name);
-    if (unparsed.length > 0) {
+    // A field that is set but unusable must abort, separate from "name absent"
+    // and "not a sheet member": otherwise an award whose (say) medalPriority
+    // holds a bad value looks like a non-member, its medal tile is silently
+    // never placed, yet its source is still consumed.
+    const malformed = malformedFields(award);
+    if (malformed.length > 0) {
       errors.push(
-        `${label}: "${entry.name}" has registry field(s) that are present but could not be parsed (${unparsed.join(", ")}); fix the entry in AwardRegistry.jsx`,
+        `${label}: "${entry.name}" has catalog field(s) that are present but unusable (${malformed.join(", ")}); fix the entry in awardCatalog.js`,
       );
       return;
     }
     if (award.awardType === undefined) {
       errors.push(
-        `${label}: "${entry.name}" has no parseable awardType in AwardRegistry.jsx`,
+        `${label}: "${entry.name}" has no usable awardType in the award catalog`,
       );
       return;
     }
@@ -462,11 +475,11 @@ async function run(paths = DEFAULT_PATHS, log = console) {
     log.log("uniform-uploads/manifest.json is empty — nothing to process.");
     return { processed: 0, warnings: [] };
   }
-  const registryText = fs.readFileSync(paths.registry, "utf8");
+  const catalog = await loadCatalog(paths.catalog);
 
   const { errors, warnings } = validateManifest(
     manifest,
-    registryText,
+    catalog,
     paths.uploadDir,
   );
   if (errors.length > 0) {
@@ -484,7 +497,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const allWarnings = [...warnings];
 
   for (const entry of manifest) {
-    const award = parseAward(registryText, entry.name);
+    const award = lookupAward(catalog, entry.name);
     const replace = entry.replace === true;
     if (onRibbonSheet(award)) {
       const { png, warnings: w } = await normalizeRibbon(
@@ -603,10 +616,10 @@ module.exports = {
   MEDAL,
   RIBBON_SHEET_TYPES,
   MEDAL_SHEET_TYPES,
-  escapeRegExp,
-  extractAwardBody,
-  parseAward,
-  unparsedFields,
+  indexCatalog,
+  loadCatalog,
+  lookupAward,
+  malformedFields,
   onRibbonSheet,
   onMedalSheet,
   readSheet,

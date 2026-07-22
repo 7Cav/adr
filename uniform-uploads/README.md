@@ -6,10 +6,11 @@ the sprite sheets and opens a pull request for review.
 
 ## How to add an award
 
-1. **Edit the registry first.** Add (and renumber) the award in
-   `client/app/uniformbuilder/modules/AwardRegistry.jsx`. This is the single
-   source of truth for placement — CI reads `awardPriority` / `medalPriority`
-   from it; the manifest never restates row numbers.
+1. **Edit the catalog first.** Add (and renumber) the award in
+   `client/app/uniformbuilder/modules/constants/awardCatalog.js`. This is the
+   single source of truth for placement — CI imports the same module the
+   uniform builder renders from and reads `awardPriority` / `medalPriority`
+   off it; the manifest never restates row numbers.
 2. **Drop the source art** here as PNG(s):
    - Ribbon art: ideally 43×13, RGB or RGBA (it is vertically stretched to
      43×14).
@@ -27,17 +28,17 @@ the sprite sheets and opens a pull request for review.
    ]
    ```
 
-   - `name` must match the registry award name exactly.
+   - `name` must match the catalog award name exactly.
    - Supply `ribbon` if the award has an `awardPriority`, and `medal` if it has
      a `medalPriority`. Service ribbons have both; pure ribbons have only
      `ribbon`.
 
-4. **Push.** CI validates the manifest against the registry, splices the tiles
-   into the sprite sheets at the registry-derived rows, removes the consumed
+4. **Push.** CI validates the manifest against the catalog, splices the tiles
+   into the sprite sheets at the catalog-derived rows, removes the consumed
    PNGs, empties the manifest, and opens a PR containing only the regenerated
    sheets and this cleanup. Review and merge it.
 
-CI never edits the registry, never touches the `.xcf` GIMP sources, and never
+CI never edits the catalog, never touches the `.xcf` GIMP sources, and never
 auto-merges.
 
 ## Adding new art vs. fixing existing art
@@ -45,11 +46,11 @@ auto-merges.
 Two modes, selected per entry:
 
 - **New award (default) — insert.** Omit `replace` (or set it to `false`). CI
-  splices the tile in at the registry-derived row and shifts every row below it
+  splices the tile in at the catalog-derived row and shifts every row below it
   down by one tile. Use this only for an award that is **new to the sheet**, and
-  renumber the registry as in step 1 so the priorities below it move too.
+  renumber the catalog as in step 1 so the priorities below it move too.
 - **Existing award — replace.** Set `"replace": true`. CI overwrites the tile
-  already at that award's registry row in place — no shift, no height change —
+  already at that award's catalog row in place — no shift, no height change —
   so re-uploading art for an award that already has a tile fixes it instead of
   inserting a duplicate.
 
@@ -63,6 +64,6 @@ Two modes, selected per entry:
   ]
   ```
 
-  Do **not** renumber the registry for a replace — the award keeps its existing
+  Do **not** renumber the catalog for a replace — the award keeps its existing
   priority. Replacing a row that doesn't exist yet (a priority past the end of
   the sheet) fails the run; use an insert for a genuinely new award.

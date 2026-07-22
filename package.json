@@ -4,11 +4,14 @@
   "scripts": {
     "format:check": "prettier --check \"{**/*,*}.{js,jsx,json,html,css}\"",
     "format": "prettier --write \"{**/*,*}.{js,jsx,json,html,css}\"",
-    "sprites:generate": "node generateAwardSprites.js",
-    "test": "node generateAwardSprites.test.js"
+    "sprites:generate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON generateAwardSprites.js",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON generateAwardSprites.test.js"
   },
   "devDependencies": {
     "prettier": "3.8.3",
     "sharp": "^0.34.4"
+  },
+  "engines": {
+    "node": ">=22.7"
   }
 }
