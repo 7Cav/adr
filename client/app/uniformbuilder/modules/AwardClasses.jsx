@@ -237,35 +237,41 @@ export class BadgeCombat extends Badge {
     this.maxAllowed = 5;
   }
 
-  getImageNum(num) {
-    // in the images folder, the numbers are defined as follows:
-    // 1 - 5 EIB thru CIB4
-    // 6 FMB
-    // 7 - 9 aviator wings
-    // 10 - 12 aircrew wings
+  getImageNum(awardPriority) {
+    // badges are defined as images in app/public/skunkworks/uniformBadges/combatBadges
+    // e.g. flight medic badge is named 6.png
+    const Badges = Object.freeze({
+      flightMedicBadge: 6,
+      aviator: 7,
+      seniorAviator: 8,
+      masterAviator: 9,
+      aircrew: 10,
+      seniorAircrew: 11,
+      masterAircrew: 12,
+    });
 
     if (this.isAviation) {
-      switch (num) {
+      switch (awardPriority) {
         case 6:
-          return 10;
+          return Badges.aircrew;
         case 7:
-          return 11;
+          return Badges.seniorAircrew;
         case 8:
-          return 12;
+          return Badges.masterAircrew;
         case 9:
-          return 7;
+          return Badges.aviator;
         case 10:
-          return 8;
+          return Badges.seniorAviator;
         case 11:
-          return 9;
+          return Badges.masterAviator;
       }
     }
 
-    if (this.isMedical && num == 6) {
-      return 6;
+    if (this.isMedical && awardPriority == 6) {
+      return Badges.flightMedicBadge;
     }
 
-    return num;
+    return awardPriority;
   }
 
   updateBadgeCombat(newAwardData, AwardRegistry) {
