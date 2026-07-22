@@ -80,7 +80,7 @@ jobs:
 
             This PR contains only the regenerated sprite-sheet PNG(s) and the
             upload-folder cleanup (consumed source art removed, manifest
-            emptied). Placement was read from `AwardRegistry.jsx`.
+            emptied). Placement was read from `constants/awardCatalog.js`.
 
             **Generator warnings** (e.g. a medal placed with a transparent gap,
             or a ribbon stretched from a wrong-sized source):

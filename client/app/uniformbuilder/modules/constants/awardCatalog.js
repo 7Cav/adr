@@ -1,5 +1,8 @@
-import { AwardType } from "./awardTypes";
-import { AwardAttachmentType } from "./awardAttachmentTypes";
+// Extensions are explicit so this module resolves under plain Node as well as
+// the Next bundler: generateAwardSprites.js imports it directly to read award
+// placement, and Node's ESM resolver does not guess extensions.
+import { AwardType } from "./awardTypes.js";
+import { AwardAttachmentType } from "./awardAttachmentTypes.js";
 
 // The full award catalog: name + per-award metadata. AwardRegistry loops this
 // in order to populate its Map, so KEEP THE ORDER STABLE — Map iteration order

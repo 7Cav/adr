@@ -1,10 +1,18 @@
 "use strict";
 
 /**
- * Self-contained harness for generateAwardSprites.js. No test framework — run
- * with `node generateAwardSprites.test.js`. Builds synthetic sprite sheets and
+ * Harness for generateAwardSprites.js. No test framework — run with `npm test`
+ * (not a bare `node`; the script carries the flag that mutes Node's
+ * MODULE_TYPELESS_PACKAGE_JSON notice). Builds synthetic sprite sheets and
  * sources in a temp dir so the real sheets are never touched, then asserts the
  * I/O-matrix edge cases from the spec.
+ *
+ * One deliberate exception to "synthetic": the first block of main() loads the
+ * REAL constants/awardCatalog.js and awardTypes.js, read-only. Those
+ * assertions are the entire point of this suite — a fixture cannot catch the
+ * award data moving or changing shape, which is how the generator once sat
+ * broken for a month with every test green. Do not replace them with a
+ * fixture.
  */
 
 const assert = require("assert");
@@ -13,9 +21,16 @@ const os = require("os");
 const path = require("path");
 const sharp = require("sharp");
 
+const { pathToFileURL } = require("url");
+
 const {
-  parseAward,
-  unparsedFields,
+  DEFAULT_PATHS,
+  RIBBON_SHEET_TYPES,
+  MEDAL_SHEET_TYPES,
+  indexCatalog,
+  loadCatalog,
+  lookupAward,
+  malformedFields,
   onRibbonSheet,
   onMedalSheet,
   validateManifest,
@@ -24,19 +39,46 @@ const {
   run,
 } = require("./generateAwardSprites");
 
-const REGISTRY = `
-  // prettier-ignore
-  initalizeAwards() {
-    this.awards.set("Lifetime Medal", {awardPriority: 0, medalPriority: 0, awardType: "Medal"});
-    this.awards.set("Foo Ribbon", {awardPriority: 1, awardType: "Ribbon"});
-    this.awards.set("Bar Medal", {awardPriority: 2, medalPriority:2, awardType: "Medal"});
-    this.awards.set(\`Baz "Q" Service Ribbon\`, {awardPriority: 4, medalPriority: 3, awardType: "Medal"});
-    this.awards.set("Ranger Tab", {awardPriority: 1, awardType: "Tab"});
-    this.awards.set("Nested Medal", {awardPriority: 5, style: {x: 1}, medalPriority: 4, awardType: "Medal"});
-    this.awards.set("Broken Medal", {awardPriority: 6, medalPriority: WIP, awardType: "Medal"});
-    this.awards.set("Typeless Medal", {awardPriority: 7, medalPriority: 6});
-  }
-`;
+// Synthetic stand-in for AWARD_CATALOG, in the real catalog's shape: an ordered
+// array of plain objects keyed by `name`. Shared by the in-memory Map fixture
+// and the on-disk ESM module that run() imports, so both exercise the same
+// data through the same indexing code the generator uses in production.
+const CATALOG_ENTRIES = [
+  {
+    name: "Lifetime Medal",
+    awardPriority: 0,
+    medalPriority: 0,
+    awardType: "Medal",
+  },
+  { name: "Foo Ribbon", awardPriority: 1, awardType: "Ribbon" },
+  { name: "Bar Medal", awardPriority: 2, medalPriority: 2, awardType: "Medal" },
+  {
+    name: `Baz "Q" Service Ribbon`,
+    awardPriority: 4,
+    medalPriority: 3,
+    awardType: "Medal",
+  },
+  { name: "Ranger Tab", awardPriority: 1, awardType: "Tab" },
+  // Carries an unrelated nested field: extra keys must not disturb placement.
+  {
+    name: "Nested Medal",
+    awardPriority: 5,
+    style: { x: 1 },
+    medalPriority: 4,
+    awardType: "Medal",
+  },
+  // medalPriority is present but not a usable row index — must be rejected
+  // loudly rather than read as "no medal tile".
+  {
+    name: "Broken Medal",
+    awardPriority: 6,
+    medalPriority: "WIP",
+    awardType: "Medal",
+  },
+  { name: "Typeless Medal", awardPriority: 7, medalPriority: 6 },
+];
+
+const CATALOG = indexCatalog(CATALOG_ENTRIES);
 
 // Solid-color RGBA tile as a PNG buffer.
 function colorTile(width, height, [r, g, b]) {
@@ -90,64 +132,196 @@ function ok(name, cond) {
 }
 
 async function main() {
-  // --- parseAward ---
-  assert.deepStrictEqual(parseAward(REGISTRY, "Foo Ribbon"), {
+  // --- REAL catalog: the guard this whole rewrite exists for ---
+  // History: the generator used to parse AwardRegistry.jsx as text. PR #130
+  // moved the award data into constants/awardCatalog.js and the text matcher
+  // silently matched nothing — every upload failed "not present in
+  // AwardRegistry.jsx" while this suite stayed green, because every other test
+  // here runs against synthetic fixtures. These assertions run against the
+  // REAL catalog, so the next time that data moves or changes shape, it fails
+  // at merge time instead of in front of a contributor.
+  const realCatalog = await loadCatalog(DEFAULT_PATHS.catalog);
+  ok("real catalog: loads a non-empty catalog", realCatalog.size > 50);
+
+  const dsc = lookupAward(realCatalog, "Army Distinguished Service Cross");
+  ok(
+    "real catalog: a known award resolves with usable placement fields",
+    dsc !== null &&
+      Number.isInteger(dsc.awardPriority) &&
+      Number.isInteger(dsc.medalPriority) &&
+      dsc.awardType === "Medal",
+  );
+  ok(
+    "real catalog: that award gates onto both sheets",
+    onRibbonSheet(dsc) && onMedalSheet(dsc),
+  );
+  ok(
+    "real catalog: an absent name resolves to null",
+    lookupAward(realCatalog, "Nope") === null,
+  );
+
+  const realAwards = [...realCatalog.values()];
+  ok(
+    "real catalog: every entry has a non-empty string awardType",
+    realAwards.every(
+      (a) => typeof a.awardType === "string" && a.awardType !== "",
+    ),
+  );
+  ok(
+    "real catalog: no entry has a malformed placement field",
+    realAwards.every((a) => malformedFields(a).length === 0),
+  );
+  ok(
+    "real catalog: at least one award gates onto each sheet",
+    realAwards.some(onRibbonSheet) && realAwards.some(onMedalSheet),
+  );
+
+  // The sheet-membership sets are written as plain strings, so they are bound
+  // to awardTypes.js only by convention. Cross-check them against the real
+  // enum: renaming a value there (Ribbon: "Ribbon" -> "RIBBON") would silently
+  // drop every award of that type off its sheet, and no assertion above would
+  // notice, because the survivors of the OTHER types keep every "some(...)"
+  // and "typeof === string" check true. Verified: that exact rename drops 7
+  // real awards off the ribbon sheet with the rest of this suite still green.
+  const { AwardType } = await import(
+    pathToFileURL(
+      path.join(path.dirname(DEFAULT_PATHS.catalog), "awardTypes.js"),
+    ).href
+  );
+  const enumValues = new Set(Object.values(AwardType));
+  const orphanedSetMembers = [
+    ...RIBBON_SHEET_TYPES,
+    ...MEDAL_SHEET_TYPES,
+  ].filter((t) => !enumValues.has(t));
+  assert.deepStrictEqual(orphanedSetMembers, []);
+  ok("real enum: every sheet-membership type is a live AwardType value", true);
+
+  const orphanedCatalogTypes = [
+    ...new Set(realAwards.map((a) => a.awardType)),
+  ].filter((t) => !enumValues.has(t));
+  assert.deepStrictEqual(orphanedCatalogTypes, []);
+  ok(
+    "real enum: every awardType used by the catalog is a live AwardType value",
+    true,
+  );
+
+  // --- indexCatalog / lookupAward ---
+  assert.deepStrictEqual(lookupAward(CATALOG, "Foo Ribbon"), {
+    name: "Foo Ribbon",
     awardPriority: 1,
     awardType: "Ribbon",
   });
-  ok("parseAward: ribbon-only has awardPriority, no medalPriority", true);
+  ok("lookup: ribbon-only has awardPriority, no medalPriority", true);
 
-  assert.deepStrictEqual(parseAward(REGISTRY, "Bar Medal"), {
-    awardPriority: 2,
-    medalPriority: 2,
-    awardType: "Medal",
-  });
-  ok("parseAward: tolerates `medalPriority:2` with no space", true);
+  assert.strictEqual(lookupAward(CATALOG, "Nope"), null);
+  ok("lookup: absent name returns null", true);
 
-  assert.deepStrictEqual(parseAward(REGISTRY, 'Baz "Q" Service Ribbon'), {
-    awardPriority: 4,
-    medalPriority: 3,
-    awardType: "Medal",
-  });
-  ok("parseAward: backtick name with embedded quotes + awardType", true);
+  assert.strictEqual(
+    lookupAward(CATALOG, 'Baz "Q" Service Ribbon').medalPriority,
+    3,
+  );
+  ok("lookup: name with embedded quotes resolves", true);
 
-  assert.strictEqual(parseAward(REGISTRY, "Nope"), null);
-  ok("parseAward: absent name returns null", true);
+  assert.strictEqual(lookupAward(CATALOG, "Nested Medal").medalPriority, 4);
+  ok("lookup: an unrelated nested field does not disturb placement", true);
 
-  // Brace-balanced extraction: a nested object before the priorities must not
-  // truncate the entry and drop its trailing fields.
-  assert.deepStrictEqual(parseAward(REGISTRY, "Nested Medal"), {
-    awardPriority: 5,
-    medalPriority: 4,
-    awardType: "Medal",
-  });
-  ok("parseAward: nested object before priorities does not truncate", true);
+  assert.throws(
+    () => indexCatalog([{ name: "Dup" }, { name: "Dup" }]),
+    /duplicate/i,
+  );
+  ok("indexCatalog: a duplicate award name throws", true);
 
-  // --- unparsedFields: present-but-unparsed field is flagged ---
-  assert.deepStrictEqual(unparsedFields(REGISTRY, "Broken Medal"), [
-    "medalPriority",
+  assert.throws(() => indexCatalog([{ awardPriority: 1 }]), /name/i);
+  ok("indexCatalog: an entry with no name throws", true);
+
+  assert.throws(() => indexCatalog([{ name: "", awardPriority: 1 }]), /name/i);
+  ok("indexCatalog: an empty-string name throws", true);
+
+  // A stray comma or a conditional spread in the catalog array leaves a hole.
+  assert.throws(() => indexCatalog([null]), /name/i);
+  ok("indexCatalog: a null entry throws the catalog-shaped error", true);
+
+  assert.throws(() => indexCatalog("not an array"), /array/i);
+  ok("indexCatalog: a non-array catalog throws", true);
+
+  // An empty catalog is never a legitimate state, and letting it through
+  // reports every award as "not present" — the same misdirection that hid the
+  // original breakage.
+  assert.throws(() => indexCatalog([]), /empty/i);
+  ok("indexCatalog: an empty catalog throws instead of indexing nothing", true);
+
+  await assert.rejects(
+    loadCatalog(path.join(os.tmpdir(), "no-such-award-catalog.js")),
+    /ERR_MODULE_NOT_FOUND|Cannot find module/,
+  );
+  ok(
+    "loadCatalog: a missing catalog file rejects, never degrades to empty",
+    true,
+  );
+
+  // --- malformedFields: present-but-unusable value is flagged ---
+  assert.deepStrictEqual(
+    malformedFields(lookupAward(CATALOG, "Broken Medal")),
+    ["medalPriority"],
+  );
+  ok("malformed: present-but-unusable medalPriority is flagged", true);
+  assert.deepStrictEqual(
+    malformedFields(lookupAward(CATALOG, "Bar Medal")),
+    [],
+  );
+  ok("malformed: clean entry flags nothing", true);
+  assert.deepStrictEqual(
+    malformedFields({ awardPriority: -1, awardType: "Medal" }),
+    ["awardPriority"],
+  );
+  ok("malformed: a negative row index is flagged", true);
+
+  // A field WRITTEN as undefined (what a typo'd or deleted enum reference
+  // evaluates to) states an intent to sit on that sheet, so it must be
+  // rejected — not read as "field omitted", which would splice the ribbon
+  // tile, skip the medal tile, and still exit 0.
+  assert.deepStrictEqual(
+    malformedFields({
+      awardPriority: 1,
+      medalPriority: undefined,
+      awardType: "Medal",
+    }),
+    ["medalPriority"],
+  );
+  ok(
+    "malformed: a field written as undefined is flagged, not read as absent",
+    true,
+  );
+
+  assert.deepStrictEqual(
+    malformedFields({ awardPriority: 1, awardType: "Medal" }),
+    [],
+  );
+  ok(
+    "malformed: an omitted field is a legitimate non-member, not flagged",
+    true,
+  );
+
+  assert.deepStrictEqual(malformedFields({ awardPriority: 1, awardType: "" }), [
+    "awardType",
   ]);
-  ok("unparsed: present-but-unparseable medalPriority is flagged", true);
-  assert.deepStrictEqual(unparsedFields(REGISTRY, "Bar Medal"), []);
-  ok("unparsed: clean entry flags nothing", true);
-  assert.deepStrictEqual(unparsedFields(REGISTRY, "Nope"), []);
-  ok("unparsed: absent name flags nothing", true);
+  ok("malformed: an empty-string awardType is flagged", true);
 
   // --- membership gating ---
   ok(
     "membership: Tab is on neither sheet",
-    !onRibbonSheet(parseAward(REGISTRY, "Ranger Tab")) &&
-      !onMedalSheet(parseAward(REGISTRY, "Ranger Tab")),
+    !onRibbonSheet(lookupAward(CATALOG, "Ranger Tab")) &&
+      !onMedalSheet(lookupAward(CATALOG, "Ranger Tab")),
   );
   ok(
     "membership: Lifetime medal (medalPriority 0) is ribbon-only, not on medal sheet",
-    onRibbonSheet(parseAward(REGISTRY, "Lifetime Medal")) &&
-      !onMedalSheet(parseAward(REGISTRY, "Lifetime Medal")),
+    onRibbonSheet(lookupAward(CATALOG, "Lifetime Medal")) &&
+      !onMedalSheet(lookupAward(CATALOG, "Lifetime Medal")),
   );
   ok(
     "membership: service ribbon is on both sheets",
-    onRibbonSheet(parseAward(REGISTRY, 'Baz "Q" Service Ribbon')) &&
-      onMedalSheet(parseAward(REGISTRY, 'Baz "Q" Service Ribbon')),
+    onRibbonSheet(lookupAward(CATALOG, 'Baz "Q" Service Ribbon')) &&
+      onMedalSheet(lookupAward(CATALOG, 'Baz "Q" Service Ribbon')),
   );
 
   // --- validateManifest ---
@@ -163,37 +337,59 @@ async function main() {
 
   let r = validateManifest(
     [{ name: "Ghost", ribbon: "ribbon.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
-  ok("validate: name absent from registry errors", r.errors.length === 1);
+  ok("validate: name absent from the catalog errors", r.errors.length === 1);
 
   r = validateManifest(
     [{ name: "Broken Medal", ribbon: "ribbon.png", medal: "medal.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
-    "validate: present-but-unparsed field is a hard error, not a non-member",
+    "validate: present-but-unusable field is a hard error, not a non-member",
     r.errors.some(
-      (e) => e.includes("could not be parsed") && e.includes("medalPriority"),
+      (e) => e.includes("present but unusable") && e.includes("medalPriority"),
+    ),
+  );
+
+  // Built inline rather than added to CATALOG_ENTRIES: JSON.stringify drops
+  // undefined-valued keys, so this entry would not survive writeCatalog() and
+  // the on-disk fixture would disagree with the in-memory one.
+  r = validateManifest(
+    [{ name: "Phantom Medal", ribbon: "ribbon.png", medal: "medal.png" }],
+    indexCatalog([
+      {
+        name: "Phantom Medal",
+        awardPriority: 8,
+        medalPriority: undefined,
+        awardType: "Medal",
+      },
+    ]),
+    dir,
+  );
+  ok(
+    "validate: a medalPriority written as undefined aborts the run, not just the medal tile",
+    r.errors.some(
+      (e) => e.includes("present but unusable") && e.includes("medalPriority"),
     ),
   );
 
   r = validateManifest(
     [{ name: "Typeless Medal", ribbon: "ribbon.png", medal: "medal.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
     "validate: priorities present but no awardType errors distinctly (not 'does not belong')",
-    r.errors.some((e) => e.includes("no parseable awardType")) &&
+    r.errors.some((e) => e.includes("no usable awardType")) &&
       !r.errors.some((e) => e.includes("does not belong")),
   );
 
   r = validateManifest(
     [{ name: "Bar Medal", ribbon: "ribbon.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -203,14 +399,14 @@ async function main() {
 
   r = validateManifest(
     [{ name: "Foo Ribbon", ribbon: "ribbon.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok("validate: ribbon-only with its source passes", r.errors.length === 0);
 
   r = validateManifest(
     [{ name: "Bar Medal", ribbon: "ribbon.png", medal: "medal.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -220,7 +416,7 @@ async function main() {
 
   r = validateManifest(
     [{ name: "Foo Ribbon", ribbon: "ribbon.png", medal: "medal.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -230,7 +426,7 @@ async function main() {
 
   r = validateManifest(
     [{ name: "Ranger Tab", ribbon: "ribbon.png" }],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -243,7 +439,7 @@ async function main() {
       { name: "Foo Ribbon", ribbon: "ribbon.png" },
       { name: "Foo Ribbon", ribbon: "ribbon.png" },
     ],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -258,7 +454,7 @@ async function main() {
       { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
       { name: "Lifetime Medal", ribbon: "ribbon.png" },
     ],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -272,7 +468,7 @@ async function main() {
       { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
       { name: "Lifetime Medal", ribbon: "ribbon.png", replace: true },
     ],
-    REGISTRY,
+    CATALOG,
     dir,
   );
   ok(
@@ -280,7 +476,7 @@ async function main() {
     !r.errors.some((e) => e.includes("both a replace and an insert")),
   );
 
-  // --- spliceSheet: two new tiles interleave at their final registry rows ---
+  // --- spliceSheet: two new tiles interleave at their final catalog rows ---
   // Refutes the "multi-insert cascade" review claim: inserting ascending on the
   // growing buffer places each tile at its final position.
   const inter = path.join(dir, "inter.png");
@@ -336,7 +532,7 @@ async function main() {
   assert.deepStrictEqual(await rowColor(appnd, 0), [50, 50, 50]);
   ok("splice: original content preserved before padded append", true);
   assert.deepStrictEqual(await rowColor(appnd, 28), [150, 0, 0]);
-  ok("splice: appended tile lands at its exact registry row y=28", true);
+  ok("splice: appended tile lands at its exact catalog row y=28", true);
 
   // --- spliceSheet: ascending multi-insert, rows below unchanged ---
   const sheet = path.join(dir, "sheet.png");
@@ -347,7 +543,7 @@ async function main() {
   ]); // 3 bands, 42px
   const tileA = await colorTile(43, 14, [100, 0, 0]);
   const tileB = await colorTile(43, 14, [200, 0, 0]);
-  // Insert at registry rows 1 (y=14) and 3 (y=42, append) — final layout.
+  // Insert at catalog rows 1 (y=14) and 3 (y=42, append) — final layout.
   await spliceSheet(sheet, [
     { y: 42, tileHeight: 14, png: tileB, name: "B" },
     { y: 14, tileHeight: 14, png: tileA, name: "A" },
@@ -361,7 +557,7 @@ async function main() {
   assert.deepStrictEqual(await rowColor(sheet, 28), [20, 0, 0]);
   ok("splice: original band 1 shifted down below insert A", true);
   assert.deepStrictEqual(await rowColor(sheet, 42), [200, 0, 0]);
-  ok("splice: tile B landed at its final registry row y=42", true);
+  ok("splice: tile B landed at its final catalog row y=42", true);
   assert.deepStrictEqual(await rowColor(sheet, 56), [30, 0, 0]);
   ok("splice: original last band shifted down below both inserts", true);
 
@@ -675,15 +871,30 @@ function makePaths(dir) {
   return {
     uploadDir: dir,
     manifest: path.join(dir, "manifest.json"),
-    registry: writeRegistry(dir),
+    catalog: writeCatalog(dir),
     ribbonSheet: path.join(dir, "ribbonSheet.png"),
     medalSheet: path.join(dir, "medalSheet.png"),
   };
 }
 
-function writeRegistry(dir) {
-  const p = path.join(dir, "AwardRegistry.jsx");
-  fs.writeFileSync(p, REGISTRY);
+/**
+ * Write CATALOG_ENTRIES out as a standalone ES module for run() to import.
+ * Self-contained (values inlined, no imports) so it loads from a temp dir with
+ * no package.json.
+ *
+ * Two constraints if you extend this. Node caches ES modules by URL and never
+ * invalidates, so a second catalog with DIFFERENT contents must be written to a
+ * different directory or the first one is served again. And JSON.stringify
+ * drops undefined-valued keys, so a fixture testing a field written as
+ * `undefined` cannot round-trip through here — build it inline with
+ * indexCatalog() instead.
+ */
+function writeCatalog(dir) {
+  const p = path.join(dir, "awardCatalog.js");
+  fs.writeFileSync(
+    p,
+    `export const AWARD_CATALOG = ${JSON.stringify(CATALOG_ENTRIES, null, 2)};\n`,
+  );
   return p;
 }
 
