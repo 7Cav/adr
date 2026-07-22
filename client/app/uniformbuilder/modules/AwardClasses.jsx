@@ -223,8 +223,7 @@ export class BadgeCombat extends Badge {
       return;
     }
 
-    //we need to give 15T an exception so that they stop at aircrew badges.
-
+    //we need to give 15T (aircrew) an exception so that they stop at aircrew badges.
     if (this.isAviation) {
       if (MosGroup.AIRCREW.includes(this.userMos)) {
         this.maxAllowed = 8;
@@ -238,9 +237,10 @@ export class BadgeCombat extends Badge {
   }
 
   getImageNum(awardPriority) {
-    // badges are defined as images in app/public/skunkworks/uniformBadges/combatBadges
-    // e.g. flight medic badge is named 6.png
-    const Badges = Object.freeze({
+    // Maps awardPriority from constants/awardCatalog.js to a badge image that
+    // canvas.jsx will use to render from client/public/skunkworks/uniformBadges/combatBadges/<n>.png
+    // awardPriority values 1-5 (EIB thru CIB4) are universal and are matched by default and fall through.
+    const BadgeImage = Object.freeze({
       flightMedicBadge: 6,
       aviator: 7,
       seniorAviator: 8,
@@ -253,22 +253,24 @@ export class BadgeCombat extends Badge {
     if (this.isAviation) {
       switch (awardPriority) {
         case 6:
-          return Badges.aircrew;
+          return BadgeImage.aircrew;
         case 7:
-          return Badges.seniorAircrew;
+          return BadgeImage.seniorAircrew;
         case 8:
-          return Badges.masterAircrew;
+          return BadgeImage.masterAircrew;
         case 9:
-          return Badges.aviator;
+          return BadgeImage.aviator;
         case 10:
-          return Badges.seniorAviator;
+          return BadgeImage.seniorAviator;
         case 11:
-          return Badges.masterAviator;
+          return BadgeImage.masterAviator;
       }
     }
 
+    // awardPriority 6 is used for both aviation and medical trees.
+    // isMedical will claim the value for the medical tree.
     if (this.isMedical && awardPriority == 6) {
-      return Badges.flightMedicBadge;
+      return BadgeImage.flightMedicBadge;
     }
 
     return awardPriority;
