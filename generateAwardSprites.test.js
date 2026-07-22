@@ -1,10 +1,18 @@
 "use strict";
 
 /**
- * Self-contained harness for generateAwardSprites.js. No test framework — run
- * with `node generateAwardSprites.test.js`. Builds synthetic sprite sheets and
+ * Harness for generateAwardSprites.js. No test framework — run with `npm test`
+ * (not a bare `node`; the script carries the flag that mutes Node's
+ * MODULE_TYPELESS_PACKAGE_JSON notice). Builds synthetic sprite sheets and
  * sources in a temp dir so the real sheets are never touched, then asserts the
  * I/O-matrix edge cases from the spec.
+ *
+ * One deliberate exception to "synthetic": the first block of main() loads the
+ * REAL constants/awardCatalog.js and awardTypes.js, read-only. Those
+ * assertions are the entire point of this suite — a fixture cannot catch the
+ * award data moving or changing shape, which is how the generator once sat
+ * broken for a month with every test green. Do not replace them with a
+ * fixture.
  */
 
 const assert = require("assert");
@@ -13,8 +21,12 @@ const os = require("os");
 const path = require("path");
 const sharp = require("sharp");
 
+const { pathToFileURL } = require("url");
+
 const {
   DEFAULT_PATHS,
+  RIBBON_SHEET_TYPES,
+  MEDAL_SHEET_TYPES,
   indexCatalog,
   loadCatalog,
   lookupAward,
@@ -148,9 +160,6 @@ async function main() {
     lookupAward(realCatalog, "Nope") === null,
   );
 
-  // Enum values must survive as the plain strings the sheet-membership sets
-  // are written in. A rename in awardTypes.js that broke this would otherwise
-  // only surface as awards mysteriously landing on neither sheet.
   const realAwards = [...realCatalog.values()];
   ok(
     "real catalog: every entry has a non-empty string awardType",
@@ -165,6 +174,35 @@ async function main() {
   ok(
     "real catalog: at least one award gates onto each sheet",
     realAwards.some(onRibbonSheet) && realAwards.some(onMedalSheet),
+  );
+
+  // The sheet-membership sets are written as plain strings, so they are bound
+  // to awardTypes.js only by convention. Cross-check them against the real
+  // enum: renaming a value there (Ribbon: "Ribbon" -> "RIBBON") would silently
+  // drop every award of that type off its sheet, and no assertion above would
+  // notice, because the survivors of the OTHER types keep every "some(...)"
+  // and "typeof === string" check true. Verified: that exact rename drops 7
+  // real awards off the ribbon sheet with the rest of this suite still green.
+  const { AwardType } = await import(
+    pathToFileURL(
+      path.join(path.dirname(DEFAULT_PATHS.catalog), "awardTypes.js"),
+    ).href
+  );
+  const enumValues = new Set(Object.values(AwardType));
+  const orphanedSetMembers = [
+    ...RIBBON_SHEET_TYPES,
+    ...MEDAL_SHEET_TYPES,
+  ].filter((t) => !enumValues.has(t));
+  assert.deepStrictEqual(orphanedSetMembers, []);
+  ok("real enum: every sheet-membership type is a live AwardType value", true);
+
+  const orphanedCatalogTypes = [
+    ...new Set(realAwards.map((a) => a.awardType)),
+  ].filter((t) => !enumValues.has(t));
+  assert.deepStrictEqual(orphanedCatalogTypes, []);
+  ok(
+    "real enum: every awardType used by the catalog is a live AwardType value",
+    true,
   );
 
   // --- indexCatalog / lookupAward ---
@@ -196,8 +234,30 @@ async function main() {
   assert.throws(() => indexCatalog([{ awardPriority: 1 }]), /name/i);
   ok("indexCatalog: an entry with no name throws", true);
 
+  assert.throws(() => indexCatalog([{ name: "", awardPriority: 1 }]), /name/i);
+  ok("indexCatalog: an empty-string name throws", true);
+
+  // A stray comma or a conditional spread in the catalog array leaves a hole.
+  assert.throws(() => indexCatalog([null]), /name/i);
+  ok("indexCatalog: a null entry throws the catalog-shaped error", true);
+
   assert.throws(() => indexCatalog("not an array"), /array/i);
   ok("indexCatalog: a non-array catalog throws", true);
+
+  // An empty catalog is never a legitimate state, and letting it through
+  // reports every award as "not present" — the same misdirection that hid the
+  // original breakage.
+  assert.throws(() => indexCatalog([]), /empty/i);
+  ok("indexCatalog: an empty catalog throws instead of indexing nothing", true);
+
+  await assert.rejects(
+    loadCatalog(path.join(os.tmpdir(), "no-such-award-catalog.js")),
+    /ERR_MODULE_NOT_FOUND|Cannot find module/,
+  );
+  ok(
+    "loadCatalog: a missing catalog file rejects, never degrades to empty",
+    true,
+  );
 
   // --- malformedFields: present-but-unusable value is flagged ---
   assert.deepStrictEqual(
@@ -416,7 +476,7 @@ async function main() {
     !r.errors.some((e) => e.includes("both a replace and an insert")),
   );
 
-  // --- spliceSheet: two new tiles interleave at their final registry rows ---
+  // --- spliceSheet: two new tiles interleave at their final catalog rows ---
   // Refutes the "multi-insert cascade" review claim: inserting ascending on the
   // growing buffer places each tile at its final position.
   const inter = path.join(dir, "inter.png");
@@ -472,7 +532,7 @@ async function main() {
   assert.deepStrictEqual(await rowColor(appnd, 0), [50, 50, 50]);
   ok("splice: original content preserved before padded append", true);
   assert.deepStrictEqual(await rowColor(appnd, 28), [150, 0, 0]);
-  ok("splice: appended tile lands at its exact registry row y=28", true);
+  ok("splice: appended tile lands at its exact catalog row y=28", true);
 
   // --- spliceSheet: ascending multi-insert, rows below unchanged ---
   const sheet = path.join(dir, "sheet.png");
@@ -483,7 +543,7 @@ async function main() {
   ]); // 3 bands, 42px
   const tileA = await colorTile(43, 14, [100, 0, 0]);
   const tileB = await colorTile(43, 14, [200, 0, 0]);
-  // Insert at registry rows 1 (y=14) and 3 (y=42, append) — final layout.
+  // Insert at catalog rows 1 (y=14) and 3 (y=42, append) — final layout.
   await spliceSheet(sheet, [
     { y: 42, tileHeight: 14, png: tileB, name: "B" },
     { y: 14, tileHeight: 14, png: tileA, name: "A" },
@@ -497,7 +557,7 @@ async function main() {
   assert.deepStrictEqual(await rowColor(sheet, 28), [20, 0, 0]);
   ok("splice: original band 1 shifted down below insert A", true);
   assert.deepStrictEqual(await rowColor(sheet, 42), [200, 0, 0]);
-  ok("splice: tile B landed at its final registry row y=42", true);
+  ok("splice: tile B landed at its final catalog row y=42", true);
   assert.deepStrictEqual(await rowColor(sheet, 56), [30, 0, 0]);
   ok("splice: original last band shifted down below both inserts", true);
 

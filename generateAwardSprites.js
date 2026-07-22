@@ -7,11 +7,11 @@
  * `constants/awardCatalog.js` (the human-owned source of truth for placement,
  * imported as a module — see loadCatalog), normalizes each source PNG to its
  * target tile geometry, and splices the tile into the correct sprite sheet(s)
- * at the catalog-derived row. An
- * in-bounds insert shifts every lower row down by its tile height (N inserts
- * shift the bottom band down by N tiles); an insert past the current end pads
- * the sub-tile remainder with transparency and appends without shifting
- * anything. An entry flagged `replace: true` overwrites the tile already at
+ * at the catalog-derived row. An in-bounds insert shifts every lower row down
+ * by its tile height (N inserts shift the bottom band down by N tiles); an
+ * insert past the current end pads the sub-tile remainder with transparency
+ * and appends without shifting anything. An entry flagged `replace: true`
+ * overwrites the tile already at
  * that row in place — no shift, no growth — to fix the art of an award that
  * already has a tile. Consumed sources and their manifest entries are then
  * removed.
@@ -27,9 +27,11 @@
  * Run via `npm run sprites:generate` to process the real manifest, or require
  * it as a module to use the exported helpers in tests. Prefer the npm script
  * over a bare `node generateAwardSprites.js`: it carries the flag that mutes
- * Node's MODULE_TYPELESS_PACKAGE_JSON notice for the imported catalog, which
- * is ESM under a package.json that cannot be marked `"type": "module"`
- * (client/next.config.js is CommonJS and would break).
+ * Node's MODULE_TYPELESS_PACKAGE_JSON notice for the imported catalog. That
+ * notice points at `client/package.json`, and marking THAT `"type": "module"`
+ * would require converting `client/next.config.js`, which is CommonJS. Do not
+ * add `"type"` to the root package.json instead — it would break this
+ * generator and silence nothing.
  */
 
 const fs = require("fs");
@@ -97,13 +99,29 @@ function onMedalSheet(award) {
  *
  * Throws on a malformed catalog rather than returning a partial index: a
  * nameless entry or a duplicate name means the app's own AwardRegistry Map is
- * broken too (it keys on the same field and a duplicate silently wins), so
- * failing here surfaces it instead of quietly misplacing a tile.
+ * broken too (it keys on the same field, so the LAST duplicate silently wins
+ * and the earlier one vanishes), so failing here surfaces it instead of
+ * quietly misplacing a tile.
+ *
+ * An empty array is rejected for a sharper reason. AWARD_CATALOG is a
+ * hand-maintained file of ~100 awards, so zero entries never means "no awards
+ * yet" — it means the module resolved but the data did not come with it.
+ * Without this, every manifest entry fails as "not present in the award
+ * catalog", which is the same misdirection that hid the original breakage: it
+ * sends the operator off to re-check the spelling of an award they just added.
  */
 function indexCatalog(entries) {
   if (!Array.isArray(entries)) {
     throw new Error(
       `award catalog must export AWARD_CATALOG as an array, got ${typeof entries}`,
+    );
+  }
+  if (entries.length === 0) {
+    throw new Error(
+      "award catalog exported AWARD_CATALOG as an EMPTY array; the module " +
+        "resolved but carried no awards, so the generator is not reading the " +
+        "data you edited. Check that AWARD_CATALOG is still the exported name " +
+        "and that the array literal is intact.",
     );
   }
   const byName = new Map();
@@ -126,9 +144,11 @@ function indexCatalog(entries) {
  *
  * The catalog is imported, not parsed as text: it is the same module the
  * uniform builder renders from, so the generator and the app can never
- * disagree about where an award sits. That coupling is the point — a refactor
- * that moves or renames this data now breaks the import loudly instead of
- * leaving a text matcher quietly finding nothing.
+ * disagree about which row an award sits in. (They can still disagree about
+ * NAMES — the app resolves through AwardRegistry.getAwardDetails, which strips
+ * valor devices first, while lookupAward here is exact-match.) That coupling
+ * is the point — a refactor that moves or renames this data now breaks the
+ * import loudly instead of leaving a text matcher quietly finding nothing.
  *
  * Imported by file URL so absolute Windows paths resolve; `await import` of an
  * ES module is why every caller of this is async.
@@ -160,12 +180,17 @@ const FIELD_IS_USABLE = {
  * sheet — its tile never placed, reported only as the misleading "does not
  * belong to this sheet".
  *
- * Keyed on whether the field is WRITTEN, not on `!== undefined`. An entry that
- * spells out `medalPriority: undefined` — which is what a typo'd or deleted
- * enum reference evaluates to — has declared an intent to sit on the medal
- * sheet and must be rejected, whereas an entry that simply omits the key is a
- * legitimate ribbon-only award. Collapsing those two would splice the ribbon
- * tile, skip the medal tile, and still exit 0.
+ * Keyed on whether the field is WRITTEN, not on `!== undefined`, because the
+ * two mean opposite things here. An entry that omits `medalPriority` is a
+ * legitimate ribbon-only award. An entry that spells the key out and lands on
+ * `undefined` — a mistyped `AwardType.Medl`, a constant deleted out from under
+ * it, a spread of a half-built object — has declared an intent to sit on the
+ * medal sheet and must be rejected. Collapsing those two would splice the
+ * ribbon tile, skip the medal tile, and still exit 0.
+ *
+ * Note this cannot catch a MISSPELLED key (`medalPriorty: 5`), which reads as
+ * omitted. Neither could the text matcher this replaced. See the manifest-side
+ * checks in validateManifest for the other half of that problem.
  */
 function malformedFields(award) {
   return Object.keys(FIELD_IS_USABLE).filter(
@@ -262,7 +287,7 @@ async function normalizeMedal(srcPath) {
  * Splice tiles into a sheet by raw-byte concatenation — the only operation
  * that guarantees every non-inserted row stays byte-identical and the sheet's
  * trailing sub-tile pixels survive. Inserts are applied in ascending row
- * order, each at its registry-derived `y`, on the progressively grown sheet
+ * order, each at its catalog-derived `y`, on the progressively grown sheet
  * (correctly interleaving multiple inserts at their final positions). When a
  * row lands at or beyond the current end — a new bottom-most award, given the
  * sub-tile remainder — the sheet is padded with transparency up to `y` so the
@@ -275,7 +300,7 @@ async function normalizeMedal(srcPath) {
  * target — the copy clamps to the bytes remaining there.
  *
  * Replaces and inserts must NOT be mixed in one call: a replace copies into an
- * absolute byte offset derived from the registry row, but an insert grows the
+ * absolute byte offset derived from the catalog row, but an insert grows the
  * buffer and shifts every lower row down, so a replace sorted after an insert
  * would land on the shifted neighbour instead of its target — overwriting the
  * wrong award while the intended one stays broken, with the run still exiting
@@ -313,8 +338,8 @@ async function buildSplicedSheet(sheetPath, inserts) {
     if (ins.replace) {
       // Overwrite the existing tile at `y` in place — no shift, no growth.
       // Gate on the row's *start*, not its full height: the bottom-most award
-      // sits in the sheet's sub-tile remainder (the real ribbon sheet is 769px
-      // = 54*14 + 13, so its last row is only 13px), and `rawTile.copy` clamps
+      // sits in the sheet's sub-tile remainder (the real ribbon sheet is 783px
+      // = 55*14 + 13, so its last row is only 13px), and `rawTile.copy` clamps
       // to the bytes actually left, writing the partial row without overrun.
       if (ins.y >= height) {
         throw new Error(
@@ -334,7 +359,7 @@ async function buildSplicedSheet(sheetPath, inserts) {
       ]);
     } else {
       // Append past the end: pad the gap (the sub-tile remainder) with
-      // transparency, then place the tile at its exact registry row.
+      // transparency, then place the tile at its exact catalog row.
       const pad = Buffer.alloc((ins.y - height) * width * channels);
       data = Buffer.concat([data, pad, rawTile]);
     }

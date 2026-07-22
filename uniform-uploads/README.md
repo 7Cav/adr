@@ -30,8 +30,12 @@ the sprite sheets and opens a pull request for review.
 
    - `name` must match the catalog award name exactly.
    - Supply `ribbon` if the award has an `awardPriority`, and `medal` if it has
-     a `medalPriority`. Service ribbons have both; pure ribbons have only
-     `ribbon`.
+     a `medalPriority` of 2 or higher. Service ribbons have both; pure ribbons
+     have only `ribbon`. Priorities 0 and 1 are the two Lifetime medals, which
+     sit on the ribbon sheet only.
+   - Only mainline medals and ribbons live in these two sheets. Badges, tabs,
+     weapon quals and unit citations render from separate assets and cannot be
+     uploaded here, even though they carry an `awardPriority`.
 
 4. **Push.** CI validates the manifest against the catalog, splices the tiles
    into the sprite sheets at the catalog-derived rows, removes the consumed
@@ -57,8 +61,8 @@ Two modes, selected per entry:
   ```json
   [
     {
-      "name": "Combat Action Badge",
-      "medal": "CAB_v2.png",
+      "name": "Army Distinguished Service Cross",
+      "medal": "ADSC_v2.png",
       "replace": true
     }
   ]
