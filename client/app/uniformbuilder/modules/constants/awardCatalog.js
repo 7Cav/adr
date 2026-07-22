@@ -429,17 +429,17 @@ export const AWARD_CATALOG = [
   }, // (3/1/b/1-7) (4/1/b/1-7)
   {
     name: "Master Army Aviator Badge",
-    awardPriority: 8,
+    awardPriority: 11,
     awardType: AwardType.BadgeCombat,
   }, // (A/1-7) (A/ACD)
   {
     name: "Senior Army Aviator Badge",
-    awardPriority: 7,
+    awardPriority: 10,
     awardType: AwardType.BadgeCombat,
   },
   {
     name: "Army Aviator Badge",
-    awardPriority: 6,
+    awardPriority: 9,
     awardType: AwardType.BadgeCombat,
   },
   {
@@ -463,13 +463,13 @@ export const AWARD_CATALOG = [
     awardType: AwardType.BadgeCombat,
   },
   {
-    name: "Combat Infantry Badge 2nd Award",
-    awardPriority: 3,
+    name: "Combat Infantry Badge 3rd Award",
+    awardPriority: 4,
     awardType: AwardType.BadgeCombat,
   },
   {
-    name: "Combat Infantry Badge 3rd Award",
-    awardPriority: 4,
+    name: "Combat Infantry Badge 2nd Award",
+    awardPriority: 3,
     awardType: AwardType.BadgeCombat,
   },
   {

@@ -223,8 +223,7 @@ export class BadgeCombat extends Badge {
       return;
     }
 
-    //we need to give 15T an exception so that they stop at aircrew badges.
-
+    //we need to give 15T (aircrew) an exception so that they stop at aircrew badges.
     if (this.isAviation) {
       if (MosGroup.AIRCREW.includes(this.userMos)) {
         this.maxAllowed = 8;
@@ -237,35 +236,44 @@ export class BadgeCombat extends Badge {
     this.maxAllowed = 5;
   }
 
-  getImageNum(num) {
-    // in the images folder, the numbers are defined as follows:
-    // 1 - 5 EIB thru CIB4
-    // 6 FMB
-    // 7 - 9 aviator wings
-    // 10 - 12 aircrew wings
+  getImageNum(awardPriority) {
+    // Maps awardPriority from constants/awardCatalog.js to a badge image that
+    // canvas.jsx will use to render from client/public/skunkworks/uniformBadges/combatBadges/<n>.png
+    // awardPriority values 1-5 (EIB thru CIB4) are universal and are matched by default and fall through.
+    const BadgeImage = Object.freeze({
+      flightMedicBadge: 6,
+      aviator: 7,
+      seniorAviator: 8,
+      masterAviator: 9,
+      aircrew: 10,
+      seniorAircrew: 11,
+      masterAircrew: 12,
+    });
 
     if (this.isAviation) {
-      switch (num) {
+      switch (awardPriority) {
         case 6:
-          return 10;
+          return BadgeImage.aircrew;
         case 7:
-          return 11;
+          return BadgeImage.seniorAircrew;
         case 8:
-          return 12;
+          return BadgeImage.masterAircrew;
         case 9:
-          return 7;
+          return BadgeImage.aviator;
         case 10:
-          return 8;
+          return BadgeImage.seniorAviator;
         case 11:
-          return 9;
+          return BadgeImage.masterAviator;
       }
     }
 
-    if (this.isMedical && num == 6) {
-      return 6;
+    // awardPriority 6 is used for both aviation and medical trees.
+    // isMedical will claim the value for the medical tree.
+    if (this.isMedical && awardPriority == 6) {
+      return BadgeImage.flightMedicBadge;
     }
 
-    return num;
+    return awardPriority;
   }
 
   updateBadgeCombat(newAwardData, AwardRegistry) {
