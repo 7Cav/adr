@@ -29,10 +29,18 @@ the sprite sheets and opens a pull request for review.
    ```
 
    - `name` must match the catalog award name exactly.
+   - `name`, `ribbon`, `medal` and `replace` are the only keys an entry may
+     carry. Anything else fails the run, because a misspelled `replace` would
+     otherwise read as absent and insert a duplicate tile instead of
+     overwriting one.
    - Supply `ribbon` if the award has an `awardPriority`, and `medal` if it has
      a `medalPriority` of 2 or higher. Service ribbons have both; pure ribbons
      have only `ribbon`. Priorities 0 and 1 are the two Lifetime medals, which
      sit on the ribbon sheet only.
+   - Supplying art for a sheet the catalog does not place the award on fails
+     the run rather than skipping that tile. If you meant to add the tile, the
+     catalog entry is what needs fixing; if you did not, drop the key. Either
+     way nothing is spliced and your PNGs stay put for the retry.
    - Only mainline medals and ribbons live in these two sheets. Badges, tabs,
      weapon quals and unit citations render from separate assets and cannot be
      uploaded here, even though they carry an `awardPriority`.

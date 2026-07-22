@@ -385,16 +385,46 @@ async function spliceSheet(sheetPath, inserts) {
 }
 
 /**
+ * Why the catalog does not place this award on `kind`'s sheet, phrased for a
+ * contributor who has just asserted the opposite by supplying art for it.
+ *
+ * The ribbon side has only one possible answer. An award only reaches here if
+ * it is a member of the OTHER sheet (a non-member of both already errored), and
+ * MEDAL_SHEET_TYPES is a subset of RIBBON_SHEET_TYPES, so a medal-sheet member
+ * necessarily has a ribbon-sheet awardType — the missing piece is the priority.
+ */
+function sheetExclusionReason(award, kind) {
+  if (kind === "ribbon") return "it has no awardPriority";
+  if (!MEDAL_SHEET_TYPES.has(award.awardType)) {
+    return `its awardType "${award.awardType}" is not one of ${[...MEDAL_SHEET_TYPES].join(", ")}`;
+  }
+  if (award.medalPriority === undefined) return "it has no medalPriority";
+  return `its medalPriority ${award.medalPriority} is below ${MEDAL_MIN_PRIORITY}, the sheet's first row`;
+}
+
+// Every key a manifest entry may carry. Anything else is rejected rather than
+// ignored, because `replace` is read as a strict `=== true`: a near-miss
+// spelling ("replaced") reads as absent, which quietly downgrades a replace
+// into an insert and shifts every row below the target down by one tile. That
+// is the same corruption the replace/insert mix guard exists to prevent, but
+// arriving with no diagnostic at all.
+const MANIFEST_KEYS = ["name", "ribbon", "medal", "replace"];
+
+/**
  * Validate the manifest against the award catalog (a name-indexed Map from
- * {@link loadCatalog}). Returns { errors, warnings }; `errors` non-empty means
- * the run must abort before any image is written.
+ * {@link loadCatalog}). Returns { errors }; non-empty means the run must abort
+ * before any image is written.
+ *
+ * Every condition here is an error, never a warning. This tool deletes its
+ * sources and empties the manifest on success, and CI opens a PR from that, so
+ * a warning is indistinguishable from approval by the time anyone reads it —
+ * the inputs that would prove something was skipped are already gone.
  */
 function validateManifest(manifest, catalog, uploadDir) {
   const errors = [];
-  const warnings = [];
   if (!Array.isArray(manifest)) {
     errors.push("manifest.json must be a JSON array of entries");
-    return { errors, warnings };
+    return { errors };
   }
   const seen = new Set();
   // Per-sheet record of which placement modes appear (true = replace, false =
@@ -413,6 +443,16 @@ function validateManifest(manifest, catalog, uploadDir) {
       return;
     }
     seen.add(entry.name);
+    const unknown = Object.keys(entry).filter(
+      (k) => !MANIFEST_KEYS.includes(k),
+    );
+    if (unknown.length > 0) {
+      errors.push(
+        `${label}: "${entry.name}" has unrecognised key(s) (${unknown.join(", ")}); ` +
+          `allowed keys are ${MANIFEST_KEYS.join(", ")} — check the spelling`,
+      );
+      return;
+    }
     if (entry.replace !== undefined && typeof entry.replace !== "boolean") {
       errors.push(
         `${label}: "${entry.name}" has a non-boolean "replace" (must be true or false)`,
@@ -463,8 +503,18 @@ function validateManifest(manifest, catalog, uploadDir) {
           );
         }
       } else if (entry[kind]) {
-        warnings.push(
-          `${label}: "${entry.name}" does not belong to the ${kind} sheet; ignoring its "${kind}" source`,
+        // Two humans contradicting each other, not a stray file: the manifest
+        // asserts this award has art for this sheet, the catalog gives it
+        // nowhere to go. Warning and continuing placed the OTHER tile, deleted
+        // its source and emptied the manifest, so the award shipped
+        // half-placed with the warning reading as "correct, this one is
+        // ribbon-only". An omitted priority is the legitimate way to say "no
+        // tile on that sheet", so the supplied source is the only signal that
+        // says otherwise — it must not be discarded.
+        errors.push(
+          `${label}: "${entry.name}" supplies a "${kind}" source but the catalog does not ` +
+            `place it on the ${kind} sheet — ${sheetExclusionReason(award, kind)}. Either fix ` +
+            `the award in awardCatalog.js, or drop "${kind}" from this manifest entry.`,
         );
       }
     };
@@ -486,7 +536,7 @@ function validateManifest(manifest, catalog, uploadDir) {
       );
     }
   });
-  return { errors, warnings };
+  return { errors };
 }
 
 /** Write the manifest array back prettier-clean (2-space, trailing newline). */
@@ -502,11 +552,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   }
   const catalog = await loadCatalog(paths.catalog);
 
-  const { errors, warnings } = validateManifest(
-    manifest,
-    catalog,
-    paths.uploadDir,
-  );
+  const { errors } = validateManifest(manifest, catalog, paths.uploadDir);
   if (errors.length > 0) {
     errors.forEach((e) => log.error(`ERROR: ${e}`));
     throw new Error(
@@ -519,7 +565,8 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonInserts = [];
   const medalInserts = [];
   const consumed = new Set();
-  const allWarnings = [...warnings];
+  // Only the normalizers warn now — geometry that was accepted but reshaped.
+  const allWarnings = [];
 
   for (const entry of manifest) {
     const award = lookupAward(catalog, entry.name);

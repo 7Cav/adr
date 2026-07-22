@@ -205,6 +205,18 @@ async function main() {
     true,
   );
 
+  // Every medal-sheet type is also a ribbon-sheet type. sheetExclusionReason
+  // leans on this to answer the ribbon side with a single fixed reason: an
+  // award reaching it is always a medal-sheet member, so its awardType is
+  // necessarily a ribbon type and only the priority can be missing. Add a type
+  // to MEDAL_SHEET_TYPES alone and that reason silently becomes a wrong
+  // diagnosis rather than a failure, so pin the premise here.
+  const medalTypesOffRibbonSheet = [...MEDAL_SHEET_TYPES].filter(
+    (t) => !RIBBON_SHEET_TYPES.has(t),
+  );
+  assert.deepStrictEqual(medalTypesOffRibbonSheet, []);
+  ok("membership: every medal-sheet type is also a ribbon-sheet type", true);
+
   // --- indexCatalog / lookupAward ---
   assert.deepStrictEqual(lookupAward(CATALOG, "Foo Ribbon"), {
     name: "Foo Ribbon",
@@ -414,14 +426,85 @@ async function main() {
     r.errors.length === 0,
   );
 
+  // Supplying art for a sheet the catalog does not place the award on is a
+  // contradiction between two humans' intent, not a stray file: the manifest
+  // asserts the tile exists, the catalog says it has nowhere to go. Warning and
+  // continuing placed the other tile, consumed its source and exited 0, leaving
+  // an award half-placed with the warning reading as "correct, ribbon-only".
   r = validateManifest(
     [{ name: "Foo Ribbon", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
   );
   ok(
-    "validate: extra source for a sheet it doesn't belong to warns",
-    r.warnings.length === 1,
+    "validate: a medal source for a pure ribbon errors, not warns",
+    r.errors.some(
+      (e) => e.includes("medal sheet") && e.includes("awardType"),
+    ) && r.errors.length === 1,
+  );
+
+  // The headline shape: a medal whose medalPriority the contributor forgot to
+  // add. Omitting it is the legitimate way to write a ribbon-only award, so the
+  // supplied "medal" source is the only thing distinguishing the two.
+  r = validateManifest(
+    [{ name: "Forgetful Medal", ribbon: "ribbon.png", medal: "medal.png" }],
+    indexCatalog([
+      { name: "Forgetful Medal", awardPriority: 3, awardType: "Medal" },
+    ]),
+    dir,
+  );
+  ok(
+    "validate: a medal source for a medal missing medalPriority errors",
+    r.errors.some(
+      (e) => e.includes("medal sheet") && e.includes("no medalPriority"),
+    ),
+  );
+
+  // A medalPriority on a non-medal awardType is not a medal tile: membership is
+  // gated on type first, so the priority is inert and the art has nowhere to go.
+  r = validateManifest(
+    [{ name: "Priced Ribbon", ribbon: "ribbon.png", medal: "medal.png" }],
+    indexCatalog([
+      {
+        name: "Priced Ribbon",
+        awardPriority: 3,
+        medalPriority: 5,
+        awardType: "Ribbon",
+      },
+    ]),
+    dir,
+  );
+  ok(
+    "validate: a medal source for a ribbon carrying a medalPriority errors",
+    r.errors.some((e) => e.includes("medal sheet") && e.includes("awardType")),
+  );
+
+  // Priorities 0 and 1 are the two Lifetime medals: on the ribbon sheet, below
+  // the medal sheet's first row. Absence and out-of-range must read alike.
+  r = validateManifest(
+    [{ name: "Lifetime Medal", ribbon: "ribbon.png", medal: "medal.png" }],
+    CATALOG,
+    dir,
+  );
+  ok(
+    "validate: a medal source for a below-minimum medalPriority errors",
+    r.errors.some((e) => e.includes("medal sheet") && e.includes("below")),
+  );
+
+  // The mirror. An award can be medal-only if it omits awardPriority, so the
+  // same contradiction has a ribbon-side shape that must fail identically.
+  r = validateManifest(
+    [{ name: "Medal Only", ribbon: "ribbon.png", medal: "medal.png" }],
+    indexCatalog([
+      { name: "Medal Only", medalPriority: 5, awardType: "Medal" },
+    ]),
+    dir,
+  );
+  ok(
+    "validate: a ribbon source for a medal-only award errors (the mirror case)",
+    r.errors.some(
+      (e) => e.includes("ribbon sheet") && e.includes("no awardPriority"),
+    ),
   );
 
   r = validateManifest(
@@ -474,6 +557,48 @@ async function main() {
   ok(
     "validate: two replaces on the same sheet (no insert) is allowed",
     !r.errors.some((e) => e.includes("both a replace and an insert")),
+  );
+
+  // An unrecognised key is rejected rather than ignored. `replace` is read as a
+  // strict `=== true`, so a near-miss spelling reads as absent and downgrades a
+  // replace to an insert — which shifts every row below it, silently.
+  r = validateManifest(
+    [{ name: "Foo Ribbon", ribbon: "ribbon.png", replaced: true }],
+    CATALOG,
+    dir,
+  );
+  ok(
+    'validate: a near-miss "replace" key errors instead of reading as an insert',
+    r.errors.some(
+      (e) => e.includes("unrecognised key") && e.includes("replaced"),
+    ),
+  );
+
+  r = validateManifest(
+    [{ name: "Foo Ribbon", ribbon: "ribbon.png", note: "hi" }],
+    CATALOG,
+    dir,
+  );
+  ok(
+    "validate: any unrecognised key errors, not only near-misses of a real one",
+    r.errors.some((e) => e.includes("unrecognised key")),
+  );
+
+  r = validateManifest(
+    [
+      {
+        name: "Bar Medal",
+        ribbon: "ribbon.png",
+        medal: "medal.png",
+        replace: true,
+      },
+    ],
+    CATALOG,
+    dir,
+  );
+  ok(
+    "validate: all four allowed keys together still pass",
+    r.errors.length === 0,
   );
 
   // --- spliceSheet: two new tiles interleave at their final catalog rows ---
@@ -831,7 +956,75 @@ async function main() {
     (await sharp(paths.medalSheet).metadata()).height === medHR,
   );
 
-  // --- run: an ignored extra source is NOT deleted (only placed tiles) ---
+  // --- run: a typo'd replace key aborts instead of turning into an insert ---
+  // The damaging shape: the operator asked to overwrite one tile, and a single
+  // misspelled key would instead insert on BOTH sheets, pushing every award
+  // below down one row so each renders as its neighbour — with no diagnostic.
+  await makeSheet(paths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+    [3, 0, 0],
+  ]);
+  await makeSheet(paths.medalSheet, 70, 120, [
+    [0, 1, 0],
+    [0, 2, 0],
+  ]);
+  fs.writeFileSync(
+    path.join(dir, "rT.png"),
+    await colorTile(43, 13, [6, 6, 6]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "mT.png"),
+    await colorTile(72, 148, [6, 6, 6]),
+  );
+  fs.writeFileSync(
+    paths.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Bar Medal",
+          ribbon: "rT.png",
+          medal: "mT.png",
+          replaced: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const ribHT = (await sharp(paths.ribbonSheet).metadata()).height;
+  const medHT = (await sharp(paths.medalSheet).metadata()).height;
+  let typoThrew = false;
+  try {
+    await run(paths, silent());
+  } catch (e) {
+    typoThrew = true;
+  }
+  ok("run(typo): unrecognised key aborts the run", typoThrew);
+  ok(
+    "run(typo): ribbon sheet not grown by a mistaken insert",
+    (await sharp(paths.ribbonSheet).metadata()).height === ribHT,
+  );
+  ok(
+    "run(typo): medal sheet not grown by a mistaken insert",
+    (await sharp(paths.medalSheet).metadata()).height === medHT,
+  );
+  ok(
+    "run(typo): sources kept for a retry, not consumed",
+    fs.existsSync(path.join(dir, "rT.png")) &&
+      fs.existsSync(path.join(dir, "mT.png")),
+  );
+  ok(
+    "run(typo): manifest entry retained, not emptied",
+    JSON.parse(fs.readFileSync(paths.manifest, "utf8")).length === 1,
+  );
+
+  // --- run: a source for a non-member sheet aborts, consuming nothing ---
+  // The whole danger of this tool is that it deletes its inputs and CI opens a
+  // PR on success, so a run that places one of two tiles and still exits 0
+  // destroys the evidence that anything was missed. Assert at the run() seam,
+  // not just validateManifest: the error is only worth anything if it actually
+  // reaches the caller before a sheet is written or a source is unlinked.
   await makeSheet(paths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
@@ -853,14 +1046,26 @@ async function main() {
       2,
     ) + "\n",
   );
-  await run(paths, silent());
+  const ribGuardHalf = fs.readFileSync(paths.ribbonSheet);
+  let halfThrew = false;
+  try {
+    await run(paths, silent());
+  } catch (e) {
+    halfThrew = true;
+  }
+  ok("run(half-placed): a source for a non-member sheet aborts", halfThrew);
   ok(
-    "run: placed ribbon source removed",
-    !fs.existsSync(path.join(dir, "rib3.png")),
+    "run(half-placed): the placeable ribbon tile was not spliced in anyway",
+    ribGuardHalf.equals(fs.readFileSync(paths.ribbonSheet)),
   );
   ok(
-    "run: ignored extra (unplaced) source is kept, not deleted",
-    fs.existsSync(path.join(dir, "extra.png")),
+    "run(half-placed): both sources kept for a retry",
+    fs.existsSync(path.join(dir, "rib3.png")) &&
+      fs.existsSync(path.join(dir, "extra.png")),
+  );
+  ok(
+    "run(half-placed): manifest entry retained, not emptied",
+    JSON.parse(fs.readFileSync(paths.manifest, "utf8")).length === 1,
   );
 
   fs.rmSync(dir, { recursive: true, force: true });
