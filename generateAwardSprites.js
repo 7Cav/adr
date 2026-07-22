@@ -177,8 +177,10 @@ const FIELD_IS_USABLE = {
  *
  * Guards the dangerous case: a field set to something unusable would otherwise
  * read as "field not set," making the award look like a non-member of that
- * sheet — its tile never placed, reported only as the misleading "does not
- * belong to this sheet".
+ * sheet. The manifest-side check catches this too whenever a source for that
+ * sheet is supplied, so what survives here is the case where none is: the
+ * award silently loses a tile it was meant to have, and the operator is told
+ * it is not on that sheet rather than that the field is broken.
  *
  * Keyed on whether the field is WRITTEN, not on `!== undefined`, because the
  * two mean opposite things here. An entry that omits `medalPriority` is a
@@ -388,16 +390,17 @@ async function spliceSheet(sheetPath, inserts) {
  * Why the catalog does not place this award on `kind`'s sheet, phrased for a
  * contributor who has just asserted the opposite by supplying art for it.
  *
- * The ribbon side has only one possible answer. An award only reaches here if
- * it is a member of the OTHER sheet (a non-member of both already errored), and
- * MEDAL_SHEET_TYPES is a subset of RIBBON_SHEET_TYPES, so a medal-sheet member
- * necessarily has a ribbon-sheet awardType — the missing piece is the priority.
+ * Checks the reasons in the same order membership is gated, rather than
+ * shortcutting on what the caller has already ruled out. A wrong reason is
+ * worse here than no reason: it sends someone to fix a field that was never
+ * the problem, and the caller's preconditions are not visible from inside.
  */
 function sheetExclusionReason(award, kind) {
-  if (kind === "ribbon") return "it has no awardPriority";
-  if (!MEDAL_SHEET_TYPES.has(award.awardType)) {
-    return `its awardType "${award.awardType}" is not one of ${[...MEDAL_SHEET_TYPES].join(", ")}`;
+  const types = kind === "ribbon" ? RIBBON_SHEET_TYPES : MEDAL_SHEET_TYPES;
+  if (!types.has(award.awardType)) {
+    return `its awardType "${award.awardType}" is not one of ${[...types].join(", ")}`;
   }
+  if (kind === "ribbon") return "it has no awardPriority";
   if (award.medalPriority === undefined) return "it has no medalPriority";
   return `its medalPriority ${award.medalPriority} is below ${MEDAL_MIN_PRIORITY}, the sheet's first row`;
 }
@@ -406,8 +409,8 @@ function sheetExclusionReason(award, kind) {
 // ignored, because `replace` is read as a strict `=== true`: a near-miss
 // spelling ("replaced") reads as absent, which quietly downgrades a replace
 // into an insert and shifts every row below the target down by one tile. That
-// is the same corruption the replace/insert mix guard exists to prevent, but
-// arriving with no diagnostic at all.
+// is the same class of silent row divergence the replace/insert mix guard
+// exists to prevent, reached by a different route and with no diagnostic.
 const MANIFEST_KEYS = ["name", "ribbon", "medal", "replace"];
 
 /**
@@ -468,8 +471,9 @@ function validateManifest(manifest, catalog, uploadDir) {
     }
     // A field that is set but unusable must abort, separate from "name absent"
     // and "not a sheet member": otherwise an award whose (say) medalPriority
-    // holds a bad value looks like a non-member, its medal tile is silently
-    // never placed, yet its source is still consumed.
+    // holds a bad value looks like a non-member. With no medal source supplied
+    // there is nothing else to notice the mismatch, so the ribbon tile goes in,
+    // its source is consumed, and the medal tile is silently never placed.
     const malformed = malformedFields(award);
     if (malformed.length > 0) {
       errors.push(
@@ -505,12 +509,12 @@ function validateManifest(manifest, catalog, uploadDir) {
       } else if (entry[kind]) {
         // Two humans contradicting each other, not a stray file: the manifest
         // asserts this award has art for this sheet, the catalog gives it
-        // nowhere to go. Warning and continuing placed the OTHER tile, deleted
-        // its source and emptied the manifest, so the award shipped
-        // half-placed with the warning reading as "correct, this one is
-        // ribbon-only". An omitted priority is the legitimate way to say "no
-        // tile on that sheet", so the supplied source is the only signal that
-        // says otherwise — it must not be discarded.
+        // nowhere to go. Warning here would place the other tile, consume that
+        // tile's source and empty the manifest, shipping the award half-placed
+        // while the warning reads as "correct, this one is ribbon-only". An
+        // omitted priority is the legitimate way to say "no tile on that
+        // sheet", so the supplied source is the only signal saying otherwise
+        // and it must not be discarded.
         errors.push(
           `${label}: "${entry.name}" supplies a "${kind}" source but the catalog does not ` +
             `place it on the ${kind} sheet — ${sheetExclusionReason(award, kind)}. Either fix ` +

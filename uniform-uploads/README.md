@@ -30,9 +30,10 @@ the sprite sheets and opens a pull request for review.
 
    - `name` must match the catalog award name exactly.
    - `name`, `ribbon`, `medal` and `replace` are the only keys an entry may
-     carry. Anything else fails the run, because a misspelled `replace` would
-     otherwise read as absent and insert a duplicate tile instead of
-     overwriting one.
+     carry, and the error message lists them if you get one wrong. Anything
+     else fails the run: a misspelled `replace` would otherwise read as absent,
+     inserting a tile instead of overwriting one and pushing every award below
+     it down a row.
    - Supply `ribbon` if the award has an `awardPriority`, and `medal` if it has
      a `medalPriority` of 2 or higher. Service ribbons have both; pure ribbons
      have only `ribbon`. Priorities 0 and 1 are the two Lifetime medals, which

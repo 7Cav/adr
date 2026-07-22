@@ -205,18 +205,6 @@ async function main() {
     true,
   );
 
-  // Every medal-sheet type is also a ribbon-sheet type. sheetExclusionReason
-  // leans on this to answer the ribbon side with a single fixed reason: an
-  // award reaching it is always a medal-sheet member, so its awardType is
-  // necessarily a ribbon type and only the priority can be missing. Add a type
-  // to MEDAL_SHEET_TYPES alone and that reason silently becomes a wrong
-  // diagnosis rather than a failure, so pin the premise here.
-  const medalTypesOffRibbonSheet = [...MEDAL_SHEET_TYPES].filter(
-    (t) => !RIBBON_SHEET_TYPES.has(t),
-  );
-  assert.deepStrictEqual(medalTypesOffRibbonSheet, []);
-  ok("membership: every medal-sheet type is also a ribbon-sheet type", true);
-
   // --- indexCatalog / lookupAward ---
   assert.deepStrictEqual(lookupAward(CATALOG, "Foo Ribbon"), {
     name: "Foo Ribbon",
@@ -476,7 +464,12 @@ async function main() {
   );
   ok(
     "validate: a medal source for a ribbon carrying a medalPriority errors",
-    r.errors.some((e) => e.includes("medal sheet") && e.includes("awardType")),
+    r.errors.some(
+      (e) =>
+        e.includes("medal sheet") &&
+        e.includes('awardType "Ribbon"') &&
+        !e.includes("medalPriority"),
+    ),
   );
 
   // Priorities 0 and 1 are the two Lifetime medals: on the ribbon sheet, below
@@ -1066,6 +1059,97 @@ async function main() {
   ok(
     "run(half-placed): manifest entry retained, not emptied",
     JSON.parse(fs.readFileSync(paths.manifest, "utf8")).length === 1,
+  );
+
+  // --- run: one bad entry aborts the whole manifest, not just itself ---
+  // Validation runs over every entry before any splice, so a good entry sharing
+  // the manifest with a bad one must not be half-applied. Pinned at the run()
+  // seam because that is the property worth keeping if entry handling ever
+  // moves closer to per-entry processing: partial application is what makes
+  // this tool dangerous, since the sources that prove it are deleted.
+  await makeSheet(paths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+    [3, 0, 0],
+  ]);
+  await makeSheet(paths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(dir, "good.png"),
+    await colorTile(43, 13, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "bad.png"),
+    await colorTile(43, 13, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "badMedal.png"),
+    await colorTile(72, 148, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    paths.manifest,
+    JSON.stringify(
+      [
+        { name: "Foo Ribbon", ribbon: "good.png" },
+        // Lifetime Medal is medalPriority 0, so it has no medal tile.
+        { name: "Lifetime Medal", ribbon: "bad.png", medal: "badMedal.png" },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const ribGuardMulti = fs.readFileSync(paths.ribbonSheet);
+  let multiThrew = false;
+  try {
+    await run(paths, silent());
+  } catch (e) {
+    multiThrew = true;
+  }
+  ok("run(multi): one bad entry aborts the run", multiThrew);
+  ok(
+    "run(multi): the good entry's tile was not spliced in",
+    ribGuardMulti.equals(fs.readFileSync(paths.ribbonSheet)),
+  );
+  ok(
+    "run(multi): the good entry's source is not consumed",
+    fs.existsSync(path.join(dir, "good.png")),
+  );
+  ok(
+    "run(multi): both manifest entries retained",
+    JSON.parse(fs.readFileSync(paths.manifest, "utf8")).length === 2,
+  );
+
+  // --- run: normalizer warnings still reach the caller and the log ---
+  // validateManifest no longer produces warnings, so this is the only path that
+  // fills the channel. Left unexercised it would rot silently.
+  await makeSheet(paths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+    [3, 0, 0],
+  ]);
+  fs.writeFileSync(
+    path.join(dir, "odd.png"),
+    await colorTile(40, 20, [3, 3, 3]),
+  );
+  fs.writeFileSync(
+    paths.manifest,
+    JSON.stringify([{ name: "Foo Ribbon", ribbon: "odd.png" }], null, 2) + "\n",
+  );
+  const warned = [];
+  const spy = {
+    log() {},
+    warn(m) {
+      warned.push(m);
+    },
+    error() {},
+  };
+  const oddResult = await run(paths, spy);
+  ok(
+    "run(warnings): an off-size source is reported, not silently reshaped",
+    oddResult.warnings.some((w) => w.includes("40x20")),
+  );
+  ok(
+    "run(warnings): the warning reaches the log too",
+    warned.some((w) => w.includes("40x20")),
   );
 
   fs.rmSync(dir, { recursive: true, force: true });
