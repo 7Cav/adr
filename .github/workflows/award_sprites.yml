@@ -42,9 +42,18 @@ jobs:
           set -o pipefail
           # Read the manifest BEFORE generating: the generator empties it on
           # success, so afterwards there is no way to tell a push that had work
-          # to do from one that did not — which is what made "no sheet changes"
+          # to do from one that did not, which is what made "no sheet changes"
           # below report a guess as a fact.
-          if [ "$(jq 'if type == "array" then length else 1 end' uniform-uploads/manifest.json)" -gt 0 ]; then
+          #
+          # A jq failure is fatal rather than falsy. Left to collapse into an
+          # empty string it would make the test below false, disarm the guard,
+          # and report "nothing to generate" about a manifest never read, which
+          # is the same inference this step exists to remove.
+          if ! ENTRY_COUNT=$(jq 'if type == "array" then length else 1 end' uniform-uploads/manifest.json); then
+            echo "::error::could not read uniform-uploads/manifest.json"
+            exit 1
+          fi
+          if [ "$ENTRY_COUNT" -gt 0 ]; then
             echo "had_work=true" >> "$GITHUB_OUTPUT"
           else
             echo "had_work=false" >> "$GITHUB_OUTPUT"
@@ -74,9 +83,12 @@ jobs:
             # push, which is the one thing it definitely was not.
             echo "::error::Manifest had entries and the generator succeeded, but no sprite sheet changed — the uploaded art was identical to the tiles already in place, and the sources have been consumed. Restore them from this push and check you uploaded the intended files."
             exit 1
-          else
+          elif [ "$HAD_WORK" = "false" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Manifest was empty; nothing to generate. Skipping PR."
+          else
+            echo "::error::had_work was '$HAD_WORK'; the manifest probe did not run, so whether there was work to do is unknown"
+            exit 1
           fi
 
       - name: Verify formatting
@@ -101,8 +113,10 @@ jobs:
             upload-folder cleanup (consumed source art removed, manifest
             emptied). Placement was read from `constants/awardCatalog.js`.
 
-            **Generator warnings** (e.g. a medal placed with a transparent gap,
-            or a ribbon stretched from a wrong-sized source):
+            **Generator warnings** (a medal scaled to fit its tile with
+            transparent margin left over). A wrong-sized ribbon source is an
+            error rather than a warning, so it fails the run instead of
+            reaching this list:
 
             ```
             ${{ steps.generate.outputs.warnings }}

@@ -18,9 +18,10 @@
  *
  * Which of the two a run is doing cannot be settled by looking at the target
  * row, since a legitimate insert and a mistaken one both land on an occupied
- * one. Every run is therefore reconciled against the catalog: each sheet must
- * hold one row per award the catalog places on it, plus the rows this run
- * inserts. See validateManifest for why that is the question worth asking.
+ * one. Each sheet the run writes to is therefore reconciled against the
+ * catalog: the catalog must place one award per row the sheet already holds,
+ * plus one for each row the run inserts. See validateManifest for why that is
+ * the question worth asking.
  *
  * Geometry (load-bearing):
  *   Ribbon: tile 43x14, row y = awardPriority * 14
@@ -135,13 +136,13 @@ function sheetRowIndex(award, kind) {
 /**
  * How many tile rows a sheet currently holds.
  *
- * Ceiling, because a partial final row is still a row: the ribbon sheet is
- * 783px = 55*14 + 13, and those last 13 pixels are opaque art, not padding.
- * Rounding is not a safe substitute. A sheet has also carried a remainder that
- * was NOT a tile — the medal sheet spent two years 1px tall from a hand-edit,
- * since cropped — and nothing measurable distinguishes the two cases, which is
- * why the count this returns is reconciled against the catalog rather than
- * trusted on its own.
+ * Ceiling, because a partial final row is still a row: the ribbon sheet's last
+ * tile is truncated, and its remaining pixels are opaque art rather than
+ * padding. Rounding is not a safe substitute. A sheet has also carried a
+ * remainder that was NOT a tile, the medal sheet having spent about two months
+ * a single pixel taller than its tiles after a hand-edit, since cropped.
+ * Nothing measurable tells those two cases apart, which is why the count this
+ * returns is reconciled against the catalog rather than trusted on its own.
  *
  * "Any pixels in row k mean row k exists" is also the notion of existence the
  * replace guard in buildSplicedSheet already uses (`ins.y >= height` means
@@ -154,21 +155,34 @@ function sheetRowCount(height, tileHeight) {
 }
 
 /**
- * The rows the catalog claims on `kind`'s sheet, as { count, extent }.
+ * The rows the catalog claims on `kind`'s sheet: how many, and every way the
+ * claim is malformed.
  *
- * They agree only when the priorities are contiguous, and the caller checks
- * that they do. The consumer reads a tile at `priority * tileHeight`, so a
- * hole in the numbering is not a cosmetic gap — it is a blank row that every
- * award below is then read across.
+ * The anomalies are returned rather than a second number to compare against
+ * `count`, because comparing counts looks like a contiguity test and is not
+ * one. Against `max(row) + 1` a priority claimed twice and a priority claimed
+ * by nobody cancel out, so [0, 1, 1, 3] reads as four awards across four rows
+ * and passes. That is a renumbering slip, which is the likeliest mistake in the
+ * workflow this file documents: bump one award's priority, miss its neighbour.
+ *
+ * It matters because the consumer reads a tile at `priority * tileHeight`. A
+ * hole is a blank row that every award below it is then read across, and a
+ * repeat is two awards fighting over one row with the loser never drawn.
  */
 function catalogSheetRows(catalog, kind) {
   const rows = [...catalog.values()]
     .filter((award) => onSheet(award, kind))
     .map((award) => sheetRowIndex(award, kind));
-  return {
-    count: rows.length,
-    extent: rows.length === 0 ? 0 : Math.max(...rows) + 1,
-  };
+  const occupied = new Set(rows);
+  const extent = rows.length === 0 ? 0 : Math.max(...rows) + 1;
+  const missing = [];
+  for (let row = 0; row < extent; row += 1) {
+    if (!occupied.has(row)) missing.push(row);
+  }
+  const duplicated = [...occupied].filter(
+    (row) => rows.filter((other) => other === row).length > 1,
+  );
+  return { count: rows.length, missing, duplicated };
 }
 
 /**
@@ -361,6 +375,17 @@ async function normalizeRibbon(srcPath) {
  */
 async function normalizeMedal(srcPath) {
   const warnings = [];
+  // A flattened export is an error, not a warning. The tile is composited onto
+  // full transparency, so a source with no alpha fills all 70x120 with a solid
+  // rectangle that hides the medals either side of it. readSheet asserts the
+  // same thing on the sheets; the input side matters more, because the input is
+  // the copy that gets deleted.
+  if (!(await sharp(srcPath).metadata()).hasAlpha) {
+    throw new Error(
+      `medal source ${path.basename(srcPath)} has no alpha channel; medal art is placed on ` +
+        `transparency, so a flattened export fills the whole tile with a solid rectangle`,
+    );
+  }
   const fit = await sharp(srcPath)
     .resize({
       width: MEDAL.width,
@@ -488,10 +513,11 @@ async function buildSplicedSheet(sheetPath, inserts) {
  * run re-encodes both sheets in full, so the default's inflation would compound
  * on an asset the client downloads.
  *
- * Do NOT add `effort` to squeeze further, however good its reported saving
- * looks. On RGBA art like the medal sheet it palettizes, which changes alpha
- * values and visible pixels — verify any encoder change by decoding both sides
- * to raw and comparing, not by comparing file sizes.
+ * Do NOT add `effort`, `quality`, `colours`/`colors` or `dither`, however good
+ * the reported saving looks. sharp sets `palette: true` if any of them is
+ * defined (see lib/output.js), and on RGBA art that quantizes: alpha values and
+ * visible pixels both change. Verify any encoder change by decoding both sides
+ * to raw and comparing them, never by comparing file sizes.
  */
 async function writeSheet(sheetPath, plan) {
   const { data, width, height, channels } = plan;
@@ -512,8 +538,10 @@ async function spliceSheet(sheetPath, inserts) {
  * Why the catalog does not place this award on `kind`'s sheet, phrased for a
  * contributor who has just asserted the opposite by supplying art for it.
  *
- * Checks the reasons in the same order membership is gated, rather than
- * shortcutting on what the caller has already ruled out. A wrong reason is
+ * Checks the reasons in the order membership gates them, rather than
+ * shortcutting on what the caller has already ruled out. It stops short of
+ * re-checking that the priority is a usable row index, which malformedFields
+ * has rejected before any caller reaches this. A wrong reason is
  * worse here than no reason: it sends someone to fix a field that was never
  * the problem, and the caller's preconditions are not visible from inside.
  */
@@ -576,15 +604,20 @@ function isPlainPngName(value) {
  * the inputs that would prove something was skipped are already gone.
  */
 function validateManifest(manifest, catalog, uploadDir, sheetRows) {
-  if (
-    !sheetRows ||
-    typeof sheetRows.ribbon !== "number" ||
-    typeof sheetRows.medal !== "number"
-  ) {
-    // Thrown, not pushed: a caller that omits this has a bug, and reporting it
-    // as a manifest error would blame the contributor for it.
+  // Integer-checked, not just `typeof === "number"`: an undecodable sheet makes
+  // sheetRowCount return NaN, which is a number, and NaN propagates into the
+  // reconciliation as "the catalog must place NaN award(s) on it" — a tool
+  // failure dressed up as a contributor error, telling them to renumber a
+  // catalog that was fine. Thrown rather than pushed for the same reason: a
+  // caller that gets this wrong has a bug, and it is not the contributor's.
+  const badRows = ["ribbon", "medal"].filter(
+    (kind) => !Number.isInteger(sheetRows?.[kind]) || sheetRows[kind] < 0,
+  );
+  if (badRows.length > 0) {
     throw new TypeError(
-      "validateManifest requires sheetRows { ribbon, medal } — each sheet's current row count",
+      `validateManifest requires sheetRows { ribbon, medal } as non-negative integer row ` +
+        `counts; got ` +
+        badRows.map((kind) => `${kind}=${sheetRows?.[kind]}`).join(", "),
     );
   }
   const errors = [];
@@ -599,8 +632,8 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
   // (see buildSplicedSheet). The insert count is the growth the catalog has to
   // have already accounted for — see the reconciliation after the loop.
   const perSheet = {
-    ribbon: { modes: new Set(), inserts: 0 },
-    medal: { modes: new Set(), inserts: 0 },
+    ribbon: { inserts: 0, replaces: 0 },
+    medal: { inserts: 0, replaces: 0 },
   };
   manifest.forEach((entry, i) => {
     const label = `entry ${i}`;
@@ -703,31 +736,53 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
       ["medal", needMedal],
     ].forEach(([kind, need]) => {
       if (!need) return;
-      perSheet[kind].modes.add(isReplace);
-      if (!isReplace) perSheet[kind].inserts += 1;
+      if (isReplace) perSheet[kind].replaces += 1;
+      else perSheet[kind].inserts += 1;
     });
   });
-  Object.entries(perSheet).forEach(([kind, state]) => {
-    // A sheet this run does not touch has nothing to reconcile. Its catalog and
-    // its rows may well disagree — that is the business of the run that finally
-    // writes to it, not of this one.
-    if (state.modes.size === 0) return;
-    if (state.modes.has(true) && state.modes.has(false)) {
+  Object.entries(perSheet).forEach(([kind, { inserts, replaces }]) => {
+    const { priorityField, tileHeight, firstPriority } = SHEETS[kind];
+    const { count, missing, duplicated } = catalogSheetRows(catalog, kind);
+    // Checked for BOTH sheets, whether or not this run writes to them. Unlike
+    // the reconciliation below, a hole or a repeat is a property of the catalog
+    // on its own: it misrenders every award beneath it from the moment it is
+    // merged, tile or no tile. This upload is what carries the catalog edit
+    // into main, so it is the thing that should refuse it.
+    if (missing.length > 0 || duplicated.length > 0) {
+      // Reported as priorities, not row indices. They differ on the medal sheet
+      // (row 0 is medalPriority 2), and the contributor is going to fix this by
+      // editing priorities.
+      const asPriorities = (rows) =>
+        rows.map((row) => row + firstPriority).join(", ");
+      const faults = [];
+      if (duplicated.length > 0) {
+        faults.push(
+          `${priorityField} ${asPriorities(duplicated)} is claimed by more than one award`,
+        );
+      }
+      if (missing.length > 0) {
+        faults.push(
+          `no award claims ${priorityField} ${asPriorities(missing)}`,
+        );
+      }
+      errors.push(
+        `the catalog's ${kind} numbering has a break in it: ${faults.join(", and ")}. ` +
+          `The sheet is read at row * ${tileHeight}px, so from that point down every award ` +
+          `renders as a different one. Renumber awardCatalog.js so the ${kind} priorities ` +
+          `run consecutively with no repeats and no holes.`,
+      );
+      return;
+    }
+    // Past this point the catalog is coherent on its own terms. What is left is
+    // whether it agrees with the sheet, which only matters for a sheet this run
+    // writes to: an untouched sheet's drift is the business of the run that
+    // finally writes to it.
+    if (inserts === 0 && replaces === 0) return;
+    if (inserts > 0 && replaces > 0) {
       errors.push(
         `the ${kind} sheet has both a replace and an insert in one run; ` +
           `an insert shifts the buffer and would send the replace to the wrong row — ` +
           `process them in separate uploads`,
-      );
-      return;
-    }
-    const { priorityField, tileHeight } = SHEETS[kind];
-    const { count, extent } = catalogSheetRows(catalog, kind);
-    if (count !== extent) {
-      errors.push(
-        `the catalog's ${priorityField} numbering is not contiguous: ${count} award(s) span ` +
-          `${extent} ${kind} row(s), so at least one row has no award. The sheet is read ` +
-          `at row * ${tileHeight}px, so a hole leaves a blank row and every award below ` +
-          `it renders as its neighbour. Renumber awardCatalog.js to close the gap.`,
       );
       return;
     }
@@ -737,28 +792,25 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
     // renumbering below it is the documented way to add an award. What actually
     // separates that from re-uploading art for an award that already has a tile
     // is whether the catalog grew to account for the new row. So: the catalog
-    // must claim exactly the rows the sheet has, plus the ones this run adds.
-    //
-    // Counted, not measured by highest priority. The two agree only because the
-    // contiguity check above has just established it, and keying on the count
-    // keeps that guarantee local — read off max(priority) this would quietly go
-    // back to trusting a numbering nothing had checked.
-    const expected = sheetRows[kind] + state.inserts;
+    // must claim one award per row the sheet already holds, plus one for each
+    // row this run is about to insert.
+    const expected = sheetRows[kind] + inserts;
     if (count === expected) return;
     errors.push(
-      state.inserts > 0
+      inserts > 0
         ? `the ${kind} sheet has ${sheetRows[kind]} row(s) and this run inserts ` +
-            `${state.inserts}, so the catalog must place ${expected} award(s) on it — it ` +
-            `places ${count}. An insert pushes every row below it down one tile, so it is ` +
-            `only right for an award that is NEW to the sheet: add it to awardCatalog.js and ` +
+            `${inserts}, so the catalog must place ${expected} award(s) on it — it places ` +
+            `${count}. An insert pushes every row below it down one tile, so it is only ` +
+            `right for an award that is NEW to the sheet: add it to awardCatalog.js and ` +
             `renumber the awards below it. To fix the art of an award that already has a ` +
             `tile, set "replace": true instead.`
         : `the ${kind} sheet has ${sheetRows[kind]} row(s) but the catalog places ${count} ` +
             `award(s) on it, and a replace overwrites a tile in place without changing that. ` +
-            `If you are adding a ${kind} tile to an award that is already on the other sheet, ` +
-            `that is an insert here and a replace there, which cannot be expressed in one ` +
-            `entry — do the two sheets in separate uploads. Otherwise the sheet and ` +
-            `awardCatalog.js have drifted apart, so restore or regenerate one of them.`,
+            `If this award is gaining a ${kind} tile it does not have yet while keeping the ` +
+            `one it already has on the other sheet, that is an insert on one sheet and a ` +
+            `replace on the other, which a single manifest entry cannot express and no ` +
+            `sequence of uploads works around — raise it rather than forcing it. Otherwise ` +
+            `the sheet and awardCatalog.js have drifted apart, so restore or regenerate one.`,
     );
   });
   return { errors };
@@ -815,7 +867,8 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonInserts = [];
   const medalInserts = [];
   const consumed = new Set();
-  // Only the normalizers warn now — geometry that was accepted but reshaped.
+  // Only the medal normalizer warns: geometry accepted, but letterboxed to fit.
+  // The ribbon side throws instead, so it has nothing to report here.
   const allWarnings = [];
 
   for (const entry of manifest) {
@@ -901,10 +954,11 @@ async function run(paths = DEFAULT_PATHS, log = console) {
     });
   }
 
-  // Consume sources and empty the manifest of processed entries. An unlink
-  // that throws here leaves the manifest full against already-written sheets;
-  // as with a partial rename above, the reconciliation turns the retry into an
-  // abort rather than a double-apply.
+  // Consume sources and empty the manifest of processed entries. An unlink that
+  // throws here leaves the manifest full against already-written sheets, with
+  // the same two outcomes on retry as the partial rename above: an insert run
+  // aborts on the reconciliation, and a replace run re-applies the same tile to
+  // the same row, which is harmless.
   consumed.forEach((file) => {
     const p = path.join(paths.uploadDir, file);
     if (fs.existsSync(p)) fs.unlinkSync(p);

@@ -86,14 +86,19 @@ const CATALOG_ENTRIES = [
 
 const CATALOG = indexCatalog(CATALOG_ENTRIES);
 
-// The rows CATALOG claims: 7 on the ribbon sheet, 3 on the medal sheet.
 // validateManifest takes each sheet's current row count as an argument, so
 // every call has to state which sheet state it is checking against. STEADY is
 // "every catalog award already has a tile", which is what a replace requires;
 // inserting(n, m) is the sheet as it stands just before n ribbon and m medal
 // tiles are spliced in; SOLO is the empty sheet that a one-award fixture
 // catalog splices its first tile into.
-const STEADY = { ribbon: 7, medal: 3 };
+//
+// Derived from CATALOG rather than written out, so adding a fixture award does
+// not silently invalidate every call site below.
+const STEADY = {
+  ribbon: catalogSheetRows(CATALOG, "ribbon").count,
+  medal: catalogSheetRows(CATALOG, "medal").count,
+};
 const SOLO = { ribbon: 0, medal: 0 };
 const inserting = (ribbon = 0, medal = 0) => ({
   ribbon: STEADY.ribbon - ribbon,
@@ -210,10 +215,10 @@ async function main() {
     ["ribbon", DEFAULT_PATHS.ribbonSheet, 14],
     ["medal", DEFAULT_PATHS.medalSheet, 120],
   ]) {
-    const { count, extent } = catalogSheetRows(realCatalog, kind);
+    const { count, missing, duplicated } = catalogSheetRows(realCatalog, kind);
     ok(
-      `real ${kind} sheet: catalog priorities are contiguous (${count} awards, ${extent} rows)`,
-      count === extent,
+      `real ${kind} sheet: ${count} catalog priorities run consecutively, no repeats or holes`,
+      missing.length === 0 && duplicated.length === 0,
     );
     const rows = sheetRowCount(
       (await sharp(sheetPath).metadata()).height,
@@ -1214,9 +1219,10 @@ async function main() {
 
   // --- run: medal geometry still warns, and the warning reaches the log ---
   // The medal normalizer resizes with fit:"inside", so an odd aspect costs
-  // transparent margin rather than the art itself — a warning, not an error.
-  // It is also the only thing left filling result.warnings, since the ribbon
-  // side now throws and validateManifest never warned; unexercised it would rot.
+  // transparent margin rather than the art itself, which is a warning and not an
+  // error. It is also the only thing left filling result.warnings, since the
+  // ribbon side throws and validateManifest no longer produces warnings.
+  // Unexercised, that channel would rot.
   await makeSheet(paths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
@@ -1314,9 +1320,10 @@ async function main() {
     fs.writeFileSync(occ.manifest, JSON.stringify([entry], null, 2) + "\n");
     const ribGuardOcc = fs.readFileSync(occ.ribbonSheet);
     const medGuardOcc = fs.readFileSync(occ.medalSheet);
+    const occLog = collecting();
     let occThrew = false;
     try {
-      await run(occ, silent());
+      await run(occ, occLog);
     } catch (e) {
       occThrew = true;
     }
@@ -1324,6 +1331,19 @@ async function main() {
     // is why requiring the key explicitly would not have been a fix on its own.
     const how = flag === undefined ? "omitted" : "false";
     ok(`run(occupied/${how}): an insert onto a full sheet aborts`, occThrew);
+    // The diagnostic IS the fix here: swapping the two reconciliation messages
+    // used to pass, so a contributor could be told to renumber when what they
+    // needed was the flag.
+    ok(
+      `run(occupied/${how}): both sheets are named and the advice is to set replace`,
+      ["ribbon", "medal"].every((kind) =>
+        occLog.errors.some(
+          (e) =>
+            e.includes(`the ${kind} sheet has`) &&
+            e.includes('set "replace": true'),
+        ),
+      ),
+    );
     ok(
       `run(occupied/${how}): ribbon sheet byte-identical`,
       ribGuardOcc.equals(fs.readFileSync(occ.ribbonSheet)),
@@ -1438,13 +1458,18 @@ async function main() {
     JSON.stringify([{ name: "Two Ribbon", ribbon: "gR.png" }], null, 2) + "\n",
   );
   const gapGuard = fs.readFileSync(gap.ribbonSheet);
-  let gapErr = "";
+  const gapLog = collecting();
+  let gapThrew = false;
   try {
-    await run(gap, silent());
+    await run(gap, gapLog);
   } catch (e) {
-    gapErr = e.message;
+    gapThrew = true;
   }
-  ok("run(gap): a non-contiguous catalog aborts the run", gapErr !== "");
+  ok("run(gap): a hole in the numbering aborts the run", gapThrew);
+  ok(
+    "run(gap): the diagnostic names the missing priority",
+    gapLog.errors.some((e) => e.includes("no award claims awardPriority 1")),
+  );
   ok(
     "run(gap): the sheet is left untouched",
     gapGuard.equals(fs.readFileSync(gap.ribbonSheet)),
@@ -1453,6 +1478,354 @@ async function main() {
     "run(gap): the source is kept for a retry",
     fs.existsSync(path.join(gap.uploadDir, "gR.png")),
   );
+
+  // --- run: a priority claimed twice aborts, even when the totals balance ---
+  // The check this replaced compared the number of awards against the highest
+  // row index, which is not a contiguity test: a priority claimed twice and a
+  // priority claimed by nobody cancel out. Rows [0, 1, 1, 3] counted four
+  // awards across four rows and passed, so the run spliced onto row 1, left
+  // row 2 blank, deleted the sources and exited 0. That is the corruption this
+  // whole file exists to prevent, reached through the renumbering step the
+  // README tells contributors to perform by hand.
+  // Duplicate with NO hole, so the repeat is the only thing that can fail:
+  // rows [0, 1, 1] leave nothing missing, and 3 awards against a 2-row sheet
+  // plus this run's 1 insert reconciles exactly. Sized any other way the case
+  // would abort on the hole or the reconciliation and prove nothing about
+  // duplicates, which is what the first version of it did.
+  const dupe = makeScratch("duplicate", [
+    { name: "Zero", awardPriority: 0, awardType: "Ribbon" },
+    { name: "One", awardPriority: 1, awardType: "Ribbon" },
+    { name: "AlsoOne", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  ok(
+    "catalogSheetRows: a duplicate and a hole no longer cancel out",
+    catalogSheetRows(
+      indexCatalog([
+        { name: "Zero", awardPriority: 0, awardType: "Ribbon" },
+        { name: "One", awardPriority: 1, awardType: "Ribbon" },
+        { name: "AlsoOne", awardPriority: 1, awardType: "Ribbon" },
+        { name: "Three", awardPriority: 3, awardType: "Ribbon" },
+      ]),
+      "ribbon",
+    ).duplicated.length === 1,
+  );
+  await makeSheet(dupe.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+  ]);
+  await makeSheet(dupe.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(dupe.uploadDir, "dR.png"),
+    await colorTile(43, 13, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    dupe.manifest,
+    JSON.stringify([{ name: "AlsoOne", ribbon: "dR.png" }], null, 2) + "\n",
+  );
+  const dupeGuard = fs.readFileSync(dupe.ribbonSheet);
+  const dupeLog = collecting();
+  let dupeThrew = false;
+  try {
+    await run(dupe, dupeLog);
+  } catch (e) {
+    dupeThrew = true;
+  }
+  ok("run(duplicate): a priority claimed twice aborts the run", dupeThrew);
+  ok(
+    "run(duplicate): the diagnostic names the repeat, and does not invent a hole",
+    dupeLog.errors.some((e) =>
+      e.includes("awardPriority 1 is claimed by more than one award"),
+    ) && !dupeLog.errors.some((e) => e.includes("no award claims")),
+  );
+  ok(
+    "run(duplicate): the sheet is left untouched",
+    dupeGuard.equals(fs.readFileSync(dupe.ribbonSheet)),
+  );
+  ok(
+    "run(duplicate): the source is kept for a retry",
+    fs.existsSync(path.join(dupe.uploadDir, "dR.png")),
+  );
+
+  // --- run: two inserts on one sheet in one upload ---
+  // The reconciliation adds the run's insert COUNT to the sheet's rows, and
+  // until this existed that count was only ever 1, so `inserts = 1` in place of
+  // `inserts += 1` passed the whole suite. Getting it wrong in that direction
+  // rejects a legitimate two-award upload; getting it wrong the other way lets
+  // a run insert more tiles than the catalog accounts for, shifting everything
+  // below the second one.
+  const two = makeScratch("two-inserts", [
+    { name: "Keep", awardPriority: 0, awardType: "Ribbon" },
+    { name: "AddOne", awardPriority: 1, awardType: "Ribbon" },
+    { name: "AddTwo", awardPriority: 2, awardType: "Ribbon" },
+    { name: "Below", awardPriority: 3, awardType: "Ribbon" },
+  ]);
+  await makeSheet(two.ribbonSheet, 43, 14, [
+    [11, 0, 0],
+    [22, 0, 0],
+  ]);
+  await makeSheet(two.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(two.uploadDir, "t1.png"),
+    await colorTile(43, 13, [91, 0, 0]),
+  );
+  fs.writeFileSync(
+    path.join(two.uploadDir, "t2.png"),
+    await colorTile(43, 13, [92, 0, 0]),
+  );
+  fs.writeFileSync(
+    two.manifest,
+    JSON.stringify(
+      [
+        { name: "AddOne", ribbon: "t1.png" },
+        { name: "AddTwo", ribbon: "t2.png" },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const twoRes = await run(two, silent());
+  ok("run(two inserts): both entries processed", twoRes.processed === 2);
+  ok(
+    "run(two inserts): sheet grew by exactly two tiles",
+    twoRes.ribbonResult.height === 56,
+  );
+  assert.deepStrictEqual(await rowColor(two.ribbonSheet, 0), [11, 0, 0]);
+  assert.deepStrictEqual(await rowColor(two.ribbonSheet, 14), [91, 0, 0]);
+  assert.deepStrictEqual(await rowColor(two.ribbonSheet, 28), [92, 0, 0]);
+  assert.deepStrictEqual(await rowColor(two.ribbonSheet, 42), [22, 0, 0]);
+  ok(
+    "run(two inserts): both tiles landed on their catalog rows, displacing the rest",
+    true,
+  );
+
+  // --- run: the medal sheet is spliced at the right row, checked by pixel ---
+  // Every other medal assertion reads a height, and height is blind to any row
+  // error that lands inside the sheet. Forcing every medal tile to row 0, or
+  // one row too low, left the suite green: in production that is every medal
+  // rendering as the award below it, sources deleted, exit 0.
+  const medal = makeScratch("medal-row", [
+    {
+      name: "First Medal",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+    {
+      name: "Second Medal",
+      awardPriority: 1,
+      medalPriority: 3,
+      awardType: "Medal",
+    },
+    {
+      name: "Third Medal",
+      awardPriority: 2,
+      medalPriority: 4,
+      awardType: "Medal",
+    },
+  ]);
+  await makeSheet(medal.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+  ]);
+  await makeSheet(medal.medalSheet, 70, 120, [
+    [0, 11, 0],
+    [0, 22, 0],
+  ]);
+  fs.writeFileSync(
+    path.join(medal.uploadDir, "mr.png"),
+    await colorTile(43, 13, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    path.join(medal.uploadDir, "mm.png"),
+    await colorTile(70, 120, [0, 99, 0]),
+  );
+  fs.writeFileSync(
+    medal.manifest,
+    JSON.stringify(
+      [{ name: "Second Medal", ribbon: "mr.png", medal: "mm.png" }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const medalRes = await run(medal, silent());
+  ok(
+    "run(medal row): medal sheet grew by one 120px tile",
+    medalRes.medalResult.height === 360,
+  );
+  assert.deepStrictEqual(await rowColor(medal.medalSheet, 0), [0, 11, 0]);
+  assert.deepStrictEqual(await rowColor(medal.medalSheet, 120), [0, 99, 0]);
+  assert.deepStrictEqual(await rowColor(medal.medalSheet, 240), [0, 22, 0]);
+  ok(
+    "run(medal row): the tile landed on medalPriority 3's row, displacing the row below",
+    true,
+  );
+
+  // --- run: the reconciliation covers the medal sheet, not just the ribbon ---
+  // Every reconciliation failure above trips on the ribbon side, so skipping
+  // the medal sheet entirely passed the suite. Here the ribbon side is exactly
+  // consistent and only the medal side is not.
+  const medalOnly = makeScratch("medal-reconcile", [
+    { name: "Rib", awardPriority: 0, awardType: "Ribbon" },
+    { name: "Med", awardPriority: 1, medalPriority: 2, awardType: "Medal" },
+  ]);
+  // Ribbon: 2 awards, 1 row, 1 insert -> consistent. Medal: 1 award, 1 row,
+  // 1 insert -> the catalog would need 2, so only the medal side can fail.
+  await makeSheet(medalOnly.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(medalOnly.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(medalOnly.uploadDir, "mo.png"),
+    await colorTile(43, 13, [6, 6, 6]),
+  );
+  fs.writeFileSync(
+    path.join(medalOnly.uploadDir, "mo2.png"),
+    await colorTile(70, 120, [0, 6, 0]),
+  );
+  fs.writeFileSync(
+    medalOnly.manifest,
+    JSON.stringify(
+      [{ name: "Med", ribbon: "mo.png", medal: "mo2.png" }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const medalOnlyLog = collecting();
+  let medalOnlyThrew = false;
+  try {
+    await run(medalOnly, medalOnlyLog);
+  } catch (e) {
+    medalOnlyThrew = true;
+  }
+  ok(
+    "run(medal reconcile): the medal sheet is reconciled independently of the ribbon",
+    medalOnlyThrew,
+  );
+  ok(
+    "run(medal reconcile): the diagnostic names the medal sheet, not the ribbon",
+    medalOnlyLog.errors.some((e) =>
+      e.includes("the medal sheet has 1 row(s)"),
+    ) && !medalOnlyLog.errors.some((e) => e.includes("the ribbon sheet has")),
+  );
+
+  // --- run: a flattened medal source aborts rather than filling the tile ---
+  // Medal art is composited onto full transparency, so a source saved without
+  // an alpha channel covers all 70x120 with a solid rectangle and hides the
+  // medals either side of it. readSheet asserts the same thing on the sheets;
+  // the input side matters more, because the input is the copy that is deleted.
+  const flat = makeScratch("flattened", [
+    {
+      name: "Flat Medal",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+  ]);
+  await makeSheet(flat.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(flat.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(flat.uploadDir, "fR.png"),
+    await colorTile(43, 13, [8, 8, 8]),
+  );
+  fs.writeFileSync(
+    path.join(flat.uploadDir, "fM.png"),
+    await sharp(Buffer.alloc(70 * 120 * 3, 200), {
+      raw: { width: 70, height: 120, channels: 3 },
+    })
+      .png()
+      .toBuffer(),
+  );
+  fs.writeFileSync(
+    flat.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Flat Medal",
+          ribbon: "fR.png",
+          medal: "fM.png",
+          replace: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const flatGuard = fs.readFileSync(flat.medalSheet);
+  let flatErr = "";
+  try {
+    await run(flat, silent());
+  } catch (e) {
+    flatErr = e.message;
+  }
+  ok(
+    "run(flattened): a medal source with no alpha channel aborts",
+    flatErr.includes("no alpha channel"),
+  );
+  ok(
+    "run(flattened): the medal sheet is untouched and the source kept",
+    flatGuard.equals(fs.readFileSync(flat.medalSheet)) &&
+      fs.existsSync(path.join(flat.uploadDir, "fM.png")),
+  );
+
+  // --- validate: the replace side of the reconciliation ---
+  // Deleting the whole `inserts === 0` branch passed the suite: every replace
+  // fixture had a catalog and sheet that already agreed, so it never fired.
+  const replaceDrift = validateManifest(
+    [{ name: "Foo Ribbon", ribbon: "ribbon.png", replace: true }],
+    CATALOG,
+    dir,
+    { ribbon: STEADY.ribbon - 1, medal: STEADY.medal },
+  );
+  ok(
+    "validate(replace drift): a replace against a short sheet errors",
+    replaceDrift.errors.some((e) =>
+      e.includes("a replace overwrites a tile in place"),
+    ),
+  );
+  ok(
+    "validate(replace drift): the message does not prescribe splitting the upload",
+    !replaceDrift.errors.some((e) => e.includes("separate uploads")),
+  );
+
+  // --- validate: sheetRows is required, and must be usable row counts ---
+  // A caller bug, so it throws rather than reporting a manifest error. NaN is
+  // the case worth pinning: an undecodable sheet makes sheetRowCount return
+  // NaN, which is a number, and it used to surface as "the catalog must place
+  // NaN award(s) on it" — a tool failure blamed on the contributor.
+  assert.throws(
+    () => validateManifest([], CATALOG, dir),
+    /sheetRows/,
+    "omitted sheetRows must throw",
+  );
+  assert.throws(
+    () => validateManifest([], CATALOG, dir, { ribbon: NaN, medal: 3 }),
+    /ribbon=NaN/,
+    "NaN row count must throw and name the sheet",
+  );
+  ok("validate: sheetRows must be present and integral", true);
+
+  // --- validate: every clause of the source-filename rule ---
+  // Reducing isPlainPngName to its basename clause passed the suite, because
+  // the only fixture was "../outsider.png". The backslash clause is the one
+  // that matters on the Linux runner: path.basename does not split on \ under
+  // POSIX, so "..\x.png" would arrive as a literal filename.
+  [
+    // Deliberately not "..\\escape.png": that starts with a dot, so the
+    // leading-dot clause rejects it and the backslash clause is never reached.
+    ["sub\\art.png", "a backslash path"],
+    [".hidden.png", "a leading dot"],
+    ["art.jpg", "a non-png extension"],
+    ["sub/art.png", "a subdirectory"],
+  ].forEach(([name, label]) => {
+    const r = validateManifest(
+      [{ name: "Foo Ribbon", ribbon: name }],
+      CATALOG,
+      dir,
+      inserting(1),
+    );
+    ok(
+      `validate: ${label} is rejected as a source filename`,
+      r.errors.some((e) => e.includes("must be a plain")),
+    );
+  });
 
   // --- run: a manifest written as a bare object is reported, not skipped ---
   // `!Array.isArray(m) || m.length === 0` collapsed "not a list" into "nothing
@@ -1470,15 +1843,20 @@ async function main() {
     bare.manifest,
     JSON.stringify({ name: "Foo Ribbon", ribbon: "bR.png" }, null, 2) + "\n",
   );
+  const bareLog = collecting();
   let bareThrew = false;
   try {
-    await run(bare, silent());
+    await run(bare, bareLog);
   } catch (e) {
     bareThrew = true;
   }
   ok(
     "run(bare object): a non-array manifest aborts rather than exiting 0",
     bareThrew,
+  );
+  ok(
+    "run(bare object): the diagnostic says the manifest must be an array",
+    bareLog.errors.some((e) => e.includes("must be a JSON array")),
   );
 
   // --- run: a source name that escapes the upload directory aborts ---
@@ -1626,6 +2004,31 @@ function writeCatalog(dir, entries = CATALOG_ENTRIES) {
 
 function silent() {
   return { log() {}, warn() {}, error() {} };
+}
+
+/**
+ * A log that keeps what it was told, for asserting on the diagnostics a run
+ * actually produces.
+ *
+ * run() throws only a summary ("manifest validation failed (2 error(s))"); the
+ * errors that tell a contributor what to fix go to log.error. Asserting on the
+ * thrown message therefore proves almost nothing, and a test that only checks
+ * something threw passes just as happily when the wrong check fires.
+ */
+function collecting() {
+  const errors = [];
+  const warnings = [];
+  return {
+    errors,
+    warnings,
+    log() {},
+    warn(m) {
+      warnings.push(m);
+    },
+    error(m) {
+      errors.push(m);
+    },
+  };
 }
 
 main().catch((err) => {

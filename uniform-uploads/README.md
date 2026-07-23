@@ -15,7 +15,7 @@ the sprite sheets and opens a pull request for review.
    subdirectories, and the name must end in `.png`:
    - Ribbon art: 43×13, or 43×14, or an exact multiple of either (86×26,
      129×39, …), RGB or RGBA. Anything else fails the run. The tile is made by
-     *stretching* the source to fill 43×14, so a source of another shape comes
+     _stretching_ the source to fill 43×14, so a source of another shape comes
      out distorted rather than merely imperfect, and by then your PNG is gone.
    - Medal art: any size, RGBA with transparency (it is scaled to fit a 70×120
      tile, centered horizontally, top-aligned on transparency). Odd proportions
@@ -71,13 +71,19 @@ Two modes, selected per entry:
   down by one tile. Use this only for an award that is **new to the sheet**, and
   renumber the catalog as in step 1 so the priorities below it move too.
 
-  Renumbering is not bookkeeping you can skip. CI checks that each sheet holds
-  exactly one row per award the catalog places on it, plus the rows your upload
-  inserts — so an insert only adds up if the catalog gained an award to match.
-  Re-uploading art for an award that is already on the sheet without setting
-  `replace` fails this check, which is the point: it would otherwise have
-  pushed every award below it down a row, and you would not have found out
+  Renumbering is not bookkeeping you can skip. CI checks that the catalog
+  places one award for every row the sheet already holds, plus one for each row
+  your upload inserts, so an insert only adds up if the catalog gained an award
+  to match. Re-uploading art for an award that is already on the sheet without
+  setting `replace` fails this check, which is the point: it would otherwise
+  have pushed every award below it down a row, and you would not have found out
   until the sprites looked wrong in the builder.
+
+  The priorities themselves also have to run consecutively, with no repeats and
+  no holes. Renumbering by hand across a hundred awards makes both easy to
+  produce, and either one misrenders every award below it, so CI rejects them
+  and names the priority at fault.
+
 - **Existing award — replace.** Set `"replace": true`. CI overwrites the tile
   already at that award's catalog row in place — no shift, no height change —
   so re-uploading art for an award that already has a tile fixes it instead of
@@ -95,4 +101,18 @@ Two modes, selected per entry:
 
   Do **not** renumber the catalog for a replace — the award keeps its existing
   priority. Replacing a row that doesn't exist yet (a priority past the end of
-  the sheet) fails the run; use an insert for a genuinely new award.
+  the sheet) fails the run; use an insert for a genuinely new award. If the
+  catalog and the sheet disagree about how many awards are on it, a replace
+  fails too, since overwriting a tile in place cannot settle that difference.
+
+One case the manifest cannot express: an award that already has a tile on one
+sheet gaining its first tile on the other. That is a replace on one sheet and
+an insert on the other, and `replace` is set per entry rather than per sheet.
+Splitting it across two uploads does not help, because an award on both sheets
+must supply both sources every time. Ask a maintainer rather than working
+around it.
+
+Two more things fail the run rather than passing quietly: art byte-identical to
+the tile already in place (your PNGs are consumed and nothing changes, so the
+job stops instead of opening an empty PR), and a medal source saved without an
+alpha channel (it would fill the whole tile with a solid rectangle).
