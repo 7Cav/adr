@@ -840,7 +840,8 @@ async function main() {
 
   // --- spliceSheet: replace into the partial final row (sub-tile remainder) ---
   // The bottom-most award lives in the sheet's leftover < tileHeight band — the
-  // real ribbon sheet is 769px = 54*14 + 13, so its last row is only 13px tall.
+  // real ribbon sheet ends in a 13px remainder, so its last row is short of a
+  // full tile (buildSplicedSheet's replace guard states the height and the sum).
   // A replace there must succeed: the guard gates on the row's start, and the
   // copy clamps to the bytes that exist. Two full 14px rows + a 13px remainder.
   const partial = path.join(dir, "partial.png");
@@ -923,28 +924,33 @@ async function main() {
   );
 
   // --- run: no-op manifest leaves sheets byte-identical ---
-  const paths = makePaths(dir);
-  await makeSheet(paths.ribbonSheet, 43, 14, [
+  // Its own directory, because "empty manifest" now also asserts that the
+  // upload folder holds no art nobody claimed, and the shared fixture dir is
+  // full of PNGs left there for the validateManifest cases.
+  const noopPaths = makeScratch("emptymanifest");
+  await makeSheet(noopPaths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
   ]);
-  await makeSheet(paths.medalSheet, 70, 120, [
+  await makeSheet(noopPaths.medalSheet, 70, 120, [
     [0, 1, 0],
     [0, 2, 0],
   ]);
-  const ribBefore = fs.readFileSync(paths.ribbonSheet);
-  const medBefore = fs.readFileSync(paths.medalSheet);
-  fs.writeFileSync(paths.manifest, "[]\n");
-  const noop = await run(paths, silent());
+  const ribBefore = fs.readFileSync(noopPaths.ribbonSheet);
+  const medBefore = fs.readFileSync(noopPaths.medalSheet);
+  fs.writeFileSync(noopPaths.manifest, "[]\n");
+  const noop = await run(noopPaths, silent());
   ok("run: empty manifest processes nothing", noop.processed === 0);
   ok(
     "run: ribbon sheet byte-identical after no-op",
-    ribBefore.equals(fs.readFileSync(paths.ribbonSheet)),
+    ribBefore.equals(fs.readFileSync(noopPaths.ribbonSheet)),
   );
   ok(
     "run: medal sheet byte-identical after no-op",
-    medBefore.equals(fs.readFileSync(paths.medalSheet)),
+    medBefore.equals(fs.readFileSync(noopPaths.medalSheet)),
   );
+
+  const paths = makePaths(dir);
 
   // --- run: full service-ribbon insert into both sheets ---
   // Baz is awardPriority 4 (ribbon y=56) and medalPriority 3 (medal y=120),
@@ -2141,11 +2147,11 @@ async function main() {
   );
 
   // --- art identical to what is already on the sheet ---
-  // The run would consume the PNG, empty the manifest and open a pull request
-  // whose only content is a re-encoded sheet. It must abort BEFORE any of that,
-  // so the recovery is to do nothing. CI cannot answer this by diffing the
-  // written file: writeSheet re-encodes from raw and its output differs from a
-  // committed sheet over PNG metadata alone.
+  // Nothing this run does is worth doing: it would consume the PNG, empty the
+  // manifest and open a pull request whose only content is a re-encoded sheet.
+  // It must abort BEFORE any of that, so the recovery is to do nothing. CI
+  // cannot answer this from out there — "did the file change" is a question
+  // about the encoder, not about the art, and it rots on any sharp bump.
   const same = collecting();
   const samePaths = makeScratch("identical", [
     { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
@@ -2167,8 +2173,10 @@ async function main() {
   const sameBefore = fs.readFileSync(samePaths.ribbonSheet);
   await assert.rejects(
     () => run(samePaths, same),
-    (e) => e.message.includes("would be unchanged by this run"),
-    "a run that changes no pixel must abort",
+    (e) =>
+      e.message.includes("would change nothing") &&
+      e.message.includes('"Only Ribbon"'),
+    "a run that changes no pixel must abort, naming the awards involved",
   );
   ok(
     "run(identical): the source is still on disk",
@@ -2274,8 +2282,10 @@ async function main() {
   );
 
   // --- the sheets' own RGBA assertion ---
-  // The input side of this pair is covered; this is the other half. An RGB sheet
-  // would otherwise run an untested 3-channel path over every offset in the file.
+  // The input side of this pair is covered; this is the other half. A sheet that
+  // reaches here without transparency has had it destroyed by something, and
+  // ensureAlpha would quietly promote it back to four channels and re-encode —
+  // burying the fact, with a solid rectangle now behind every medal.
   const rgbSheet = path.join(dir, "rgbSheet.png");
   await sharp({
     create: {
@@ -2294,6 +2304,17 @@ async function main() {
   );
   ok("readSheet: an RGB sheet is refused", true);
 
+  // readSheet is reached directly by spliceSheet, so it names the sheet itself
+  // rather than leaning on run() having read the metadata first.
+  const corruptSheet = path.join(dir, "corruptSheet.png");
+  fs.writeFileSync(corruptSheet, "not a PNG at all\n");
+  await assert.rejects(
+    () => readSheet(corruptSheet),
+    (e) => e.message.includes("corruptSheet.png"),
+    "an undecodable sheet must name itself from readSheet too",
+  );
+  ok("readSheet: an undecodable sheet names itself", true);
+
   // --- a tile of the wrong size is refused before it shifts every later pixel ---
   // The last line of defence if a normalizer ever changes: the splice is a byte
   // copy, so a 13px tile would slide every subsequent row up a scanline.
@@ -2311,9 +2332,10 @@ async function main() {
   ok("splice: a wrong-sized tile is refused with its byte counts", true);
 
   // --- art left in the folder that no entry claimed ---
-  // The manifest is emptied on the way out, so the next push reports "nothing to
-  // generate" and this file sits there forever with its award never getting a
-  // tile. The run is legitimate; it just did less than the uploader thinks.
+  // The run is legitimate; it just did less than the uploader thinks. The
+  // warning has to be emitted BEFORE the sheets are written and the sources
+  // deleted: held to the end it arrives after everything it could have
+  // prevented, and it is lost outright if a later entry throws.
   const stray = collecting();
   const strayPaths = makeScratch("strayupload", [
     { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
@@ -2351,6 +2373,453 @@ async function main() {
     "run(stray): the sheets themselves are never reported as unclaimed art",
     !strayRes.warnings.some((w) => w.includes("Sheet.png")),
   );
+  ok(
+    "run(stray): the claimed source is not reported as unclaimed",
+    !strayRes.warnings.some((w) => w.includes("claimed.png")),
+  );
+
+  // --- art pushed with nothing in the manifest to process it ---
+  // The one case a warning cannot cover, and the likeliest slip in the
+  // documented flow: drop the PNGs, forget the manifest edit. run() used to
+  // return at "manifest is empty, nothing to process" before the upload folder
+  // was ever looked at, so the workflow printed "Skipping PR" and went green.
+  // There is no pull request in that case, and the PR body is the only place a
+  // warning is read — so this has to fail the run instead.
+  const unmanifested = collecting();
+  const unmanifestedPaths = makeScratch("unmanifested", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(unmanifestedPaths.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(unmanifestedPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(unmanifestedPaths.uploadDir, "nobody-claimed-me.png"),
+    await colorTile(43, 13, [6, 6, 6]),
+  );
+  fs.writeFileSync(unmanifestedPaths.manifest, "[]\n");
+  await assert.rejects(
+    () => run(unmanifestedPaths, unmanifested),
+    (e) => e.message.includes("no manifest entry"),
+    "art pushed against an empty manifest must fail, not report nothing to do",
+  );
+  ok(
+    "run(unmanifested): the file nobody claimed is named",
+    unmanifested.errors.some((e) => e.includes("nobody-claimed-me.png")),
+  );
+  ok(
+    "run(unmanifested): the art is left where it is, for the retry",
+    fs.existsSync(
+      path.join(unmanifestedPaths.uploadDir, "nobody-claimed-me.png"),
+    ),
+  );
+
+  // --- one tile in a batch that changes nothing ---
+  // The identical-art guard used to be one boolean per SHEET, so a tile that
+  // moved no pixel was excused by any sibling tile on the same sheet that did.
+  // The run exited 0 with that award's PNG deleted, the manifest emptied, and
+  // nothing anywhere saying its upload had achieved nothing — while the PR
+  // showed a real binary diff, produced by the sibling.
+  const batch = collecting();
+  const batchPaths = makeScratch("batchnoop", [
+    { name: "R Moved", awardPriority: 0, awardType: "Ribbon" },
+    { name: "R Same", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  await makeSheet(batchPaths.ribbonSheet, 43, 14, [
+    [4, 4, 4],
+    [5, 5, 5],
+  ]);
+  await makeSheet(batchPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(batchPaths.uploadDir, "moved.png"),
+    await colorTile(43, 14, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    path.join(batchPaths.uploadDir, "same.png"),
+    await colorTile(43, 14, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    batchPaths.manifest,
+    JSON.stringify(
+      [
+        { name: "R Moved", ribbon: "moved.png", replace: true },
+        { name: "R Same", ribbon: "same.png", replace: true },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const batchRes = await run(batchPaths, batch);
+  ok(
+    "run(batch no-op): the tile that changed nothing is named",
+    batchRes.warnings.some(
+      (w) => w.includes('"R Same"') && w.includes("already"),
+    ),
+  );
+  ok(
+    "run(batch no-op): the tile that did change is not accused of it",
+    !batchRes.warnings.some((w) => w.includes('"R Moved"')),
+  );
+  ok(
+    "run(batch no-op): the run still completes, having placed the other tile",
+    batchRes.processed === 2 &&
+      (await rowColor(batchPaths.ribbonSheet, 0)).join() === "9,9,9",
+  );
+  ok(
+    "run(batch no-op): the row it would not have changed is untouched",
+    (await rowColor(batchPaths.ribbonSheet, 14)).join() === "5,5,5",
+  );
+
+  // --- an award on both sheets, fixing the art on only one of them ---
+  // 45 of the 105 real awards sit on both sheets, and validateManifest requires
+  // a source for each. So fixing just the medal art means re-supplying the
+  // ribbon art unchanged, and the per-SHEET guard read that as "the ribbon
+  // sheet would be unchanged, abort" — telling a contributor who had uploaded
+  // exactly the right files to go and check they had uploaded the right files.
+  // Nothing is wrong here: the run has work to do, and says what it skipped.
+  const oneSide = makeScratch("onesided", [
+    {
+      name: "Both Award",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+  ]);
+  await makeSheet(oneSide.ribbonSheet, 43, 14, [[4, 4, 4]]);
+  await makeSheet(oneSide.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(oneSide.uploadDir, "sameR.png"),
+    await colorTile(43, 14, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    path.join(oneSide.uploadDir, "newM.png"),
+    await colorTile(70, 120, [0, 9, 0]),
+  );
+  fs.writeFileSync(
+    oneSide.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Both Award",
+          ribbon: "sameR.png",
+          medal: "newM.png",
+          replace: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const oneSideRes = await run(oneSide, silent());
+  ok(
+    "run(one-sided): fixing one sheet's art is allowed, not aborted",
+    oneSideRes.processed === 1 &&
+      (await rowColor(oneSide.medalSheet, 0)).join() === "0,9,0",
+  );
+  ok(
+    "run(one-sided): the sheet that could not change says so",
+    oneSideRes.warnings.some(
+      (w) => w.includes('"Both Award"') && w.includes("ribbonSheet.png"),
+    ),
+  );
+
+  // --- run: a failed encode leaves BOTH sheets as they were ---
+  // The temp-file-then-rename dance exists for exactly this: two destinations
+  // cannot be written atomically, so everything is encoded first and the
+  // renames run last. Deleting the whole mechanism and writing each sheet
+  // straight to its destination passed the entire suite, which meant the
+  // property it exists for was asserted nowhere.
+  //
+  // The encode is made to fail by putting a DIRECTORY where the medal sheet's
+  // temp file goes: readSheet still reads the real sheet, and sharp's toFile
+  // fails on the destination.
+  const atomic = collecting();
+  const atomicPaths = makeScratch("atomic", [
+    {
+      name: "Both Award",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+  ]);
+  await makeSheet(atomicPaths.ribbonSheet, 43, 14, [[4, 4, 4]]);
+  await makeSheet(atomicPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(atomicPaths.uploadDir, "aR.png"),
+    await colorTile(43, 14, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    path.join(atomicPaths.uploadDir, "aM.png"),
+    await colorTile(70, 120, [0, 9, 0]),
+  );
+  fs.writeFileSync(
+    atomicPaths.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Both Award",
+          ribbon: "aR.png",
+          medal: "aM.png",
+          replace: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const atomicRibBefore = fs.readFileSync(atomicPaths.ribbonSheet);
+  const atomicMedBefore = fs.readFileSync(atomicPaths.medalSheet);
+  const blockedTmp = atomicPaths.medalSheet + ".tmp.png";
+  fs.mkdirSync(blockedTmp);
+  await assert.rejects(
+    () => run(atomicPaths, atomic),
+    "an encode failure on the second sheet must abort the run",
+  );
+  ok(
+    "run(atomic): the sheet that encoded first is not left overwritten",
+    atomicRibBefore.equals(fs.readFileSync(atomicPaths.ribbonSheet)),
+  );
+  ok(
+    "run(atomic): the sheet that failed to encode is untouched",
+    atomicMedBefore.equals(fs.readFileSync(atomicPaths.medalSheet)),
+  );
+  ok(
+    "run(atomic): no source was consumed",
+    fs.existsSync(path.join(atomicPaths.uploadDir, "aR.png")) &&
+      fs.existsSync(path.join(atomicPaths.uploadDir, "aM.png")),
+  );
+  ok(
+    "run(atomic): the manifest still holds its entry for the retry",
+    JSON.parse(fs.readFileSync(atomicPaths.manifest, "utf8")).length === 1,
+  );
+  ok(
+    "run(atomic): the temp file that did get written is cleaned up",
+    !fs.existsSync(atomicPaths.ribbonSheet + ".tmp.png"),
+  );
+  ok(
+    "run(atomic): a temp file that cannot be removed is reported, not swallowed",
+    atomic.warnings.some(
+      (w) => w.startsWith("WARN:") && w.includes("could not remove temp file"),
+    ),
+  );
+  fs.rmdirSync(blockedTmp);
+
+  // --- run: a warning produced before a later entry throws is not lost ---
+  // Warnings used to be printed after the loop, which is precisely when they
+  // are worth having and precisely when the loop does not reach the end. The
+  // first entry warns (a wide medal source), the second throws (a square ribbon
+  // source), and the warning still has to have been said.
+  const lost = collecting();
+  const lostPaths = makeScratch("lostwarning", [
+    {
+      name: "Wide Medal",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+    { name: "Square Ribbon", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  await makeSheet(lostPaths.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+  ]);
+  await makeSheet(lostPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(lostPaths.uploadDir, "wR.png"),
+    await colorTile(43, 14, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    path.join(lostPaths.uploadDir, "wM.png"),
+    await colorTile(140, 120, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    path.join(lostPaths.uploadDir, "sq.png"),
+    await colorTile(512, 512, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    lostPaths.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Wide Medal",
+          ribbon: "wR.png",
+          medal: "wM.png",
+          replace: true,
+        },
+        { name: "Square Ribbon", ribbon: "sq.png", replace: true },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  await assert.rejects(
+    () => run(lostPaths, lost),
+    (e) => e.message.includes("512x512"),
+    "a square ribbon source must abort the run",
+  );
+  ok(
+    "run(lost warning): a warning from an earlier entry survives a later throw",
+    lost.warnings.some((w) => w.includes("70x60")),
+  );
+
+  // --- run: a medal source smaller than its tile is scaled up, and says so ---
+  // The aspect warnings cannot see this one: 35x60 fits 70x120 exactly, filling
+  // the tile edge to edge with no margin to report. It is simply blurred, and
+  // once the source is consumed there is nothing left to compare it against.
+  const small = makeScratch("upscale", [
+    {
+      name: "Both Award",
+      awardPriority: 0,
+      medalPriority: 2,
+      awardType: "Medal",
+    },
+  ]);
+  await makeSheet(small.ribbonSheet, 43, 14, [[4, 4, 4]]);
+  await makeSheet(small.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(small.uploadDir, "sR.png"),
+    await colorTile(43, 14, [9, 9, 9]),
+  );
+  fs.writeFileSync(
+    path.join(small.uploadDir, "sM.png"),
+    await colorTile(35, 60, [0, 9, 0]),
+  );
+  fs.writeFileSync(
+    small.manifest,
+    JSON.stringify(
+      [
+        {
+          name: "Both Award",
+          ribbon: "sR.png",
+          medal: "sM.png",
+          replace: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
+  );
+  const smallRes = await run(small, silent());
+  ok(
+    "run(upscale): a medal source below tile size is reported, not silently blurred",
+    smallRes.warnings.some(
+      (w) => w.includes("35x60") && w.includes("scaled UP"),
+    ),
+  );
+
+  // --- the diagnostics name the file they are about ---
+  // Both of these used to surface as a bare library string. JSON.parse names a
+  // character offset and no file; sharp says "Input file contains unsupported
+  // image format" and nothing else, which with several entries queued leaves no
+  // way to tell which upload is the bad one.
+  const badJson = makeScratch("badjson");
+  fs.writeFileSync(badJson.manifest, '[{"name": "Foo Ribbon",}]\n');
+  await assert.rejects(
+    () => run(badJson, silent()),
+    (e) =>
+      e.message.includes("manifest.json") &&
+      e.message.includes("No sprite sheet was modified"),
+    "an unparseable manifest must name the file it could not read",
+  );
+  ok("run(bad json): the manifest is named, not just an offset", true);
+
+  const notArt = makeScratch("notart", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(notArt.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(notArt.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(notArt.uploadDir, "renamed.png"),
+    "this is not a PNG\n",
+  );
+  fs.writeFileSync(
+    notArt.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "renamed.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await assert.rejects(
+    () => run(notArt, silent()),
+    (e) => e.message.includes("renamed.png"),
+    "a source that is not an image must name itself",
+  );
+  ok("run(not art): an undecodable source is named", true);
+
+  // The same courtesy for the sheets. There are two of them, and sharp's
+  // message says which of them is broken exactly as well as it says which
+  // upload is: not at all.
+  const badSheet = makeScratch("badsheet", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  fs.writeFileSync(badSheet.ribbonSheet, "truncated to nothing\n");
+  await makeSheet(badSheet.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(badSheet.uploadDir, "art.png"),
+    await colorTile(43, 13, [7, 7, 7]),
+  );
+  fs.writeFileSync(
+    badSheet.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "art.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await assert.rejects(
+    () => run(badSheet, silent()),
+    (e) => e.message.includes("ribbonSheet.png"),
+    "an undecodable sprite sheet must say which sheet it is",
+  );
+  ok(
+    "run(bad sheet): the sheet that could not be read is named",
+    fs.existsSync(path.join(badSheet.uploadDir, "art.png")),
+  );
+
+  // --- a repeated priority is reported in the order a human reads ---
+  // `occupied` follows catalog order, so the offending priorities came out in
+  // whatever order the catalog happened to mention them first: "awardPriority
+  // 3, 1" reads as one fault about row 3 before you reach the comma.
+  const unsorted = indexCatalog([
+    { name: "P Three", awardPriority: 3, awardType: "Ribbon" },
+    { name: "P One", awardPriority: 1, awardType: "Ribbon" },
+    { name: "P Zero", awardPriority: 0, awardType: "Ribbon" },
+    { name: "P Two", awardPriority: 2, awardType: "Ribbon" },
+    { name: "P Three Again", awardPriority: 3, awardType: "Ribbon" },
+    { name: "P One Again", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  ok(
+    "validate: repeated priorities are listed in ascending order",
+    validateManifest([], unsorted, dir, { ribbon: 4, medal: 0 }).errors.some(
+      (e) => e.includes("awardPriority 1, 3 is claimed by more than one award"),
+    ),
+  );
+
+  // --- splice: a negative row is refused ---
+  // Unreachable through run() today, since both sheets' firstPriority keeps y at
+  // or above 0 — but buildSplicedSheet is exported and this is the last check
+  // between a bad offset and a Buffer.concat that would silently reorder the
+  // sheet.
+  const negSheet = path.join(dir, "negSheet.png");
+  await makeSheet(negSheet, 43, 14, [[1, 0, 0]]);
+  const negTile = await colorTile(43, 14, [2, 2, 2]);
+  await assert.rejects(
+    () =>
+      spliceSheet(negSheet, [
+        { y: -14, tileHeight: 14, png: negTile, name: "Below Zero" },
+      ]),
+    (e) => e.message.includes("negative") && e.message.includes("Below Zero"),
+    "a negative row must be refused",
+  );
+  ok("splice: a negative row is refused, naming the award", true);
+
+  // A negative row count is as much a caller bug as a missing one, and it makes
+  // the reconciliation demand a negative number of awards.
+  assert.throws(
+    () => validateManifest([], CATALOG, dir, { ribbon: -1, medal: 3 }),
+    /ribbon=-1/,
+    "a negative row count must throw and name the sheet",
+  );
+  ok("validate: a negative row count is refused", true);
 
   fs.rmSync(dir, { recursive: true, force: true });
   scratchDirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true }));

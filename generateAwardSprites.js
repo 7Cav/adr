@@ -217,9 +217,12 @@ function catalogSheetRows(catalog, kind) {
   for (let row = 0; row < extent; row += 1) {
     if (!occupied.has(row)) missing.push(row);
   }
-  const duplicated = [...occupied].filter(
-    (row) => rows.filter((other) => other === row).length > 1,
-  );
+  // Sorted, like `missing` is by construction: `occupied` follows catalog order,
+  // and a contributor reading "awardPriority 12, 4 is claimed by more than one
+  // award" reads it as one fault about row 12 before they reach the comma.
+  const duplicated = [...occupied]
+    .filter((row) => rows.filter((other) => other === row).length > 1)
+    .sort((a, b) => a - b);
   const unusable = awards
     .filter((award) => unusablePriority(award, kind))
     .map((award) => ({ name: award.name, value: award[priorityField] }));
@@ -337,12 +340,18 @@ function malformedFields(award) {
 }
 
 /**
- * Read a sheet's raw RGBA pixels. Both production sheets are RGBA; we assert it
- * rather than silently handling RGB so a future flatten-on-export fails loud
- * here instead of running an untested 3-channel path.
+ * Read a sheet's raw RGBA pixels.
+ *
+ * Both production sheets are RGBA and this asserts it. Not because the splice
+ * would break otherwise — `ensureAlpha` would quietly promote a flattened sheet
+ * back to four channels and the arithmetic would go on working — but because a
+ * sheet that arrived here without transparency has had it destroyed by
+ * something, and re-encoding it as RGBA is how that gets buried. Every tile
+ * behind every medal is a hole in the rack; this is the check that says so
+ * instead of shipping it.
  */
 async function readSheet(sheetPath) {
-  const meta = await sharp(sheetPath).metadata();
+  const meta = await readSheetMetadata(sheetPath);
   if (!meta.hasAlpha) {
     throw new Error(
       `sheet ${path.basename(sheetPath)} has no alpha channel; sprite sheets must be RGBA`,
@@ -353,13 +362,63 @@ async function readSheet(sheetPath) {
   return { data, width: meta.width, height: meta.height, channels };
 }
 
-/** Render a tile PNG buffer to raw bytes at the sheet's channel count. */
+/**
+ * Render a tile PNG buffer to raw bytes at the sheet's channel count.
+ *
+ * That count is readSheet's, and readSheet returns 4 for every sheet it will
+ * accept — so the parameter has exactly one legal value today and this asserts
+ * it rather than quietly rendering a tile at a stride the sheet is not using.
+ * It is written as a check on the caller instead of dropping the parameter
+ * because the coupling is the thing worth stating: whatever a tile is rendered
+ * at has to be whatever the sheet was read at, and if readSheet ever learns a
+ * second answer this is where that lands.
+ */
 async function tileToRaw(tilePng, channels) {
-  const pipe =
-    channels === 4
-      ? sharp(tilePng).ensureAlpha()
-      : sharp(tilePng).removeAlpha();
-  return pipe.raw().toBuffer();
+  if (channels !== 4) {
+    throw new Error(
+      `tileToRaw got channels=${channels}; readSheet reads every sheet as RGBA, so a tile ` +
+        `rendered at any other channel count would be copied in at the wrong stride`,
+    );
+  }
+  return sharp(tilePng).ensureAlpha().raw().toBuffer();
+}
+
+/**
+ * Read an image's metadata, naming the file if it cannot be decoded.
+ *
+ * sharp's own message for a file that is not an image is "Input file contains
+ * unsupported image format" and nothing else — no path. With several entries
+ * queued that leaves a contributor with no way to tell which of their uploads
+ * is the bad one, and for a sheet it does not even say which of the two. Every
+ * error this file writes itself names the file it is about; the ones that came
+ * from the library were the exceptions.
+ */
+async function readImageMetadata(file, label, hint) {
+  try {
+    return await sharp(file).metadata();
+  } catch (e) {
+    throw new Error(
+      `${label} ${path.basename(file)} could not be read as an image: ${e.message}. ${hint}`,
+    );
+  }
+}
+
+/** Metadata for one uploaded source PNG, named as the contributor named it. */
+function readSourceMetadata(srcPath, kind) {
+  return readImageMetadata(
+    srcPath,
+    `${kind} source`,
+    `Check it is a real PNG and not, say, an .xcf or a Git LFS pointer renamed to .png`,
+  );
+}
+
+/** Metadata for one sprite sheet, which is a repo file rather than an upload. */
+function readSheetMetadata(sheetPath) {
+  return readImageMetadata(
+    sheetPath,
+    "sprite sheet",
+    `Restore it from git — nothing was modified by this run`,
+  );
 }
 
 // Source shapes a ribbon tile can be produced from: the documented 43x13, the
@@ -397,7 +456,7 @@ function isRibbonSourceShape(width, height) {
  * still on disk, while one wrongly accepted is unrecoverable.
  */
 async function normalizeRibbon(srcPath) {
-  const meta = await sharp(srcPath).metadata();
+  const meta = await readSourceMetadata(srcPath, "ribbon");
   if (!isRibbonSourceShape(meta.width, meta.height)) {
     throw new Error(
       `ribbon source ${path.basename(srcPath)} is ${meta.width}x${meta.height}; ` +
@@ -420,15 +479,28 @@ async function normalizeRibbon(srcPath) {
  */
 async function normalizeMedal(srcPath) {
   const warnings = [];
+  const meta = await readSourceMetadata(srcPath, "medal");
   // A flattened export is an error, not a warning. The tile is composited onto
   // full transparency, so a source with no alpha fills all 70x120 with a solid
   // rectangle that hides the medals either side of it. readSheet asserts the
   // same thing on the sheets; the input side matters more, because the input is
   // the copy that gets deleted.
-  if (!(await sharp(srcPath).metadata()).hasAlpha) {
+  if (!meta.hasAlpha) {
     throw new Error(
       `medal source ${path.basename(srcPath)} has no alpha channel; medal art is placed on ` +
         `transparency, so a flattened export fills the whole tile with a solid rectangle`,
+    );
+  }
+  // Upscaling is the one geometry problem the aspect warnings below cannot see:
+  // a source smaller than the tile fits perfectly, fills it edge to edge, and
+  // arrives blurred with nothing to compare it against once the original is
+  // gone. `withoutEnlargement: false` is deliberate — a small source is still
+  // better placed than refused — but it must not be silent.
+  if (meta.width < MEDAL.width && meta.height < MEDAL.tileHeight) {
+    warnings.push(
+      `medal source ${path.basename(srcPath)} is ${meta.width}x${meta.height}, smaller than the ` +
+        `${MEDAL.width}x${MEDAL.tileHeight} tile, so it is scaled UP and the tile will look soft. ` +
+        `Author medal art at ${MEDAL.width}x${MEDAL.tileHeight} or larger`,
     );
   }
   const fit = await sharp(srcPath)
@@ -503,11 +575,13 @@ async function buildSplicedSheet(sheetPath, inserts) {
   const sheet = await readSheet(sheetPath);
   let { data, height } = sheet;
   const { width, channels } = sheet;
-  // Snapshot for the `changed` comparison at the end. It has to be taken here:
-  // the replace path writes through `rawTile.copy(data, …)`, which mutates the
-  // buffer `sheet.data` still points at, so comparing the two afterwards would
-  // be comparing a buffer to itself and calling every replace a no-op.
-  const before = Buffer.from(data);
+  // Names of the awards whose tile is already exactly the art being spliced
+  // over it. Collected per tile rather than compared once over the whole sheet
+  // at the end: a sheet-wide comparison answers "did this run move anything",
+  // which any one real change makes true, and the tile that moved nothing is
+  // then consumed and reported as placed. Inserts never appear here — an insert
+  // adds a row, so it always changes the sheet.
+  const unchanged = [];
   const sorted = [...inserts].sort((a, b) => a.y - b.y);
   for (const ins of sorted) {
     if (ins.y < 0) {
@@ -533,7 +607,16 @@ async function buildSplicedSheet(sheetPath, inserts) {
           `replace for "${ins.name}" targets row y=${ins.y} but the sheet is only ${height}px tall; there is no existing tile to overwrite (use an insert for a new award)`,
         );
       }
-      rawTile.copy(data, ins.y * width * channels);
+      const at = ins.y * width * channels;
+      // Compare only the bytes that will actually land. `copy` clamps to the
+      // room left, which for the bottom-most award is a partial row, and the
+      // tile rows past the sheet's end never reach it — a difference confined
+      // to those is not a difference to any pixel anyone sees.
+      const room = Math.min(rawTile.length, data.length - at);
+      if (rawTile.subarray(0, room).equals(data.subarray(at, at + room))) {
+        unchanged.push(ins.name);
+      }
+      rawTile.copy(data, at);
       continue; // height unchanged
     }
     if (ins.y <= height) {
@@ -552,20 +635,14 @@ async function buildSplicedSheet(sheetPath, inserts) {
     }
     height = Math.max(height, ins.y) + ins.tileHeight;
   }
-  // `changed` compares pixels, and it is the only trustworthy way to ask
-  // whether this run did anything. The obvious alternative — let CI diff the
-  // written file against git — asks the encoder instead: `writeSheet` re-encodes
-  // from raw, so its output differs from a committed sheet over PNG metadata
-  // alone (a pHYs density chunk libvips fills in from nothing), and it would
-  // report a change for a run that moved not one pixel. That inference also
-  // rots on any sharp/libvips/zlib bump. Here it is just two buffers.
-  return {
-    data,
-    width,
-    height,
-    channels,
-    changed: height !== sheet.height || !data.equals(before),
-  };
+  // `unchanged` is answered on pixels, here, and that is the only trustworthy
+  // way to ask it. The obvious alternative — let CI diff the written file
+  // against git — asks the encoder instead of the art: two PNGs can hold
+  // identical pixels and differ over metadata (a pHYs density chunk, say), and
+  // identical bytes are not what "this award's tile did not change" means
+  // anyway, since a sheet carries many awards. That inference also rots on any
+  // sharp/libvips/zlib bump. Here it is a Buffer.equals per tile.
+  return { data, width, height, channels, unchanged };
 }
 
 /**
@@ -681,12 +758,18 @@ function isPlainPngName(value) {
  * the inputs that would prove something was skipped are already gone.
  */
 function validateManifest(manifest, catalog, uploadDir, sheetRows) {
-  // Integer-checked, not just `typeof === "number"`: an undecodable sheet makes
-  // sheetRowCount return NaN, which is a number, and NaN propagates into the
+  // A caller contract, checked because getting it wrong is silent. Integer, not
+  // just `typeof === "number"`: NaN is a number, and it propagates into the
   // reconciliation as "the catalog must place NaN award(s) on it" — a tool
   // failure dressed up as a contributor error, telling them to renumber a
   // catalog that was fine. Thrown rather than pushed for the same reason: a
   // caller that gets this wrong has a bug, and it is not the contributor's.
+  //
+  // Not reachable from run() today — an undecodable sheet throws in
+  // sharp().metadata() long before this, which is what the read in run() is
+  // positioned to do. It guards the seam, which is exported and has other
+  // callers: anything that computes a row count from somewhere other than
+  // sheetRowCount can land here with undefined or a float.
   const badRows = ["ribbon", "medal"].filter(
     (kind) => !Number.isInteger(sheetRows?.[kind]) || sheetRows[kind] < 0,
   );
@@ -949,19 +1032,94 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
   return { errors };
 }
 
+/**
+ * PNGs sitting in the upload folder that no manifest entry names.
+ *
+ * Read straight off the manifest rather than off what a run consumed, so the
+ * answer exists before anything is spliced or deleted — and so it exists for a
+ * manifest that will process nothing at all, which is the case it matters most
+ * in.
+ *
+ * Directories are skipped: a sheet's temp file is `<sheet>.png.tmp.png`, and a
+ * leftover of any shape there is the write path's business, not unclaimed art.
+ * `outputNames` is the basenames to disregard — the sprite sheets, named rather
+ * than assumed to live elsewhere. They do in production, but they are outputs
+ * either way, and a layout that put them side by side would otherwise have this
+ * report the generator's own product back as art nobody claimed.
+ */
+function unclaimedArt(uploadDir, manifest, outputNames) {
+  const claimed = new Set();
+  if (Array.isArray(manifest)) {
+    manifest.forEach((entry) => {
+      if (!entry) return;
+      ["ribbon", "medal"].forEach((kind) => {
+        if (typeof entry[kind] === "string") claimed.add(entry[kind]);
+      });
+    });
+  }
+  const outputs = new Set(outputNames);
+  return fs
+    .readdirSync(uploadDir, { withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
+    .filter((f) => /\.png$/i.test(f) && !claimed.has(f) && !outputs.has(f));
+}
+
 /** Write the manifest array back prettier-clean (2-space, trailing newline). */
 function writeManifest(manifestPath, entries) {
   fs.writeFileSync(manifestPath, JSON.stringify(entries, null, 2) + "\n");
 }
 
 async function run(paths = DEFAULT_PATHS, log = console) {
-  const manifest = JSON.parse(fs.readFileSync(paths.manifest, "utf8"));
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(paths.manifest, "utf8"));
+  } catch (e) {
+    // JSON.parse names a character offset and no file. This is the one input a
+    // contributor hand-edits every time, so it gets the same treatment as the
+    // catalog: say which file, and that nothing was touched.
+    throw new Error(
+      `could not read ${path.basename(paths.manifest)}: ${e.message}. ` +
+        `No sprite sheet was modified`,
+    );
+  }
+  // Art in the folder that no entry names. Computed before anything else so it
+  // can be reported ahead of every write and every unlink, but only ACTED on
+  // below — a manifest that does not validate has an untrustworthy idea of what
+  // it claims, and an orphan error raised off the back of a typo'd key sends
+  // someone to add an entry when what they need to fix is the key.
+  const orphans = unclaimedArt(
+    paths.uploadDir,
+    manifest,
+    [paths.ribbonSheet, paths.medalSheet].map((p) => path.basename(p)),
+  );
+  // One phrasing of the fact, whether it goes out as an error or a warning.
+  const unclaimed = (f) =>
+    `${f} is in ${path.basename(paths.uploadDir)}/ but no manifest entry claims it`;
   // Only an empty ARRAY means "nothing to do". A manifest that is not an array
   // at all — an object written where a one-element array was meant — is a
   // mistake worth reporting, not a no-op to skip. Collapsing the two made
   // validateManifest's "must be a JSON array" error unreachable from here, so
   // that manifest was silently ignored and the run exited 0.
   if (Array.isArray(manifest) && manifest.length === 0) {
+    // Art with an empty manifest is the one unclaimed-art case a warning cannot
+    // cover, and the likeliest slip in the documented flow: drop the PNGs,
+    // forget the manifest edit. Nothing is generated, so CI opens no pull
+    // request — and the pull request body is the only place a warning is ever
+    // read. Silence here is a green check over an upload that did nothing and
+    // will keep doing nothing on every push after it.
+    if (orphans.length > 0) {
+      orphans.forEach((f) =>
+        log.error(
+          `ERROR: ${unclaimed(f)}, and the manifest is empty, so nothing will be generated ` +
+            `from it. Add an entry for it to ${path.basename(paths.manifest)}, or remove the file`,
+        ),
+      );
+      throw new Error(
+        `${orphans.length} uploaded file(s) with no manifest entry (${orphans.join(", ")}); ` +
+          `no sprite sheet was modified`,
+      );
+    }
     log.log("uniform-uploads/manifest.json is empty — nothing to process.");
     return { processed: 0, warnings: [] };
   }
@@ -973,11 +1131,11 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   // normalized, let alone consumed.
   const sheetRows = {
     ribbon: sheetRowCount(
-      (await sharp(paths.ribbonSheet).metadata()).height,
+      (await readSheetMetadata(paths.ribbonSheet)).height,
       RIBBON.tileHeight,
     ),
     medal: sheetRowCount(
-      (await sharp(paths.medalSheet).metadata()).height,
+      (await readSheetMetadata(paths.medalSheet)).height,
       MEDAL.tileHeight,
     ),
   };
@@ -990,26 +1148,46 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   );
   if (errors.length > 0) {
     errors.forEach((e) => log.error(`ERROR: ${e}`));
-    throw new Error(
-      `manifest validation failed (${errors.length} error(s)); no sprite sheet was modified`,
+    // The list rides along on the Error too. A caller that is not a terminal —
+    // a test, or anything that drives run() programmatically — otherwise gets
+    // only the count and has to scrape stderr for what actually went wrong.
+    throw Object.assign(
+      new Error(
+        `manifest validation failed (${errors.length} error(s)); no sprite sheet was modified`,
+      ),
+      { errors },
     );
   }
+
+  // Every warning goes out as it is produced AND is kept for the return value.
+  // Emitting immediately matters because later steps throw: a warning held back
+  // to be printed at the end is lost exactly when the run had something to say.
+  const allWarnings = [];
+  const warn = (m) => {
+    allWarnings.push(m);
+    log.warn(`WARN: ${m}`);
+  };
+
+  // Uploaded art nobody claimed, now that the manifest is known to be coherent
+  // and its claims can be believed. Pre-existing behaviour is to leave the file
+  // sitting in the folder, which is fine — but the manifest is emptied on the
+  // way out, so the next push reports "nothing to generate" and the file stays
+  // there forever with its award never getting a tile. A warning is the whole
+  // fix: the run is legitimate, it just does less than the uploader thinks.
+  // Said here rather than on the way out, because a warning that arrives after
+  // the sheets are written and the sources deleted has outlived everything it
+  // could have prevented — and is lost outright if a later entry throws.
+  orphans.forEach((f) =>
+    warn(
+      `${unclaimed(f)}; no tile will be spliced from it and the manifest is emptied by this run`,
+    ),
+  );
 
   // Build insert plans. Normalize everything BEFORE writing any sheet so a bad
   // source aborts the run without leaving a half-written sheet.
   const ribbonInserts = [];
   const medalInserts = [];
   const consumed = new Set();
-  // Every warning goes out as it is produced AND is kept for the return value.
-  // Emitting immediately matters because later steps throw: a warning held back
-  // to be printed at the end is lost exactly when the run had something to say.
-  // The medal normalizer is the only geometry warning — accepted, but letterboxed
-  // to fit; the ribbon side throws instead, so it has nothing to report here.
-  const allWarnings = [];
-  const warn = (m) => {
-    allWarnings.push(m);
-    log.warn(`WARN: ${m}`);
-  };
 
   for (const entry of manifest) {
     const award = lookupAward(catalog, entry.name);
@@ -1052,33 +1230,46 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonPlan = await buildSplicedSheet(paths.ribbonSheet, ribbonInserts);
   const medalPlan = await buildSplicedSheet(paths.medalSheet, medalInserts);
   const pending = [];
-  if (ribbonPlan)
-    pending.push({
-      dest: paths.ribbonSheet,
-      plan: ribbonPlan,
-      inserts: ribbonInserts,
-    });
-  if (medalPlan)
-    pending.push({
-      dest: paths.medalSheet,
-      plan: medalPlan,
-      inserts: medalInserts,
-    });
+  if (ribbonPlan) pending.push({ dest: paths.ribbonSheet, plan: ribbonPlan });
+  if (medalPlan) pending.push({ dest: paths.medalSheet, plan: medalPlan });
 
-  // Nothing moved. The art supplied is byte-identical to the tiles already in
-  // place, so this run would delete the contributor's PNGs, empty the manifest,
-  // and open a pull request whose only content is a re-encoded sheet — the
-  // upload having achieved nothing, with no way left to tell. Thrown here, ahead
-  // of the writes: nothing has been consumed yet, so recovery is to do nothing.
-  for (const { dest, plan, inserts } of pending) {
-    if (plan.changed) continue;
+  // Tiles whose art is byte-identical to what is already at their row, per
+  // tile and per sheet. Two different situations, and they need opposite
+  // answers:
+  //
+  // If EVERY tile in the run is one of these, the run achieves nothing. It
+  // would delete the contributor's PNGs, empty the manifest and open a pull
+  // request whose only content is a re-encoded sheet, with no way left to tell.
+  // Thrown ahead of the writes: nothing has been consumed, so recovery is to do
+  // nothing.
+  //
+  // If only SOME are, the run has real work to do and must not be blocked — an
+  // award on both sheets has to supply both sources every time, so fixing the
+  // art on one sheet necessarily re-submits the other sheet's tile unchanged,
+  // and that is the documented way to do it rather than a mistake. Aborting
+  // there told a contributor who had uploaded exactly the right files to go and
+  // check they had uploaded the right files. What is owed is a warning naming
+  // the tile that did not move, so "I uploaded the wrong file for one of these"
+  // is visible in the pull request rather than indistinguishable from success.
+  const noops = pending.flatMap(({ dest, plan }) =>
+    plan.unchanged.map((name) => ({ sheet: path.basename(dest), name })),
+  );
+  if (noops.length === ribbonInserts.length + medalInserts.length) {
     throw new Error(
-      `${path.basename(dest)} would be unchanged by this run: every tile spliced into it is ` +
-        `byte-identical to the art already there (${inserts.map((i) => `"${i.name}"`).join(", ")}). ` +
+      `this run would change nothing: every tile it splices is byte-identical to the art ` +
+        `already in place (${noops.map(({ name, sheet }) => `"${name}" on ${sheet}`).join(", ")}). ` +
         `Nothing has been deleted — check you uploaded the files you meant to, and that they ` +
-        `are not the same PNGs the sheet was built from.`,
+        `are not the same PNGs the sheets were built from.`,
     );
   }
+  noops.forEach(({ sheet, name }) =>
+    warn(
+      `"${name}" already has exactly this art on ${sheet}, so its tile there is unchanged by ` +
+        `this run. That is expected when you are fixing an award's art on the other sheet ` +
+        `only; if you meant to change this one, the file you uploaded for it is not the ` +
+        `file you edited`,
+    ),
+  );
 
   const tmpFor = (dest) => dest + ".tmp.png";
   try {
@@ -1099,7 +1290,27 @@ async function run(paths = DEFAULT_PATHS, log = console) {
     // for it and aborts, and re-running a replace writes the same tile to the
     // same row. Restoring both sheets from git before re-running is still the
     // clean recovery.
-    renames.forEach(([tmp, dest]) => fs.renameSync(tmp, dest));
+    const replaced = [];
+    try {
+      renames.forEach(([tmp, dest]) => {
+        fs.renameSync(tmp, dest);
+        replaced.push(path.basename(dest));
+      });
+    } catch (e) {
+      // The reasoning above is a code comment, and the person who hits this is
+      // not reading the code — they are reading a bare ENOSPC and deciding what
+      // to do next. Say which sheets are already replaced, because that is the
+      // difference between "re-run it" and "restore from git first".
+      throw new Error(
+        `a sprite sheet could not be moved into place: ${e.message}. ` +
+          (replaced.length > 0
+            ? `${replaced.join(" and ")} HAS already been replaced and ${renames.length - replaced.length} ` +
+              `sheet(s) still hold the old art, so the two are now out of step. `
+            : `No sheet was replaced. `) +
+          `No source has been deleted and the manifest still holds every entry. Restore both ` +
+          `sheets from git before re-running`,
+      );
+    }
   } finally {
     // Best-effort: remove any tmp that didn't get renamed (write failure or a
     // partial-rename crash) so a failed run never litters the repo with orphans.
@@ -1126,38 +1337,42 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   // re-applies the same tile to the same row or aborts because a source it
   // already deleted is missing — the loop deletes as it goes, so a failure part
   // way through leaves some sources gone. Either way nothing is applied twice.
-  consumed.forEach((file) => {
-    const p = path.join(paths.uploadDir, file);
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-    // validateManifest proved this file existed minutes ago. If it is gone now,
-    // something outside this run removed it, and skipping it in silence turns
-    // that into a no-op. It is on its way to deletion anyway, so saying so costs
-    // nothing and is the only trace anyone would get.
-    else warn(`source ${file} was already gone before it was consumed`);
-  });
-
-  // Uploaded art nobody claimed. Pre-existing behaviour is to leave it sitting
-  // in the folder, which is fine — but the manifest is emptied on the way out,
-  // so the next push reports "nothing to generate" and the file stays there
-  // forever with its award never getting a tile. A warning is the whole fix:
-  // the run was legitimate, it just did less than the uploader thinks.
-  // The sprite sheets are excluded by name rather than assumed to live
-  // elsewhere. They do in production, but they are outputs either way, and a
-  // layout that put them side by side would otherwise have this report the
-  // generator's own product back as unclaimed art.
-  const outputs = new Set(
-    [paths.ribbonSheet, paths.medalSheet].map((p) => path.basename(p)),
-  );
-  const orphans = fs
-    .readdirSync(paths.uploadDir)
-    .filter((f) => /\.png$/i.test(f) && !consumed.has(f) && !outputs.has(f));
-  orphans.forEach((f) =>
-    warn(
-      `${f} is in ${path.basename(paths.uploadDir)}/ but no manifest entry claimed it; ` +
-        `no tile was spliced from it and the manifest is now empty`,
-    ),
-  );
-  writeManifest(paths.manifest, []);
+  // Tracked as it goes, because the loop deletes one at a time and a failure
+  // part way through leaves the folder half cleared. Which half is exactly what
+  // the person picking up the pieces needs and cannot otherwise find out.
+  const deleted = [];
+  try {
+    consumed.forEach((file) => {
+      const p = path.join(paths.uploadDir, file);
+      if (fs.existsSync(p)) {
+        fs.unlinkSync(p);
+        deleted.push(file);
+        // validateManifest proved this file existed minutes ago. If it is gone
+        // now, something outside this run removed it, and skipping it in
+        // silence turns that into a no-op. It is on its way to deletion anyway,
+        // so saying so costs nothing and is the only trace anyone would get.
+      } else warn(`source ${file} was already gone before it was consumed`);
+    });
+    writeManifest(paths.manifest, []);
+  } catch (e) {
+    // Both sheets are correct and on disk at this point; only the upload folder
+    // is not. Worth spelling out, because the failure that leaves the manifest
+    // full with the sources already deleted presents on the NEXT run as "your
+    // source file is missing" — sending someone to re-upload art that is
+    // already spliced, which lands as a second insert.
+    const left = [...consumed].filter((f) => !deleted.includes(f));
+    throw new Error(
+      `both sprite sheets are written and correct, but clearing the upload folder failed: ` +
+        `${e.message}. The tiles ARE in the sheets — do not upload them again. ` +
+        (deleted.length > 0
+          ? `Already deleted: ${deleted.join(", ")}. `
+          : `Nothing was deleted. `) +
+        (left.length > 0
+          ? `Still to delete by hand: ${left.join(", ")}. `
+          : ``) +
+        `Then empty ${path.basename(paths.manifest)} to []`,
+    );
+  }
 
   log.log(
     `Processed ${manifest.length} award(s): ` +

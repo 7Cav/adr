@@ -13,20 +13,22 @@ the sprite sheets and opens a pull request for review.
    off it; the manifest never restates row numbers.
 2. **Drop the source art** here as PNG(s), named as plain filenames — no
    subdirectories, and the name must end in `.png`:
-   - Ribbon art: 43×13 or 43×14, RGB or RGBA. Anything else fails the run. The
+   - Ribbon art: 43×13 or 43×14, RGB or RGBA, or an exact whole-number multiple
+     of either (86×26, 86×28, 129×39, …). Any other shape fails the run: the
      tile is made by _stretching_ the source to fill 43×14, so a source of
      another shape comes out distorted rather than merely imperfect, and by
      then your PNG is gone.
 
-     Exact multiples (86×26, 129×39, …) are also accepted, but author at 1× if
-     you can: a larger source is scaled down first, and that resample softens
-     stripe edges, so the tile it produces is **not** the same as the one you
-     would get from a 43×13 original.
+     Author at 1× if you can. A larger source is scaled down first, and that
+     resample softens stripe edges, so the tile it produces is **not** the same
+     as the one you would get from a 43×13 original.
 
-   - Medal art: any size, RGBA with transparency (it is scaled to fit a 70×120
-     tile, centered horizontally, top-aligned on transparency). Odd proportions
-     warn rather than fail here — the scale preserves aspect, so the cost is
-     transparent margin, not the art.
+   - Medal art: RGBA with transparency, ideally 70×120 or larger (it is scaled
+     to fit a 70×120 tile, centered horizontally, top-aligned on
+     transparency). Odd proportions warn rather than fail — the scale preserves
+     aspect, so the cost is transparent margin, not the art. A source smaller
+     than the tile is scaled **up**, which warns too: it will look soft, and
+     once the run consumes it there is nothing left to compare against.
 
 3. **Add a manifest entry** to `manifest.json` (a JSON array):
 
@@ -111,7 +113,8 @@ Two modes, selected per entry:
   [
     {
       "name": "Army Distinguished Service Cross",
-      "medal": "ADSC_v2.png",
+      "ribbon": "ADSC_ribbon_v2.png",
+      "medal": "ADSC_medal_v2.png",
       "replace": true
     }
   ]
@@ -123,6 +126,14 @@ Two modes, selected per entry:
   catalog and the sheet disagree about how many awards are on it, a replace
   fails too, since overwriting a tile in place cannot settle that difference.
 
+  **Fixing the art on only one sheet.** Most medals sit on both sheets, and an
+  entry has to supply both sources every time — so to fix just the medal, you
+  re-supply the ribbon art you already have. That is fine and it is the
+  intended way to do it. The run notices that the ribbon tile did not change
+  and says so in the PR body, naming the award and the sheet; treat that
+  warning as confirmation, unless it names a tile you _did_ mean to change, in
+  which case the file you uploaded for it is not the file you edited.
+
 One case the manifest cannot express: an award that already has a tile on one
 sheet gaining its first tile on the other. That is a replace on one sheet and
 an insert on the other, and `replace` is set per entry rather than per sheet.
@@ -132,16 +143,19 @@ around it.
 
 Two more things fail the run rather than passing quietly:
 
-- **Art identical to the tile already in place.** The run would consume your
-  PNGs and change nothing, so it stops before deleting anything — your files
-  are still here and the manifest still holds its entries. This is checked per
-  sheet, on pixels: if a run leaves either sheet untouched, it aborts and names
-  the awards involved.
+- **Art identical to every tile it would place.** The run would consume your
+  PNGs and change nothing at all, so it stops before deleting anything — your
+  files are still here and the manifest still holds its entries. Checked on
+  pixels, per tile: a tile that changes nothing alongside one that does is the
+  one-sheet case above, and warns instead.
 - **A medal source saved without an alpha channel.** It would fill the whole
   tile with a solid rectangle, hiding the medals either side of it.
 
-And one thing that only warns: a PNG left in this folder that no manifest entry
-claimed. The run is legitimate — it just did less than you probably intended,
-and since it empties the manifest on the way out, the next push will report
-"nothing to generate" and that file will sit here indefinitely. The warning is
-in the PR body; if you see one, the award it belongs to did not get a tile.
+And **art in this folder that no manifest entry claims**. If the manifest has
+other work to do, that is a warning in the PR body — the run is legitimate, it
+just did less than you intended, and your file is still here. If the manifest
+is _empty_, it is an error instead. Nothing would be generated, so no PR gets
+opened and there is no PR body for a warning to appear in: the push would have
+gone green over an upload that did nothing, and would keep doing so on every
+push after it. Dropping the PNGs and forgetting the manifest edit is the
+easiest mistake here, so it fails loudly rather than quietly.
