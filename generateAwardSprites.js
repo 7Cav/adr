@@ -106,15 +106,43 @@ const SHEETS = {
   },
 };
 
-/** Does this award have a tile on `kind`'s sheet? */
+/**
+ * Does this award have a tile on `kind`'s sheet?
+ *
+ * The priority must be a usable row index, not merely present. `null >= 0` is
+ * true in JS and `null - 0` is 0, so a priority written as null — or as a
+ * string, or a float — would otherwise be counted as a member sitting on row 0
+ * (or on row 3.5). validateManifest catches that for an award the manifest
+ * names, via malformedFields, but catalogSheetRows scans the WHOLE catalog and
+ * has no such guard behind it. Awards that state the field and fill it with
+ * something unusable are collected there by name instead of being silently
+ * counted or silently dropped.
+ */
 function onSheet(award, kind) {
   const { types, priorityField, firstPriority } = SHEETS[kind];
   return (
     !!award &&
     types.has(award.awardType) &&
-    award[priorityField] !== undefined &&
+    Number.isInteger(award[priorityField]) &&
     award[priorityField] >= firstPriority
   );
+}
+
+/**
+ * Does this award state `kind`'s priority field but fill it with a value that
+ * cannot be a row index?
+ *
+ * Distinct from "not a member". A medal-typed award with medalPriority 0 is a
+ * Lifetime medal, legitimately off the medal sheet — that is what
+ * firstPriority expresses. A medalPriority of null, "WIP" or -1 is a broken
+ * entry, and the difference matters because the two need opposite advice.
+ */
+function unusablePriority(award, kind) {
+  const { types, priorityField } = SHEETS[kind];
+  if (!award || !types.has(award.awardType)) return false;
+  if (!Object.hasOwn(award, priorityField)) return false;
+  const value = award[priorityField];
+  return !Number.isInteger(value) || value < 0;
 }
 
 /** Does this award have a tile on the ribbon sheet? */
@@ -165,12 +193,18 @@ function sheetRowCount(height, tileHeight) {
  * and passes. That is a renumbering slip, which is the likeliest mistake in the
  * workflow this file documents: bump one award's priority, miss its neighbour.
  *
- * It matters because the consumer reads a tile at `priority * tileHeight`. A
- * hole is a blank row that every award below it is then read across, and a
- * repeat is two awards fighting over one row with the loser never drawn.
+ * It matters because the consumer reads a tile at `row * tileHeight`. A hole is
+ * a blank row that every award below it is then read across, and a repeat is
+ * two awards fighting over one row with the loser never drawn.
+ *
+ * `unusable` names the awards that claim a row on this sheet with a value that
+ * cannot be one. They are reported separately rather than folded into the hole
+ * count, because "your medalPriority is null" and "nothing claims medalPriority
+ * 7" send a contributor to different places, and only one of them is true.
  */
 function catalogSheetRows(catalog, kind) {
-  const rows = [...catalog.values()]
+  const awards = [...catalog.values()];
+  const rows = awards
     .filter((award) => onSheet(award, kind))
     .map((award) => sheetRowIndex(award, kind));
   const occupied = new Set(rows);
@@ -182,7 +216,13 @@ function catalogSheetRows(catalog, kind) {
   const duplicated = [...occupied].filter(
     (row) => rows.filter((other) => other === row).length > 1,
   );
-  return { count: rows.length, missing, duplicated };
+  const unusable = awards
+    .filter((award) => unusablePriority(award, kind))
+    .map(
+      (award) =>
+        `"${award.name}" (${SHEETS[kind].priorityField}: ${JSON.stringify(award[SHEETS[kind].priorityField])})`,
+    );
+  return { count: rows.length, missing, duplicated, unusable };
 }
 
 /**
@@ -282,8 +322,9 @@ const FIELD_IS_USABLE = {
  * ribbon tile, skip the medal tile, and still exit 0.
  *
  * Note this cannot catch a MISSPELLED key (`medalPriorty: 5`), which reads as
- * omitted. Neither could the text matcher this replaced. See the manifest-side
- * checks in validateManifest for the other half of that problem.
+ * omitted. Neither could the text matcher this replaced. What catches it now is
+ * the catalog numbering check in validateManifest: the award drops off its
+ * sheet, leaving a hole in the priorities, and the hole is reported by number.
  */
 function malformedFields(award) {
   return Object.keys(FIELD_IS_USABLE).filter(
@@ -458,6 +499,11 @@ async function buildSplicedSheet(sheetPath, inserts) {
   const sheet = await readSheet(sheetPath);
   let { data, height } = sheet;
   const { width, channels } = sheet;
+  // Snapshot for the `changed` comparison at the end. It has to be taken here:
+  // the replace path writes through `rawTile.copy(data, …)`, which mutates the
+  // buffer `sheet.data` still points at, so comparing the two afterwards would
+  // be comparing a buffer to itself and calling every replace a no-op.
+  const before = Buffer.from(data);
   const sorted = [...inserts].sort((a, b) => a.y - b.y);
   for (const ins of sorted) {
     if (ins.y < 0) {
@@ -502,16 +548,36 @@ async function buildSplicedSheet(sheetPath, inserts) {
     }
     height = Math.max(height, ins.y) + ins.tileHeight;
   }
-  return { data, width, height, channels };
+  // `changed` compares pixels, and it is the only trustworthy way to ask
+  // whether this run did anything. The obvious alternative — let CI diff the
+  // written file against git — asks the encoder instead: `writeSheet` re-encodes
+  // from raw, so its output differs from a committed sheet over PNG metadata
+  // alone (a pHYs density chunk libvips fills in from nothing), and it would
+  // report a change for a run that moved not one pixel. That inference also
+  // rots on any sharp/libvips/zlib bump. Here it is just two buffers.
+  return {
+    data,
+    width,
+    height,
+    channels,
+    changed: height !== sheet.height || !data.equals(before),
+  };
 }
 
 /**
  * Write a computed raw sheet buffer back out as a PNG.
  *
  * Encoded at full compression with adaptive filtering, which on these sheets is
- * lossless and still smaller than sharp's defaults. Worth setting because every
- * run re-encodes both sheets in full, so the default's inflation would compound
- * on an asset the client downloads.
+ * lossless and still smaller than sharp's defaults. Worth setting because a
+ * sheet this run touches is re-encoded whole — there is no partial PNG write —
+ * so the default's inflation would compound on an asset the client downloads.
+ *
+ * Both committed sheets are already the output of this function, so encoding
+ * one and comparing it to what is in git is a no-op. Keep it that way: it makes
+ * an unexpected binary diff mean something. Note it holds only for the file
+ * bytes reached through readSheet -> writeSheet; re-compressing a sheet with
+ * some other tool will differ over PNG metadata (a pHYs density chunk) while
+ * every pixel stays the same.
  *
  * Do NOT add `effort`, `quality`, `colours`/`colors` or `dither`, however good
  * the reported saving looks. sharp sets `palette: true` if any of them is
@@ -572,9 +638,16 @@ const MANIFEST_KEYS = ["name", "ribbon", "medal", "replace"];
  * it to a bare filename makes containment provable here instead of something
  * to re-derive at each use.
  *
- * Backslash is rejected on its own account: `path.basename` does not treat it
- * as a separator on POSIX, so `..\x.png` would otherwise reach the Linux
- * runner as a literal filename and be created and deleted under that name.
+ * Backslash is rejected separately from the `basename` check rather than as a
+ * traversal in its own right. On POSIX `path.basename` does not split on it, so
+ * `sub\art.png` passes as a plain name and stays inside uploadDir — harmless
+ * here, and a directory traversal the moment this runs anywhere `path.join`
+ * treats `\` as a separator. Rejecting it keeps containment true on both
+ * platforms instead of true only on the runner we happen to use. (`..\x.png` is
+ * not the example to reach for: the leading-dot clause below rejects it first.)
+ *
+ * The leading-dot clause is what stops `..` and `.` themselves, and it also
+ * keeps dotfiles out — neither is art anyone means to upload.
  *
  * A committed symlink still passes — it is a plain name. Left open knowingly:
  * `unlink` removes the link rather than its target, so the worst case is a
@@ -626,6 +699,12 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
     return { errors };
   }
   const seen = new Set();
+  // Source files already claimed by an earlier entry, filename -> which entry.
+  // Two entries naming one PNG is not caught by anything else: the row
+  // reconciliation counts rows and the row count is right, `consumed` is a Set
+  // so the file is unlinked once, and the award whose art was never uploaded is
+  // never missed. The result is two awards wearing the same tile, exit 0.
+  const claimedSources = new Map();
   // Per-sheet record of what this run does: which placement modes appear (true
   // = replace, false = insert) and how many tiles it inserts. A sheet that sees
   // both modes is rejected below, because mixing them corrupts the wrong row
@@ -711,6 +790,15 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
           errors.push(
             `${label}: "${kind}" source "${entry[kind]}" for "${entry.name}" not found in ${path.basename(uploadDir)}/`,
           );
+        } else if (claimedSources.has(entry[kind])) {
+          errors.push(
+            `${label}: "${kind}" source "${entry[kind]}" for "${entry.name}" is already claimed by ` +
+              `${claimedSources.get(entry[kind])}. Each tile needs its own file: two entries ` +
+              `pointing at one PNG splice the same art into both awards' rows, consume the file ` +
+              `once, and the art that was meant for the other award is never missed.`,
+          );
+        } else {
+          claimedSources.set(entry[kind], `${label} ("${entry.name}")`);
         }
       } else if (entry[kind]) {
         // Two humans contradicting each other, not a stray file: the manifest
@@ -740,14 +828,41 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
       else perSheet[kind].inserts += 1;
     });
   });
+  // Whether every entry was fully accounted for. An entry that bailed out early
+  // above never reached the insert/replace tally, so `perSheet` undercounts and
+  // the reconciliation below would compute an expectation from a manifest it
+  // only partly read. The run aborts either way, but the second error tells the
+  // contributor to renumber a catalog that is fine — and someone who fixes both
+  // as instructed ends up with a genuinely broken one.
+  const manifestFullyRead = errors.length === 0;
   Object.entries(perSheet).forEach(([kind, { inserts, replaces }]) => {
     const { priorityField, tileHeight, firstPriority } = SHEETS[kind];
-    const { count, missing, duplicated } = catalogSheetRows(catalog, kind);
+    const { count, missing, duplicated, unusable } = catalogSheetRows(
+      catalog,
+      kind,
+    );
+    // An award of this sheet's type whose priority cannot be a row index is
+    // dropped from `count` and from the numbering, so it can manifest as a hole
+    // or as a count that is one short. Not an error on its own — an award the
+    // manifest never names and that nothing is counting on is somebody else's
+    // problem, and malformedFields already rejects it the moment art is
+    // supplied for it. But when one of the checks below DOES fail, this is the
+    // likeliest reason, and saying so is the difference between fixing the
+    // broken entry and renumbering a hundred that were fine.
+    const unusableHint =
+      unusable.length > 0
+        ? ` Note the catalog also gives ${unusable.length} ${kind}-sheet award(s) a ` +
+          `${priorityField} that cannot be a row: ${unusable.join(", ")}. Those are not ` +
+          `counted as being on the sheet, which may be the whole of what is wrong here.`
+        : "";
     // Checked for BOTH sheets, whether or not this run writes to them. Unlike
     // the reconciliation below, a hole or a repeat is a property of the catalog
     // on its own: it misrenders every award beneath it from the moment it is
     // merged, tile or no tile. This upload is what carries the catalog edit
-    // into main, so it is the thing that should refuse it.
+    // into main, so it is the thing that should refuse it. (The break may not
+    // be the uploader's doing — it can arrive by any route that edits the
+    // catalog — which is why the message describes the fault rather than
+    // blaming them.)
     if (missing.length > 0 || duplicated.length > 0) {
       // Reported as priorities, not row indices. They differ on the medal sheet
       // (row 0 is medalPriority 2), and the contributor is going to fix this by
@@ -769,7 +884,8 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
         `the catalog's ${kind} numbering has a break in it: ${faults.join(", and ")}. ` +
           `The sheet is read at row * ${tileHeight}px, so from that point down every award ` +
           `renders as a different one. Renumber awardCatalog.js so the ${kind} priorities ` +
-          `run consecutively with no repeats and no holes.`,
+          `run consecutively with no repeats and no holes.` +
+          unusableHint,
       );
       return;
     }
@@ -777,6 +893,7 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
     // whether it agrees with the sheet, which only matters for a sheet this run
     // writes to: an untouched sheet's drift is the business of the run that
     // finally writes to it.
+    if (!manifestFullyRead) return;
     if (inserts === 0 && replaces === 0) return;
     if (inserts > 0 && replaces > 0) {
       errors.push(
@@ -803,7 +920,10 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
             `${count}. An insert pushes every row below it down one tile, so it is only ` +
             `right for an award that is NEW to the sheet: add it to awardCatalog.js and ` +
             `renumber the awards below it. To fix the art of an award that already has a ` +
-            `tile, set "replace": true instead.`
+            `tile, set "replace": true instead. If the catalog looks right as it stands, ` +
+            `suspect the sheet: its row count is its pixel height divided by ${tileHeight} ` +
+            `and rounded UP, so a stray row of leftover pixels reads as a whole extra row. ` +
+            `Do not renumber the catalog to match a sheet you have not checked.`
         : `the ${kind} sheet has ${sheetRows[kind]} row(s) but the catalog places ${count} ` +
             `award(s) on it, and a replace overwrites a tile in place without changing that. ` +
             `If this award is gaining a ${kind} tile it does not have yet while keeping the ` +
@@ -812,6 +932,7 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
             `sequence of uploads works around — raise it rather than forcing it. Otherwise ` +
             `the sheet and awardCatalog.js have drifted apart, so restore or regenerate one.`,
     );
+    if (unusableHint) errors.push(unusableHint.trim());
   });
   return { errors };
 }
@@ -867,9 +988,16 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonInserts = [];
   const medalInserts = [];
   const consumed = new Set();
-  // Only the medal normalizer warns: geometry accepted, but letterboxed to fit.
-  // The ribbon side throws instead, so it has nothing to report here.
+  // Every warning goes out as it is produced AND is kept for the return value.
+  // Emitting immediately matters because later steps throw: a warning held back
+  // to be printed at the end is lost exactly when the run had something to say.
+  // The medal normalizer is the only geometry warning — accepted, but letterboxed
+  // to fit; the ribbon side throws instead, so it has nothing to report here.
   const allWarnings = [];
+  const warn = (m) => {
+    allWarnings.push(m);
+    log.warn(`WARN: ${m}`);
+  };
 
   for (const entry of manifest) {
     const award = lookupAward(catalog, entry.name);
@@ -893,12 +1021,7 @@ async function run(paths = DEFAULT_PATHS, log = console) {
       const { png, warnings: w } = await normalizeMedal(
         path.join(paths.uploadDir, entry.medal),
       );
-      // Emitted as produced, not collected and printed after the loop: the
-      // ribbon normalizer throws, so a later entry's bad art would otherwise
-      // discard an earlier entry's warning and tell the contributor only about
-      // the abort. Both diagnostics are worth having on the same run.
-      w.forEach((m) => log.warn(`WARN: ${m}`));
-      allWarnings.push(...w);
+      w.forEach(warn);
       medalInserts.push({
         y: sheetRowIndex(award, "medal") * MEDAL.tileHeight,
         tileHeight: MEDAL.tileHeight,
@@ -917,8 +1040,24 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonPlan = await buildSplicedSheet(paths.ribbonSheet, ribbonInserts);
   const medalPlan = await buildSplicedSheet(paths.medalSheet, medalInserts);
   const pending = [];
-  if (ribbonPlan) pending.push([paths.ribbonSheet, ribbonPlan]);
-  if (medalPlan) pending.push([paths.medalSheet, medalPlan]);
+  if (ribbonPlan) pending.push([paths.ribbonSheet, ribbonPlan, ribbonInserts]);
+  if (medalPlan) pending.push([paths.medalSheet, medalPlan, medalInserts]);
+
+  // Nothing moved. The art supplied is byte-identical to the tiles already in
+  // place, so this run would delete the contributor's PNGs, empty the manifest,
+  // and open a pull request whose only content is a re-encoded sheet — the
+  // upload having achieved nothing, with no way left to tell. Thrown here, ahead
+  // of the writes: nothing has been consumed yet, so recovery is to do nothing.
+  pending.forEach(([dest, plan, inserts]) => {
+    if (plan.changed) return;
+    throw new Error(
+      `${path.basename(dest)} would be unchanged by this run: every tile spliced into it is ` +
+        `byte-identical to the art already there (${inserts.map((i) => `"${i.name}"`).join(", ")}). ` +
+        `Nothing has been deleted — check you uploaded the files you meant to, and that they ` +
+        `are not the same PNGs the sheet was built from.`,
+    );
+  });
+
   const tmpFor = (dest) => dest + ".tmp.png";
   try {
     const renames = [];
@@ -947,22 +1086,54 @@ async function run(paths = DEFAULT_PATHS, log = console) {
       if (fs.existsSync(tmp)) {
         try {
           fs.unlinkSync(tmp);
-        } catch {
-          /* nothing more we can do */
+        } catch (e) {
+          // Not "nothing more we can do" — say so. The orphan sits inside
+          // client/public/skunkworks/, which CI both diffs and commits, so an
+          // unremovable one would otherwise ride into the pull request as an
+          // untracked file nobody wrote.
+          log.warn(`WARN: could not remove temp file ${tmp}: ${e.message}`);
         }
       }
     });
   }
 
   // Consume sources and empty the manifest of processed entries. An unlink that
-  // throws here leaves the manifest full against already-written sheets, with
-  // the same two outcomes on retry as the partial rename above: an insert run
-  // aborts on the reconciliation, and a replace run re-applies the same tile to
-  // the same row, which is harmless.
+  // throws here leaves the manifest full against already-written sheets. On
+  // retry an insert run aborts on the reconciliation, and a replace run either
+  // re-applies the same tile to the same row or aborts because a source it
+  // already deleted is missing — the loop deletes as it goes, so a failure part
+  // way through leaves some sources gone. Either way nothing is applied twice.
   consumed.forEach((file) => {
     const p = path.join(paths.uploadDir, file);
     if (fs.existsSync(p)) fs.unlinkSync(p);
+    // validateManifest proved this file existed minutes ago. If it is gone now,
+    // something outside this run removed it, and skipping it in silence turns
+    // that into a no-op. It is on its way to deletion anyway, so saying so costs
+    // nothing and is the only trace anyone would get.
+    else warn(`source ${file} was already gone before it was consumed`);
   });
+
+  // Uploaded art nobody claimed. Pre-existing behaviour is to leave it sitting
+  // in the folder, which is fine — but the manifest is emptied on the way out,
+  // so the next push reports "nothing to generate" and the file stays there
+  // forever with its award never getting a tile. A warning is the whole fix:
+  // the run was legitimate, it just did less than the uploader thinks.
+  // The sprite sheets are excluded by name rather than assumed to live
+  // elsewhere. They do in production, but they are outputs either way, and a
+  // layout that put them side by side would otherwise have this report the
+  // generator's own product back as unclaimed art.
+  const outputs = new Set(
+    [paths.ribbonSheet, paths.medalSheet].map((p) => path.basename(p)),
+  );
+  const orphans = fs
+    .readdirSync(paths.uploadDir)
+    .filter((f) => /\.png$/i.test(f) && !consumed.has(f) && !outputs.has(f));
+  orphans.forEach((f) =>
+    warn(
+      `${f} is in ${path.basename(paths.uploadDir)}/ but no manifest entry claimed it; ` +
+        `no tile was spliced from it and the manifest is now empty`,
+    ),
+  );
   writeManifest(paths.manifest, []);
 
   log.log(
@@ -1010,9 +1181,12 @@ module.exports = {
   malformedFields,
   onRibbonSheet,
   onMedalSheet,
+  unusablePriority,
   sheetRowIndex,
   sheetRowCount,
   catalogSheetRows,
+  isPlainPngName,
+  isRibbonSourceShape,
   readSheet,
   normalizeRibbon,
   normalizeMedal,

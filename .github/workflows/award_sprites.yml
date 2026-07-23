@@ -45,12 +45,18 @@ jobs:
           # to do from one that did not, which is what made "no sheet changes"
           # below report a guess as a fact.
           #
-          # A jq failure is fatal rather than falsy. Left to collapse into an
-          # empty string it would make the test below false, disarm the guard,
-          # and report "nothing to generate" about a manifest never read, which
-          # is the same inference this step exists to remove.
-          if ! ENTRY_COUNT=$(jq 'if type == "array" then length else 1 end' uniform-uploads/manifest.json); then
-            echo "::error::could not read uniform-uploads/manifest.json"
+          # Both the exit status AND the output are checked. `-e` would already
+          # abort the step on a non-zero jq, but jq can also exit 0 having
+          # printed nothing (an empty file) or several lines (a stream of
+          # documents). Either would leave ENTRY_COUNT non-numeric, and
+          # `[ "$ENTRY_COUNT" -gt 0 ]` fails on that WITHOUT tripping `-e`,
+          # because a failing `if` condition is not an error — so the guard
+          # would silently take the "nothing to generate" branch about a
+          # manifest it never read. That is the inference this step exists to
+          # remove, so it must not be how the step itself fails.
+          if ! ENTRY_COUNT=$(jq 'if type == "array" then length else 1 end' uniform-uploads/manifest.json) \
+             || ! [ "$ENTRY_COUNT" -eq "$ENTRY_COUNT" ] 2>/dev/null; then
+            echo "::error::could not read uniform-uploads/manifest.json as a JSON document (jq produced '$ENTRY_COUNT')"
             exit 1
           fi
           if [ "$ENTRY_COUNT" -gt 0 ]; then
@@ -76,12 +82,15 @@ jobs:
           if [ -n "$(git status --porcelain client/public/skunkworks/)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           elif [ "$HAD_WORK" = "true" ]; then
-            # The generator reported success and consumed the sources, yet no
-            # sheet moved. The uploaded art was byte-identical to what was
-            # already there, so the PNGs have been deleted for nothing. Fail
-            # rather than skip: this used to be reported as a manifest-only
-            # push, which is the one thing it definitely was not.
-            echo "::error::Manifest had entries and the generator succeeded, but no sprite sheet changed — the uploaded art was identical to the tiles already in place, and the sources have been consumed. Restore them from this push and check you uploaded the intended files."
+            # A backstop, not the identical-art check. The generator itself now
+            # refuses a run that would change no pixel, and it does so before
+            # deleting anything, which git cannot do from out here: writeSheet
+            # re-encodes from raw, so its output differs from a committed sheet
+            # over PNG metadata alone and "the file changed" is not the same
+            # question as "the art changed". Reaching this branch means the
+            # generator claimed to have spliced something and the working tree
+            # disagrees — no known cause, so fail rather than guess one.
+            echo "::error::Manifest had entries and the generator reported success, but no sprite sheet changed on disk. That combination is not expected — the generator refuses a no-op run itself. Do not merge; report this with the run log attached."
             exit 1
           elif [ "$HAD_WORK" = "false" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -113,10 +122,13 @@ jobs:
             upload-folder cleanup (consumed source art removed, manifest
             emptied). Placement was read from `constants/awardCatalog.js`.
 
-            **Generator warnings** (a medal scaled to fit its tile with
-            transparent margin left over). A wrong-sized ribbon source is an
-            error rather than a warning, so it fails the run instead of
-            reaching this list:
+            **Generator warnings** — a medal scaled to fit its tile with
+            transparent margin left over, or a PNG left in the upload folder
+            that no manifest entry claimed (that one means an award you may
+            have meant to include did not get a tile). A wrong-sized ribbon
+            source, a flattened medal source, and art identical to the tile
+            already in place are all errors rather than warnings, so they fail
+            the run instead of reaching this list:
 
             ```
             ${{ steps.generate.outputs.warnings }}

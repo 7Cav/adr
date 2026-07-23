@@ -35,6 +35,9 @@ const {
   onMedalSheet,
   sheetRowCount,
   catalogSheetRows,
+  writeSheet,
+  isPlainPngName,
+  isRibbonSourceShape,
   validateManifest,
   spliceSheet,
   readSheet,
@@ -211,6 +214,10 @@ async function main() {
   //
   // The row counts must be read through sheetRowCount, not height/tileHeight:
   // the ribbon sheet is 783px = 55*14 + 13, its final tile genuinely truncated.
+  const reencodeDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "sprites-reencode-"),
+  );
+  scratchDirs.push(reencodeDir);
   for (const [kind, sheetPath, tileHeight] of [
     ["ribbon", DEFAULT_PATHS.ribbonSheet, 14],
     ["medal", DEFAULT_PATHS.medalSheet, 120],
@@ -228,12 +235,24 @@ async function main() {
       `real ${kind} sheet: holds exactly the ${count} row(s) the catalog claims`,
       rows === count,
     );
+    // The committed sheet is the generator's own output, so re-encoding it
+    // changes nothing. Worth pinning because it makes an unexplained binary
+    // diff mean something: with this true, the next sheet change in git is
+    // either real art or a dependency that started encoding differently, and
+    // both are things a reviewer should be told about rather than wave past.
+    const reencoded = path.join(reencodeDir, `${kind}.png`);
+    await writeSheet(reencoded, await readSheet(sheetPath));
+    ok(
+      `real ${kind} sheet: committed bytes are exactly what writeSheet emits`,
+      fs.readFileSync(reencoded).equals(fs.readFileSync(sheetPath)),
+    );
   }
 
   // sheetRowCount against both real geometries and the accident it survived.
-  // 5401px was a hand-edit that added 121px where 120 was meant; the stray row
-  // has since been cropped, but rounding down on it would have hidden a row and
-  // rounding up would have invented one.
+  // The stray pixel arrived when a hand-edit added 121px where 120 was meant
+  // (5160 -> 5281, 2026-05-05) and rode along through a later clean +120 to
+  // 5401; it has since been cropped. Rounding down on it would have hidden a
+  // row and rounding up would have invented one.
   ok(
     "sheetRowCount: a truncated final tile still counts as a row (783px = 56)",
     sheetRowCount(783, 14) === 56,
@@ -404,6 +423,14 @@ async function main() {
   fs.writeFileSync(
     path.join(dir, "medal.png"),
     await colorTile(72, 148, [9, 9, 9]),
+  );
+  // A second ribbon source, for the cases that put two entries in one manifest.
+  // They cannot share one file: two entries naming the same PNG is itself an
+  // error now (it would splice one award's art into two rows and consume the
+  // file once), and it would mask the check each of those cases is really about.
+  fs.writeFileSync(
+    path.join(dir, "ribbon2.png"),
+    await colorTile(43, 13, [8, 8, 8]),
   );
 
   let r = validateManifest(
@@ -613,7 +640,7 @@ async function main() {
   r = validateManifest(
     [
       { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
-      { name: "Lifetime Medal", ribbon: "ribbon.png" },
+      { name: "Lifetime Medal", ribbon: "ribbon2.png" },
     ],
     CATALOG,
     dir,
@@ -628,7 +655,7 @@ async function main() {
   r = validateManifest(
     [
       { name: "Foo Ribbon", ribbon: "ribbon.png", replace: true },
-      { name: "Lifetime Medal", ribbon: "ribbon.png", replace: true },
+      { name: "Lifetime Medal", ribbon: "ribbon2.png", replace: true },
     ],
     CATALOG,
     dir,
@@ -1951,6 +1978,378 @@ async function main() {
   ok(
     "run(geometry): an already-tile-sized 43x14 source passes without warning",
     tileRes.warnings.length === 0,
+  );
+
+  // --- replace onto the row one past the end: the boundary that copies nothing ---
+  // `ins.y >= height` is the whole guard, and `>` instead of `>=` leaves every
+  // assertion in this file green. It is not a cosmetic off-by-one: Buffer.copy
+  // with targetStart === data.length copies ZERO bytes and does not throw, so
+  // the sheet re-encodes unchanged, the source is unlinked, the manifest is
+  // emptied and the run exits 0. A contributor reaches it by setting
+  // "replace": true on a new bottom-most award, whose row is exactly the row
+  // count. Reproduced at the seam rather than through run(), because the
+  // reconciliation would reject that manifest before the splicer ever saw it.
+  const edge = path.join(dir, "edgeSheet.png");
+  await makeSheet(edge, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+  ]);
+  const edgeBefore = fs.readFileSync(edge);
+  let edgeErr = null;
+  try {
+    await spliceSheet(edge, [
+      {
+        y: 28,
+        tileHeight: 14,
+        png: await colorTile(43, 14, [9, 9, 9]),
+        name: "Past The End",
+        replace: true,
+      },
+    ]);
+  } catch (e) {
+    edgeErr = e;
+  }
+  ok(
+    "splice(replace): a replace one row past the end throws, never copies nothing",
+    edgeErr !== null &&
+      edgeErr.message.includes("no existing tile to overwrite"),
+  );
+  ok(
+    "splice(replace): the sheet is untouched after that rejection",
+    edgeBefore.equals(fs.readFileSync(edge)),
+  );
+
+  // --- the medal sheet's diagnostic speaks in priorities, not row indices ---
+  // Row 0 of the medal sheet is medalPriority 2, so a hole at row 1 must be
+  // reported as medalPriority 3. Dropping the `+ firstPriority` offset survives
+  // every other assertion here, because both existing numbering cases are
+  // ribbon-side where the offset is zero and therefore invisible. The wrong
+  // number is worse than a vague one: medalPriority 1 is a Lifetime medal,
+  // deliberately not on this sheet, so it sends someone to "fix" an award that
+  // is correct by design, two rows from the actual break.
+  const medGap = collecting();
+  const medGapPaths = makeScratch("medalgap", [
+    { name: "M Two", awardPriority: 0, medalPriority: 2, awardType: "Medal" },
+    { name: "M Four", awardPriority: 1, medalPriority: 4, awardType: "Medal" },
+  ]);
+  await makeSheet(medGapPaths.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(medGapPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(medGapPaths.uploadDir, "r.png"),
+    await colorTile(43, 13, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    path.join(medGapPaths.uploadDir, "m.png"),
+    await colorTile(72, 148, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    medGapPaths.manifest,
+    JSON.stringify(
+      [{ name: "M Two", ribbon: "r.png", medal: "m.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await assert.rejects(() => run(medGapPaths, medGap));
+  ok(
+    "run(medal gap): the hole is named as medalPriority 3, not row 1",
+    medGap.errors.some((e) => e.includes("no award claims medalPriority 3")),
+  );
+  ok(
+    "run(medal gap): it never names medalPriority 1, a deliberate off-sheet Lifetime row",
+    !medGap.errors.some((e) => e.includes("medalPriority 1")),
+  );
+
+  // --- ribbon source shapes, at the seam ---
+  // Exercised directly because run() can only reach two of these, and the
+  // clause that makes the rest safe — equal scale on both axes — is invisible
+  // at 1x. Without it 86x14 and 43x28 are accepted and `fit: "fill"`-stretched
+  // into mush, and the contributor's only copy is unlinked either way. The
+  // asymmetry is the point: a wrongly rejected source costs one retry, a
+  // wrongly accepted one is unrecoverable.
+  [
+    [43, 13, true, "the documented 1x source"],
+    [43, 14, true, "already at tile size"],
+    [86, 26, true, "2x of 43x13"],
+    [86, 28, true, "2x of 43x14"],
+    [129, 39, true, "3x of 43x13"],
+    [43, 26, false, "twice as tall, same width"],
+    [43, 28, false, "double height at 1x width"],
+    [86, 13, false, "double width, unscaled height"],
+    [86, 14, false, "double width, tile height"],
+    [64, 20, false, "a shape that is no multiple of either base"],
+    [512, 512, false, "a square export"],
+    [0, 0, false, "a zero-sized source"],
+    [43, 0, false, "no height at all"],
+  ].forEach(([w, h, want, why]) => {
+    ok(
+      `ribbon shape: ${w}x${h} is ${want ? "accepted" : "rejected"} (${why})`,
+      isRibbonSourceShape(w, h) === want,
+    );
+  });
+
+  // An uppercase extension is a valid upload, not a traversal. Every other
+  // filename assertion is a rejection, so dropping the /i would go unnoticed.
+  ok(
+    "filename: an uppercase .PNG extension is accepted",
+    isPlainPngName("art.PNG"),
+  );
+
+  // --- two entries naming one source file ---
+  // The row reconciliation cannot see this by construction: both awards are new,
+  // the catalog grew by two, the run inserts two, and the count balances. The
+  // file is unlinked once, so the art that was meant for the second award is
+  // never missed and both awards wear the same tile.
+  const sharedPaths = makeScratch("sharedsource", [
+    { name: "First New", awardPriority: 0, awardType: "Ribbon" },
+    { name: "Second New", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  fs.writeFileSync(
+    path.join(sharedPaths.uploadDir, "one.png"),
+    await colorTile(43, 13, [3, 3, 3]),
+  );
+  const sharedErrors = validateManifest(
+    [
+      { name: "First New", ribbon: "one.png" },
+      { name: "Second New", ribbon: "one.png" },
+    ],
+    indexCatalog([
+      { name: "First New", awardPriority: 0, awardType: "Ribbon" },
+      { name: "Second New", awardPriority: 1, awardType: "Ribbon" },
+    ]),
+    sharedPaths.uploadDir,
+    { ribbon: 0, medal: 0 },
+  ).errors;
+  ok(
+    "validate: two entries claiming one source file errors",
+    sharedErrors.some(
+      (e) => e.includes("already claimed by") && e.includes("one.png"),
+    ),
+  );
+
+  // A non-boolean `replace` is the natural JSON slip, and `"true"` is the
+  // damaging one: read through the strict `=== true` it is an INSERT, which
+  // shifts every row below the target.
+  ok(
+    'validate: a string "true" replace errors rather than reading as an insert',
+    validateManifest(
+      [{ name: "Foo Ribbon", ribbon: "ribbon.png", replace: "true" }],
+      CATALOG,
+      dir,
+      STEADY,
+    ).errors.some((e) => e.includes("non-boolean")),
+  );
+
+  // --- art identical to what is already on the sheet ---
+  // The run would consume the PNG, empty the manifest and open a pull request
+  // whose only content is a re-encoded sheet. It must abort BEFORE any of that,
+  // so the recovery is to do nothing. CI cannot answer this by diffing the
+  // written file: writeSheet re-encodes from raw and its output differs from a
+  // committed sheet over PNG metadata alone.
+  const same = collecting();
+  const samePaths = makeScratch("identical", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(samePaths.ribbonSheet, 43, 14, [[4, 4, 4]]);
+  await makeSheet(samePaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(samePaths.uploadDir, "same.png"),
+    await colorTile(43, 14, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    samePaths.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "same.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const sameBefore = fs.readFileSync(samePaths.ribbonSheet);
+  await assert.rejects(
+    () => run(samePaths, same),
+    (e) => e.message.includes("would be unchanged by this run"),
+    "a run that changes no pixel must abort",
+  );
+  ok(
+    "run(identical): the source is still on disk",
+    fs.existsSync(path.join(samePaths.uploadDir, "same.png")),
+  );
+  ok(
+    "run(identical): the manifest still holds its entry",
+    JSON.parse(fs.readFileSync(samePaths.manifest, "utf8")).length === 1,
+  );
+  ok(
+    "run(identical): the sheet is byte-identical, not even re-encoded",
+    sameBefore.equals(fs.readFileSync(samePaths.ribbonSheet)),
+  );
+
+  // Art that differs by a single channel in one pixel is a real change, and the
+  // guard above must not swallow it. Without this the cheapest way to pass the
+  // identical-art test is to call every run unchanged.
+  const near = makeScratch("nearidentical", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(near.ribbonSheet, 43, 14, [[4, 4, 4]]);
+  await makeSheet(near.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(near.uploadDir, "near.png"),
+    await colorTile(43, 14, [4, 4, 5]),
+  );
+  fs.writeFileSync(
+    near.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "near.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await run(near, silent());
+  ok(
+    "run(near-identical): a one-channel difference still counts as a change",
+    !fs.existsSync(path.join(near.uploadDir, "near.png")),
+  );
+
+  // --- an unusable priority is named, not silently uncounted ---
+  // `null >= 0` is true and `null - 0` is 0, so before onSheet required an
+  // integer this award was counted as sitting on row 0. Now it is excluded —
+  // which on its own would present as a hole with no stated cause, and send
+  // someone renumbering the awards that were fine.
+  const badPrio = collecting();
+  const badPrioPaths = makeScratch("nullpriority", [
+    { name: "R Zero", awardPriority: 0, awardType: "Ribbon" },
+    { name: "R Null", awardPriority: null, awardType: "Ribbon" },
+    { name: "R Two", awardPriority: 2, awardType: "Ribbon" },
+  ]);
+  await makeSheet(badPrioPaths.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(badPrioPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(badPrioPaths.uploadDir, "r.png"),
+    await colorTile(43, 13, [5, 5, 5]),
+  );
+  fs.writeFileSync(
+    badPrioPaths.manifest,
+    JSON.stringify(
+      [{ name: "R Zero", ribbon: "r.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  await assert.rejects(() => run(badPrioPaths, badPrio));
+  ok(
+    "run(null priority): the offending award is named, with its unusable value",
+    badPrio.errors.some(
+      (e) => e.includes('"R Null"') && e.includes("cannot be a row"),
+    ),
+  );
+  // The claim that separates a usable row index from a merely present one.
+  // Without the integer check `null >= 0` is true and `null - 0` is 0, so
+  // R Null is counted as sitting on row 0 alongside R Zero and the run reports
+  // awardPriority 0 as claimed twice. It is not: R Null claims no row at all,
+  // and renumbering R Zero to chase that would break a correct entry.
+  ok(
+    "run(null priority): it does not accuse a real award of duplicating row 0",
+    !badPrio.errors.some((e) =>
+      e.includes("awardPriority 0 is claimed by more than one award"),
+    ),
+  );
+
+  // --- an entry that bailed out early must not feed the reconciliation ---
+  // The tally it never reached would make the run look like it inserts one tile
+  // when it inserts two, producing a second error that instructs a contributor
+  // to renumber a catalog that is correct. Someone who fixes both as told ends
+  // up with a genuinely broken one.
+  const partialRead = validateManifest(
+    [
+      { name: "Foo Ribbon", ribbon: "ribbon.png", bogus: 1 },
+      { name: "Lifetime Medal", ribbon: "ribbon2.png" },
+    ],
+    CATALOG,
+    dir,
+    inserting(2),
+  );
+  ok(
+    "validate: a typo'd key does not also produce a bogus renumber-the-catalog error",
+    partialRead.errors.some((e) => e.includes("unrecognised key")) &&
+      !partialRead.errors.some((e) => e.includes("the catalog must place")),
+  );
+
+  // --- the sheets' own RGBA assertion ---
+  // The input side of this pair is covered; this is the other half. An RGB sheet
+  // would otherwise run an untested 3-channel path over every offset in the file.
+  const rgbSheet = path.join(dir, "rgbSheet.png");
+  await sharp({
+    create: {
+      width: 43,
+      height: 14,
+      channels: 3,
+      background: { r: 1, g: 2, b: 3 },
+    },
+  })
+    .png()
+    .toFile(rgbSheet);
+  await assert.rejects(
+    () => readSheet(rgbSheet),
+    (e) => e.message.includes("no alpha channel"),
+    "an RGB sprite sheet must be refused, not silently handled",
+  );
+  ok("readSheet: an RGB sheet is refused", true);
+
+  // --- a tile of the wrong size is refused before it shifts every later pixel ---
+  // The last line of defence if a normalizer ever changes: the splice is a byte
+  // copy, so a 13px tile would slide every subsequent row up a scanline.
+  const wrongSize = path.join(dir, "wrongSize.png");
+  await makeSheet(wrongSize, 43, 14, [[1, 0, 0]]);
+  const shortTile = await colorTile(43, 13, [2, 2, 2]);
+  await assert.rejects(
+    () =>
+      spliceSheet(wrongSize, [
+        { y: 0, tileHeight: 14, png: shortTile, name: "Short Tile" },
+      ]),
+    (e) => e.message.includes("expected"),
+    "a tile whose raw size is wrong must be refused",
+  );
+  ok("splice: a wrong-sized tile is refused with its byte counts", true);
+
+  // --- art left in the folder that no entry claimed ---
+  // The manifest is emptied on the way out, so the next push reports "nothing to
+  // generate" and this file sits there forever with its award never getting a
+  // tile. The run is legitimate; it just did less than the uploader thinks.
+  const stray = collecting();
+  const strayPaths = makeScratch("strayupload", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(strayPaths.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(strayPaths.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(strayPaths.uploadDir, "claimed.png"),
+    await colorTile(43, 13, [7, 7, 7]),
+  );
+  fs.writeFileSync(
+    path.join(strayPaths.uploadDir, "forgotten.png"),
+    await colorTile(43, 13, [6, 6, 6]),
+  );
+  fs.writeFileSync(
+    strayPaths.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "claimed.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const strayRes = await run(strayPaths, stray);
+  ok(
+    "run(stray): unclaimed art in the upload folder is reported by name",
+    strayRes.warnings.some((w) => w.includes("forgotten.png")),
+  );
+  ok(
+    "run(stray): the warning reaches the log, where CI greps for it",
+    stray.warnings.some(
+      (w) => w.startsWith("WARN:") && w.includes("forgotten.png"),
+    ),
+  );
+  ok(
+    "run(stray): the sheets themselves are never reported as unclaimed art",
+    !strayRes.warnings.some((w) => w.includes("Sheet.png")),
   );
 
   fs.rmSync(dir, { recursive: true, force: true });

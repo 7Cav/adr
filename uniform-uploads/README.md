@@ -13,14 +13,21 @@ the sprite sheets and opens a pull request for review.
    off it; the manifest never restates row numbers.
 2. **Drop the source art** here as PNG(s), named as plain filenames — no
    subdirectories, and the name must end in `.png`:
-   - Ribbon art: 43×13, or 43×14, or an exact multiple of either (86×26,
-     129×39, …), RGB or RGBA. Anything else fails the run. The tile is made by
-     _stretching_ the source to fill 43×14, so a source of another shape comes
-     out distorted rather than merely imperfect, and by then your PNG is gone.
+   - Ribbon art: 43×13 or 43×14, RGB or RGBA. Anything else fails the run. The
+     tile is made by _stretching_ the source to fill 43×14, so a source of
+     another shape comes out distorted rather than merely imperfect, and by
+     then your PNG is gone.
+
+     Exact multiples (86×26, 129×39, …) are also accepted, but author at 1× if
+     you can: a larger source is scaled down first, and that resample softens
+     stripe edges, so the tile it produces is **not** the same as the one you
+     would get from a 43×13 original.
+
    - Medal art: any size, RGBA with transparency (it is scaled to fit a 70×120
      tile, centered horizontally, top-aligned on transparency). Odd proportions
      warn rather than fail here — the scale preserves aspect, so the cost is
      transparent margin, not the art.
+
 3. **Add a manifest entry** to `manifest.json` (a JSON array):
 
    ```json
@@ -37,6 +44,11 @@ the sprite sheets and opens a pull request for review.
    - `ribbon` and `medal` must be plain filenames sitting in this folder. A
      path that climbs out of it (`../…`) is rejected: the generator deletes
      each source once its tile is spliced.
+   - Every entry needs its **own** file. Two entries naming one PNG is
+     rejected: it would splice the same art into both awards' rows and consume
+     the file once, so the art meant for the second award would never be
+     missed. Copy-pasting an entry and forgetting to change the filename is
+     the way this happens.
    - `name`, `ribbon`, `medal` and `replace` are the only keys an entry may
      carry, and the error message lists them if you get one wrong. Anything
      else fails the run: a misspelled `replace` would otherwise read as absent,
@@ -84,6 +96,12 @@ Two modes, selected per entry:
   produce, and either one misrenders every award below it, so CI rejects them
   and names the priority at fault.
 
+  What this check cannot catch: it counts rows, so it is satisfied by the wrong
+  insert as readily as the right one. Add award X to the catalog and then
+  upload art under existing award Y's name as an insert, and the numbers still
+  balance — the tile lands on Y's row and shifts everything below it. Getting
+  the `name` right is still on you; the check only proves the catalog grew.
+
 - **Existing award — replace.** Set `"replace": true`. CI overwrites the tile
   already at that award's catalog row in place — no shift, no height change —
   so re-uploading art for an award that already has a tile fixes it instead of
@@ -112,7 +130,18 @@ Splitting it across two uploads does not help, because an award on both sheets
 must supply both sources every time. Ask a maintainer rather than working
 around it.
 
-Two more things fail the run rather than passing quietly: art byte-identical to
-the tile already in place (your PNGs are consumed and nothing changes, so the
-job stops instead of opening an empty PR), and a medal source saved without an
-alpha channel (it would fill the whole tile with a solid rectangle).
+Two more things fail the run rather than passing quietly:
+
+- **Art identical to the tile already in place.** The run would consume your
+  PNGs and change nothing, so it stops before deleting anything — your files
+  are still here and the manifest still holds its entries. This is checked per
+  sheet, on pixels: if a run leaves either sheet untouched, it aborts and names
+  the awards involved.
+- **A medal source saved without an alpha channel.** It would fill the whole
+  tile with a solid rectangle, hiding the medals either side of it.
+
+And one thing that only warns: a PNG left in this folder that no manifest entry
+claimed. The run is legitimate — it just did less than you probably intended,
+and since it empties the manifest on the way out, the next push will report
+"nothing to generate" and that file will sit here indefinitely. The warning is
+in the PR body; if you see one, the award it belongs to did not get a tile.
