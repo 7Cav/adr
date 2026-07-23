@@ -1,6 +1,7 @@
 // Ribbon/medal attachment-device taxonomy and the max displayable count per
-// device. MAX_AWARD_COUNT mirrors the AwardRegistry.getMaxAwardCount switch —
-// keep the numbers in sync here, not scattered across files.
+// device. MAX_AWARD_COUNT is the source of those numbers, not a copy of them:
+// AwardRegistry.getMaxAwardCount reads this table. (It once described a switch
+// statement there, which PR #130 replaced with this lookup.)
 export const AwardAttachmentType = Object.freeze({
   OAK_CLUSTERS: "oakClusters",
   UNIT_CITATION_CLUSTERS: "unitCitationClusters",

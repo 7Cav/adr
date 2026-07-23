@@ -40,6 +40,15 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
+          # Read the manifest BEFORE generating: the generator empties it on
+          # success, so afterwards there is no way to tell a push that had work
+          # to do from one that did not — which is what made "no sheet changes"
+          # below report a guess as a fact.
+          if [ "$(jq 'if type == "array" then length else 1 end' uniform-uploads/manifest.json)" -gt 0 ]; then
+            echo "had_work=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "had_work=false" >> "$GITHUB_OUTPUT"
+          fi
           npm run sprites:generate 2>&1 | tee sprite-gen.log
           WARNINGS=$(grep '^WARN:' sprite-gen.log || true)
           [ -z "$WARNINGS" ] && WARNINGS="(none)"
@@ -52,12 +61,22 @@ jobs:
       - name: Detect sprite-sheet changes
         id: changes
         shell: bash
+        env:
+          HAD_WORK: ${{ steps.generate.outputs.had_work }}
         run: |
           if [ -n "$(git status --porcelain client/public/skunkworks/)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$HAD_WORK" = "true" ]; then
+            # The generator reported success and consumed the sources, yet no
+            # sheet moved. The uploaded art was byte-identical to what was
+            # already there, so the PNGs have been deleted for nothing. Fail
+            # rather than skip: this used to be reported as a manifest-only
+            # push, which is the one thing it definitely was not.
+            echo "::error::Manifest had entries and the generator succeeded, but no sprite sheet changed — the uploaded art was identical to the tiles already in place, and the sources have been consumed. Restore them from this push and check you uploaded the intended files."
+            exit 1
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No sprite-sheet changes (e.g. README/manifest-only push); skipping PR."
+            echo "Manifest was empty; nothing to generate. Skipping PR."
           fi
 
       - name: Verify formatting

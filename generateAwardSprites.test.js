@@ -33,6 +33,8 @@ const {
   malformedFields,
   onRibbonSheet,
   onMedalSheet,
+  sheetRowCount,
+  catalogSheetRows,
   validateManifest,
   spliceSheet,
   readSheet,
@@ -52,6 +54,10 @@ const CATALOG_ENTRIES = [
   },
   { name: "Foo Ribbon", awardPriority: 1, awardType: "Ribbon" },
   { name: "Bar Medal", awardPriority: 2, medalPriority: 2, awardType: "Medal" },
+  // Holds ribbon row 3. A real catalog's priorities are contiguous — the sheet
+  // is read at row * tileHeight, so a hole is a blank row every award below it
+  // is then read across — and validateManifest now rejects a gap outright.
+  { name: "Filler Ribbon", awardPriority: 3, awardType: "Ribbon" },
   {
     name: `Baz "Q" Service Ribbon`,
     awardPriority: 4,
@@ -79,6 +85,20 @@ const CATALOG_ENTRIES = [
 ];
 
 const CATALOG = indexCatalog(CATALOG_ENTRIES);
+
+// The rows CATALOG claims: 7 on the ribbon sheet, 3 on the medal sheet.
+// validateManifest takes each sheet's current row count as an argument, so
+// every call has to state which sheet state it is checking against. STEADY is
+// "every catalog award already has a tile", which is what a replace requires;
+// inserting(n, m) is the sheet as it stands just before n ribbon and m medal
+// tiles are spliced in; SOLO is the empty sheet that a one-award fixture
+// catalog splices its first tile into.
+const STEADY = { ribbon: 7, medal: 3 };
+const SOLO = { ribbon: 0, medal: 0 };
+const inserting = (ribbon = 0, medal = 0) => ({
+  ribbon: STEADY.ribbon - ribbon,
+  medal: STEADY.medal - medal,
+});
 
 // Solid-color RGBA tile as a PNG buffer.
 function colorTile(width, height, [r, g, b]) {
@@ -174,6 +194,52 @@ async function main() {
   ok(
     "real catalog: at least one award gates onto each sheet",
     realAwards.some(onRibbonSheet) && realAwards.some(onMedalSheet),
+  );
+
+  // --- REAL catalog against the REAL sheets ---
+  // The invariant the whole reconciliation rests on: each sheet holds exactly
+  // one row per award the catalog places on it, densely numbered from the
+  // sheet's first row. It is unverifiable from the artifact alone — a PNG
+  // records no award identity — so it is asserted here against production data
+  // rather than assumed. If it ever stops holding, every upload starts failing
+  // reconciliation, and the fix is the catalog or the sheet, not this check.
+  //
+  // The row counts must be read through sheetRowCount, not height/tileHeight:
+  // the ribbon sheet is 783px = 55*14 + 13, its final tile genuinely truncated.
+  for (const [kind, sheetPath, tileHeight] of [
+    ["ribbon", DEFAULT_PATHS.ribbonSheet, 14],
+    ["medal", DEFAULT_PATHS.medalSheet, 120],
+  ]) {
+    const { count, extent } = catalogSheetRows(realCatalog, kind);
+    ok(
+      `real ${kind} sheet: catalog priorities are contiguous (${count} awards, ${extent} rows)`,
+      count === extent,
+    );
+    const rows = sheetRowCount(
+      (await sharp(sheetPath).metadata()).height,
+      tileHeight,
+    );
+    ok(
+      `real ${kind} sheet: holds exactly the ${count} row(s) the catalog claims`,
+      rows === count,
+    );
+  }
+
+  // sheetRowCount against both real geometries and the accident it survived.
+  // 5401px was a hand-edit that added 121px where 120 was meant; the stray row
+  // has since been cropped, but rounding down on it would have hidden a row and
+  // rounding up would have invented one.
+  ok(
+    "sheetRowCount: a truncated final tile still counts as a row (783px = 56)",
+    sheetRowCount(783, 14) === 56,
+  );
+  ok(
+    "sheetRowCount: an exact multiple counts cleanly (5400px = 45)",
+    sheetRowCount(5400, 120) === 45,
+  );
+  ok(
+    "sheetRowCount: a stray pixel past the last tile reads as another row",
+    sheetRowCount(5401, 120) === 46,
   );
 
   // The sheet-membership sets are written as plain strings, so they are bound
@@ -339,6 +405,7 @@ async function main() {
     [{ name: "Ghost", ribbon: "ribbon.png" }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok("validate: name absent from the catalog errors", r.errors.length === 1);
 
@@ -346,6 +413,7 @@ async function main() {
     [{ name: "Broken Medal", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: present-but-unusable field is a hard error, not a non-member",
@@ -362,12 +430,13 @@ async function main() {
     indexCatalog([
       {
         name: "Phantom Medal",
-        awardPriority: 8,
+        awardPriority: 0,
         medalPriority: undefined,
         awardType: "Medal",
       },
     ]),
     dir,
+    STEADY,
   );
   ok(
     "validate: a medalPriority written as undefined aborts the run, not just the medal tile",
@@ -380,6 +449,7 @@ async function main() {
     [{ name: "Typeless Medal", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: priorities present but no awardType errors distinctly (not 'does not belong')",
@@ -391,6 +461,7 @@ async function main() {
     [{ name: "Bar Medal", ribbon: "ribbon.png" }],
     CATALOG,
     dir,
+    inserting(1, 1),
   );
   ok(
     "validate: missing required medal source errors",
@@ -401,6 +472,7 @@ async function main() {
     [{ name: "Foo Ribbon", ribbon: "ribbon.png" }],
     CATALOG,
     dir,
+    inserting(1),
   );
   ok("validate: ribbon-only with its source passes", r.errors.length === 0);
 
@@ -408,6 +480,7 @@ async function main() {
     [{ name: "Bar Medal", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
+    inserting(1, 1),
   );
   ok(
     "validate: both-sheet award with both sources passes",
@@ -423,6 +496,7 @@ async function main() {
     [{ name: "Foo Ribbon", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
+    inserting(1),
   );
   ok(
     "validate: a medal source for a pure ribbon errors, not warns",
@@ -437,9 +511,10 @@ async function main() {
   r = validateManifest(
     [{ name: "Forgetful Medal", ribbon: "ribbon.png", medal: "medal.png" }],
     indexCatalog([
-      { name: "Forgetful Medal", awardPriority: 3, awardType: "Medal" },
+      { name: "Forgetful Medal", awardPriority: 0, awardType: "Medal" },
     ]),
     dir,
+    SOLO,
   );
   ok(
     "validate: a medal source for a medal missing medalPriority errors",
@@ -455,12 +530,13 @@ async function main() {
     indexCatalog([
       {
         name: "Priced Ribbon",
-        awardPriority: 3,
+        awardPriority: 0,
         medalPriority: 5,
         awardType: "Ribbon",
       },
     ]),
     dir,
+    SOLO,
   );
   ok(
     "validate: a medal source for a ribbon carrying a medalPriority errors",
@@ -478,6 +554,7 @@ async function main() {
     [{ name: "Lifetime Medal", ribbon: "ribbon.png", medal: "medal.png" }],
     CATALOG,
     dir,
+    inserting(1),
   );
   ok(
     "validate: a medal source for a below-minimum medalPriority errors",
@@ -489,9 +566,10 @@ async function main() {
   r = validateManifest(
     [{ name: "Medal Only", ribbon: "ribbon.png", medal: "medal.png" }],
     indexCatalog([
-      { name: "Medal Only", medalPriority: 5, awardType: "Medal" },
+      { name: "Medal Only", medalPriority: 2, awardType: "Medal" },
     ]),
     dir,
+    SOLO,
   );
   ok(
     "validate: a ribbon source for a medal-only award errors (the mirror case)",
@@ -504,6 +582,7 @@ async function main() {
     [{ name: "Ranger Tab", ribbon: "ribbon.png" }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: award on neither sheet (Tab) errors",
@@ -517,6 +596,7 @@ async function main() {
     ],
     CATALOG,
     dir,
+    inserting(1),
   );
   ok(
     "validate: duplicate manifest entry errors",
@@ -532,6 +612,7 @@ async function main() {
     ],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: mixing a replace and an insert on the same sheet errors",
@@ -546,6 +627,7 @@ async function main() {
     ],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: two replaces on the same sheet (no insert) is allowed",
@@ -559,6 +641,7 @@ async function main() {
     [{ name: "Foo Ribbon", ribbon: "ribbon.png", replaced: true }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     'validate: a near-miss "replace" key errors instead of reading as an insert',
@@ -571,6 +654,7 @@ async function main() {
     [{ name: "Foo Ribbon", ribbon: "ribbon.png", note: "hi" }],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: any unrecognised key errors, not only near-misses of a real one",
@@ -588,6 +672,7 @@ async function main() {
     ],
     CATALOG,
     dir,
+    STEADY,
   );
   ok(
     "validate: all four allowed keys together still pass",
@@ -831,13 +916,16 @@ async function main() {
 
   // --- run: full service-ribbon insert into both sheets ---
   // Baz is awardPriority 4 (ribbon y=56) and medalPriority 3 (medal y=120),
-  // so the sheets must be tall enough to splice mid-sequence.
+  // so the sheets must be tall enough to splice mid-sequence. Six ribbon rows
+  // and two medal rows are what the catalog claims minus this run's one insert
+  // per sheet — the state a contributor is in having just added Baz.
   await makeSheet(paths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
     [3, 0, 0],
     [4, 0, 0],
     [5, 0, 0],
+    [6, 0, 0],
   ]);
   await makeSheet(paths.medalSheet, 70, 120, [
     [0, 1, 0],
@@ -910,16 +998,22 @@ async function main() {
   );
 
   // --- run: replace:true overwrites both tiles in place without growing ---
-  // Bar Medal: ribbon y=28 (priority 2), medal y=0 (priority 2). Sheets are
-  // pre-sized so the rows already exist; replace must not change height.
+  // Bar Medal: ribbon y=28 (priority 2), medal y=0 (priority 2). Sheets hold
+  // every row the catalog claims, which is what a replace requires: the rows
+  // already exist, and overwriting one must not change the height.
   await makeSheet(paths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
     [3, 0, 0],
+    [4, 0, 0],
+    [5, 0, 0],
+    [6, 0, 0],
+    [7, 0, 0],
   ]);
   await makeSheet(paths.medalSheet, 70, 120, [
     [0, 1, 0],
     [0, 2, 0],
+    [0, 3, 0],
   ]);
   fs.writeFileSync(
     path.join(dir, "rR.png"),
@@ -1118,21 +1212,47 @@ async function main() {
     JSON.parse(fs.readFileSync(paths.manifest, "utf8")).length === 2,
   );
 
-  // --- run: normalizer warnings still reach the caller and the log ---
-  // validateManifest no longer produces warnings, so this is the only path that
-  // fills the channel. Left unexercised it would rot silently.
+  // --- run: medal geometry still warns, and the warning reaches the log ---
+  // The medal normalizer resizes with fit:"inside", so an odd aspect costs
+  // transparent margin rather than the art itself — a warning, not an error.
+  // It is also the only thing left filling result.warnings, since the ribbon
+  // side now throws and validateManifest never warned; unexercised it would rot.
   await makeSheet(paths.ribbonSheet, 43, 14, [
     [1, 0, 0],
     [2, 0, 0],
     [3, 0, 0],
+    [4, 0, 0],
+    [5, 0, 0],
+    [6, 0, 0],
+    [7, 0, 0],
+  ]);
+  await makeSheet(paths.medalSheet, 70, 120, [
+    [0, 1, 0],
+    [0, 2, 0],
+    [0, 3, 0],
   ]);
   fs.writeFileSync(
-    path.join(dir, "odd.png"),
-    await colorTile(40, 20, [3, 3, 3]),
+    path.join(dir, "wideR.png"),
+    await colorTile(43, 13, [3, 3, 3]),
+  );
+  fs.writeFileSync(
+    path.join(dir, "wideM.png"),
+    await colorTile(140, 120, [3, 3, 3]),
   );
   fs.writeFileSync(
     paths.manifest,
-    JSON.stringify([{ name: "Foo Ribbon", ribbon: "odd.png" }], null, 2) + "\n",
+    JSON.stringify(
+      [
+        {
+          name: "Bar Medal",
+          ribbon: "wideR.png",
+          medal: "wideM.png",
+          replace: true,
+        },
+      ],
+      null,
+      2,
+    ) + "\n",
   );
   const warned = [];
   const spy = {
@@ -1144,26 +1264,343 @@ async function main() {
   };
   const oddResult = await run(paths, spy);
   ok(
-    "run(warnings): an off-size source is reported, not silently reshaped",
-    oddResult.warnings.some((w) => w.includes("40x20")),
+    "run(warnings): a wide medal source is reported, not silently letterboxed",
+    oddResult.warnings.some((w) => w.includes("70x60")),
   );
   ok(
     "run(warnings): the warning reaches the log too",
-    warned.some((w) => w.includes("40x20")),
+    warned.some((w) => w.includes("70x60")),
+  );
+
+  // --- run: THE BUG. An occupied row, uploaded without `replace` ---
+  // A contributor re-uploading fixed art for an award that already has a tile,
+  // who simply forgets the flag. It needs no typo and no catalog mistake, and
+  // it reached the same corruption as the misspelled `replace` key: a tile
+  // inserted rather than overwritten, pushing every row below it down one, on
+  // both sheets, exiting 0 with the sources deleted and the manifest emptied.
+  //
+  // Occupancy alone cannot catch it — inserting onto a taken row and renumbering
+  // below is the documented way to ADD an award, so the corrupting case and the
+  // intended one land on the same row. What separates them is whether the
+  // catalog grew to account for the new row, which is what is asserted here:
+  // the sheets already hold every row the catalog claims, so there is no room
+  // for an insert.
+  const occ = makeScratch("occupied", CATALOG_ENTRIES);
+  for (const flag of [undefined, false]) {
+    await makeSheet(occ.ribbonSheet, 43, 14, [
+      [1, 0, 0],
+      [2, 0, 0],
+      [3, 0, 0],
+      [4, 0, 0],
+      [5, 0, 0],
+      [6, 0, 0],
+      [7, 0, 0],
+    ]);
+    await makeSheet(occ.medalSheet, 70, 120, [
+      [0, 1, 0],
+      [0, 2, 0],
+      [0, 3, 0],
+    ]);
+    fs.writeFileSync(
+      path.join(occ.uploadDir, "oR.png"),
+      await colorTile(43, 13, [9, 9, 9]),
+    );
+    fs.writeFileSync(
+      path.join(occ.uploadDir, "oM.png"),
+      await colorTile(70, 120, [9, 9, 9]),
+    );
+    const entry = { name: "Bar Medal", ribbon: "oR.png", medal: "oM.png" };
+    if (flag !== undefined) entry.replace = flag;
+    fs.writeFileSync(occ.manifest, JSON.stringify([entry], null, 2) + "\n");
+    const ribGuardOcc = fs.readFileSync(occ.ribbonSheet);
+    const medGuardOcc = fs.readFileSync(occ.medalSheet);
+    let occThrew = false;
+    try {
+      await run(occ, silent());
+    } catch (e) {
+      occThrew = true;
+    }
+    // `replace: false` written out is the same defect reached deliberately, and
+    // is why requiring the key explicitly would not have been a fix on its own.
+    const how = flag === undefined ? "omitted" : "false";
+    ok(`run(occupied/${how}): an insert onto a full sheet aborts`, occThrew);
+    ok(
+      `run(occupied/${how}): ribbon sheet byte-identical`,
+      ribGuardOcc.equals(fs.readFileSync(occ.ribbonSheet)),
+    );
+    ok(
+      `run(occupied/${how}): medal sheet byte-identical`,
+      medGuardOcc.equals(fs.readFileSync(occ.medalSheet)),
+    );
+    ok(
+      `run(occupied/${how}): both sources kept for a retry`,
+      fs.existsSync(path.join(occ.uploadDir, "oR.png")) &&
+        fs.existsSync(path.join(occ.uploadDir, "oM.png")),
+    );
+    ok(
+      `run(occupied/${how}): manifest entry retained`,
+      JSON.parse(fs.readFileSync(occ.manifest, "utf8")).length === 1,
+    );
+  }
+
+  // --- run: the control. A legitimate MID-SHEET insert still shifts ---
+  // The half of the rule that is easy to break: the fix must not turn every
+  // insert into an error. Bar Medal sits at ribbon row 2 with rows below it,
+  // and the catalog claims one more row than the sheet holds — a contributor
+  // who added an award and renumbered. The tile goes in at row 2 and the old
+  // occupant moves down to row 3.
+  const mid = makeScratch("midsheet", CATALOG_ENTRIES);
+  await makeSheet(mid.ribbonSheet, 43, 14, [
+    [1, 0, 0],
+    [2, 0, 0],
+    [3, 0, 0],
+    [4, 0, 0],
+    [5, 0, 0],
+    [6, 0, 0],
+  ]);
+  await makeSheet(mid.medalSheet, 70, 120, [
+    [0, 1, 0],
+    [0, 2, 0],
+  ]);
+  fs.writeFileSync(
+    path.join(mid.uploadDir, "mR.png"),
+    await colorTile(43, 13, [77, 0, 0]),
+  );
+  fs.writeFileSync(
+    path.join(mid.uploadDir, "mM.png"),
+    await colorTile(70, 120, [0, 77, 0]),
+  );
+  fs.writeFileSync(
+    mid.manifest,
+    JSON.stringify(
+      [{ name: "Bar Medal", ribbon: "mR.png", medal: "mM.png" }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const midRes = await run(mid, silent());
+  ok(
+    "run(mid-sheet): a legitimate mid-sheet insert is not blocked",
+    midRes.processed === 1,
+  );
+  ok(
+    "run(mid-sheet): ribbon sheet grew by one tile",
+    midRes.ribbonResult.height === 98,
+  );
+  assert.deepStrictEqual(await rowColor(mid.ribbonSheet, 28), [77, 0, 0]);
+  ok("run(mid-sheet): the new tile landed on its catalog row", true);
+  assert.deepStrictEqual(await rowColor(mid.ribbonSheet, 42), [3, 0, 0]);
+  ok("run(mid-sheet): the row it displaced moved down one tile", true);
+
+  // --- run: the other control. A new bottom-most award still appends ---
+  const app = makeScratch("append", [
+    { name: "First Ribbon", awardPriority: 0, awardType: "Ribbon" },
+    { name: "Second Ribbon", awardPriority: 1, awardType: "Ribbon" },
+  ]);
+  await makeSheet(app.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(app.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(app.uploadDir, "aR.png"),
+    await colorTile(43, 13, [55, 0, 0]),
+  );
+  fs.writeFileSync(
+    app.manifest,
+    JSON.stringify([{ name: "Second Ribbon", ribbon: "aR.png" }], null, 2) +
+      "\n",
+  );
+  const appRes = await run(app, silent());
+  ok(
+    "run(append): a new bottom-most award still appends",
+    appRes.ribbonResult.height === 28,
+  );
+
+  // --- run: a catalog with a hole in its numbering aborts ---
+  // The sheet is read at row * tileHeight, so a missing priority is not a
+  // cosmetic gap: it is a blank row that every award below it renders across.
+  const gap = makeScratch("gap", [
+    { name: "Zero Ribbon", awardPriority: 0, awardType: "Ribbon" },
+    { name: "Two Ribbon", awardPriority: 2, awardType: "Ribbon" },
+  ]);
+  // One row, deliberately: the catalog holds 2 awards spanning 3 rows, so this
+  // is the one sheet size at which the reconciliation is satisfied (2 awards ==
+  // 1 row + 1 insert) and contiguity is the only check left that can fail.
+  // Sized any other way the case aborts on the reconciliation instead and
+  // passes while saying nothing about gaps — which is exactly what it did until
+  // mutation testing caught it.
+  await makeSheet(gap.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(gap.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(gap.uploadDir, "gR.png"),
+    await colorTile(43, 13, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    gap.manifest,
+    JSON.stringify([{ name: "Two Ribbon", ribbon: "gR.png" }], null, 2) + "\n",
+  );
+  const gapGuard = fs.readFileSync(gap.ribbonSheet);
+  let gapErr = "";
+  try {
+    await run(gap, silent());
+  } catch (e) {
+    gapErr = e.message;
+  }
+  ok("run(gap): a non-contiguous catalog aborts the run", gapErr !== "");
+  ok(
+    "run(gap): the sheet is left untouched",
+    gapGuard.equals(fs.readFileSync(gap.ribbonSheet)),
+  );
+  ok(
+    "run(gap): the source is kept for a retry",
+    fs.existsSync(path.join(gap.uploadDir, "gR.png")),
+  );
+
+  // --- run: a manifest written as a bare object is reported, not skipped ---
+  // `!Array.isArray(m) || m.length === 0` collapsed "not a list" into "nothing
+  // to do", so an object written where a one-element array was meant exited 0
+  // saying the manifest was empty, and validateManifest's own "must be a JSON
+  // array" error was unreachable from run().
+  const bare = makeScratch("bare", CATALOG_ENTRIES);
+  await makeSheet(bare.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(bare.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(bare.uploadDir, "bR.png"),
+    await colorTile(43, 13, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    bare.manifest,
+    JSON.stringify({ name: "Foo Ribbon", ribbon: "bR.png" }, null, 2) + "\n",
+  );
+  let bareThrew = false;
+  try {
+    await run(bare, silent());
+  } catch (e) {
+    bareThrew = true;
+  }
+  ok(
+    "run(bare object): a non-array manifest aborts rather than exiting 0",
+    bareThrew,
+  );
+
+  // --- run: a source name that escapes the upload directory aborts ---
+  // The value is joined to uploadDir, spliced, and then unlinked, so a path
+  // that climbs out would consume a file elsewhere in the repo.
+  const esc = makeScratch("escape", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(esc.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(esc.medalSheet, 70, 120, [[0, 1, 0]]);
+  const outsider = path.join(esc.uploadDir, "..", "outsider.png");
+  fs.writeFileSync(outsider, await colorTile(43, 13, [4, 4, 4]));
+  fs.writeFileSync(
+    esc.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "../outsider.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  let escThrew = false;
+  try {
+    await run(esc, silent());
+  } catch (e) {
+    escThrew = true;
+  }
+  ok(
+    "run(escape): a source name climbing out of the upload dir aborts",
+    escThrew,
+  );
+  ok(
+    "run(escape): the file it pointed at was not consumed",
+    fs.existsSync(outsider),
+  );
+  fs.unlinkSync(outsider);
+
+  // --- run: a ribbon source of the wrong shape aborts, rather than stretching ---
+  // The ribbon resize is fit:"fill". A 512x512 source does not come out
+  // imperfect, it comes out as 43x14 of mush — and the only copy is deleted.
+  const geo = makeScratch("geometry", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(geo.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(geo.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(geo.uploadDir, "sq.png"),
+    await colorTile(512, 512, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    geo.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "sq.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  let geoErr = "";
+  try {
+    await run(geo, silent());
+  } catch (e) {
+    geoErr = e.message;
+  }
+  ok(
+    "run(geometry): a 512x512 ribbon source aborts",
+    geoErr.includes("512x512"),
+  );
+  ok(
+    "run(geometry): the source is kept for a retry",
+    fs.existsSync(path.join(geo.uploadDir, "sq.png")),
+  );
+
+  // A source already at tile size used to WARN, which is a false positive — and
+  // a warning block that cries wolf is one reviewers learn to skim.
+  const tile = makeScratch("tilesize", [
+    { name: "Only Ribbon", awardPriority: 0, awardType: "Ribbon" },
+  ]);
+  await makeSheet(tile.ribbonSheet, 43, 14, [[1, 0, 0]]);
+  await makeSheet(tile.medalSheet, 70, 120, [[0, 1, 0]]);
+  fs.writeFileSync(
+    path.join(tile.uploadDir, "exact.png"),
+    await colorTile(43, 14, [4, 4, 4]),
+  );
+  fs.writeFileSync(
+    tile.manifest,
+    JSON.stringify(
+      [{ name: "Only Ribbon", ribbon: "exact.png", replace: true }],
+      null,
+      2,
+    ) + "\n",
+  );
+  const tileRes = await run(tile, silent());
+  ok(
+    "run(geometry): an already-tile-sized 43x14 source passes without warning",
+    tileRes.warnings.length === 0,
   );
 
   fs.rmSync(dir, { recursive: true, force: true });
+  scratchDirs.forEach((d) => fs.rmSync(d, { recursive: true, force: true }));
   console.log(`\nAll ${passed} assertions passed.`);
 }
 
-function makePaths(dir) {
+function makePaths(dir, entries = CATALOG_ENTRIES) {
   return {
     uploadDir: dir,
     manifest: path.join(dir, "manifest.json"),
-    catalog: writeCatalog(dir),
+    catalog: writeCatalog(dir, entries),
     ribbonSheet: path.join(dir, "ribbonSheet.png"),
     medalSheet: path.join(dir, "medalSheet.png"),
   };
+}
+
+/**
+ * A scratch upload directory with its own catalog, for a run() case that needs
+ * catalog contents the shared fixture cannot express. A fresh directory per
+ * call is not tidiness: Node caches ES modules by URL and never invalidates, so
+ * two different catalogs written to one directory would serve the first twice.
+ */
+const scratchDirs = [];
+function makeScratch(tag, entries) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `sprites-${tag}-`));
+  scratchDirs.push(dir);
+  return makePaths(dir, entries);
 }
 
 /**
@@ -1178,11 +1615,11 @@ function makePaths(dir) {
  * `undefined` cannot round-trip through here — build it inline with
  * indexCatalog() instead.
  */
-function writeCatalog(dir) {
+function writeCatalog(dir, entries = CATALOG_ENTRIES) {
   const p = path.join(dir, "awardCatalog.js");
   fs.writeFileSync(
     p,
-    `export const AWARD_CATALOG = ${JSON.stringify(CATALOG_ENTRIES, null, 2)};\n`,
+    `export const AWARD_CATALOG = ${JSON.stringify(entries, null, 2)};\n`,
   );
   return p;
 }

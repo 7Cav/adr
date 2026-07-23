@@ -11,11 +11,16 @@ the sprite sheets and opens a pull request for review.
    single source of truth for placement — CI imports the same module the
    uniform builder renders from and reads `awardPriority` / `medalPriority`
    off it; the manifest never restates row numbers.
-2. **Drop the source art** here as PNG(s):
-   - Ribbon art: ideally 43×13, RGB or RGBA (it is vertically stretched to
-     43×14).
+2. **Drop the source art** here as PNG(s), named as plain filenames — no
+   subdirectories, and the name must end in `.png`:
+   - Ribbon art: 43×13, or 43×14, or an exact multiple of either (86×26,
+     129×39, …), RGB or RGBA. Anything else fails the run. The tile is made by
+     *stretching* the source to fill 43×14, so a source of another shape comes
+     out distorted rather than merely imperfect, and by then your PNG is gone.
    - Medal art: any size, RGBA with transparency (it is scaled to fit a 70×120
-     tile, centered horizontally, top-aligned on transparency).
+     tile, centered horizontally, top-aligned on transparency). Odd proportions
+     warn rather than fail here — the scale preserves aspect, so the cost is
+     transparent margin, not the art.
 3. **Add a manifest entry** to `manifest.json` (a JSON array):
 
    ```json
@@ -29,6 +34,9 @@ the sprite sheets and opens a pull request for review.
    ```
 
    - `name` must match the catalog award name exactly.
+   - `ribbon` and `medal` must be plain filenames sitting in this folder. A
+     path that climbs out of it (`../…`) is rejected: the generator deletes
+     each source once its tile is spliced.
    - `name`, `ribbon`, `medal` and `replace` are the only keys an entry may
      carry, and the error message lists them if you get one wrong. Anything
      else fails the run: a misspelled `replace` would otherwise read as absent,
@@ -62,6 +70,14 @@ Two modes, selected per entry:
   splices the tile in at the catalog-derived row and shifts every row below it
   down by one tile. Use this only for an award that is **new to the sheet**, and
   renumber the catalog as in step 1 so the priorities below it move too.
+
+  Renumbering is not bookkeeping you can skip. CI checks that each sheet holds
+  exactly one row per award the catalog places on it, plus the rows your upload
+  inserts — so an insert only adds up if the catalog gained an award to match.
+  Re-uploading art for an award that is already on the sheet without setting
+  `replace` fails this check, which is the point: it would otherwise have
+  pushed every award below it down a row, and you would not have found out
+  until the sprites looked wrong in the builder.
 - **Existing award — replace.** Set `"replace": true`. CI overwrites the tile
   already at that award's catalog row in place — no shift, no height change —
   so re-uploading art for an award that already has a tile fixes it instead of
