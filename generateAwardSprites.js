@@ -134,15 +134,16 @@ function onSheet(award, kind) {
  *
  * Distinct from "not a member". A medal-typed award with medalPriority 0 is a
  * Lifetime medal, legitimately off the medal sheet — that is what
- * firstPriority expresses. A medalPriority of null, "WIP" or -1 is a broken
- * entry, and the difference matters because the two need opposite advice.
+ * firstPriority expresses, and why this asks FIELD_IS_USABLE (is the value a
+ * row index at all?) rather than repeating the `>= firstPriority` membership
+ * test. A medalPriority of null, "WIP" or -1 is a broken entry, and the two
+ * need opposite advice.
  */
 function unusablePriority(award, kind) {
   const { types, priorityField } = SHEETS[kind];
   if (!award || !types.has(award.awardType)) return false;
   if (!Object.hasOwn(award, priorityField)) return false;
-  const value = award[priorityField];
-  return !Number.isInteger(value) || value < 0;
+  return !FIELD_IS_USABLE[priorityField](award[priorityField]);
 }
 
 /** Does this award have a tile on the ribbon sheet? */
@@ -197,12 +198,15 @@ function sheetRowCount(height, tileHeight) {
  * a blank row that every award below it is then read across, and a repeat is
  * two awards fighting over one row with the loser never drawn.
  *
- * `unusable` names the awards that claim a row on this sheet with a value that
- * cannot be one. They are reported separately rather than folded into the hole
- * count, because "your medalPriority is null" and "nothing claims medalPriority
- * 7" send a contributor to different places, and only one of them is true.
+ * `unusable` lists the awards that claim a row on this sheet with a value that
+ * cannot be one, as { name, value }. Kept separate from the hole count because
+ * "your medalPriority is null" and "nothing claims medalPriority 7" send a
+ * contributor to different places, and only one of them is true. Returned as
+ * data rather than a formatted string for the same reason `missing` is: the
+ * caller is the one that knows how to phrase a priority.
  */
 function catalogSheetRows(catalog, kind) {
+  const { priorityField } = SHEETS[kind];
   const awards = [...catalog.values()];
   const rows = awards
     .filter((award) => onSheet(award, kind))
@@ -218,10 +222,7 @@ function catalogSheetRows(catalog, kind) {
   );
   const unusable = awards
     .filter((award) => unusablePriority(award, kind))
-    .map(
-      (award) =>
-        `"${award.name}" (${SHEETS[kind].priorityField}: ${JSON.stringify(award[SHEETS[kind].priorityField])})`,
-    );
+    .map((award) => ({ name: award.name, value: award[priorityField] }));
   return { count: rows.length, missing, duplicated, unusable };
 }
 
@@ -322,9 +323,12 @@ const FIELD_IS_USABLE = {
  * ribbon tile, skip the medal tile, and still exit 0.
  *
  * Note this cannot catch a MISSPELLED key (`medalPriorty: 5`), which reads as
- * omitted. Neither could the text matcher this replaced. What catches it now is
- * the catalog numbering check in validateManifest: the award drops off its
- * sheet, leaving a hole in the priorities, and the hole is reported by number.
+ * omitted. Neither could the text matcher this replaced. The catalog numbering
+ * check in validateManifest usually catches it downstream — the award drops off
+ * its sheet and leaves a hole, reported by number — but not always: an award
+ * that held the HIGHEST priority on its sheet leaves no hole when it drops out,
+ * since the numbering simply ends one row sooner. What catches that one is the
+ * reconciliation, and only on a run that writes to the sheet.
  */
 function malformedFields(award) {
   return Object.keys(FIELD_IS_USABLE).filter(
@@ -842,18 +846,28 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
       kind,
     );
     // An award of this sheet's type whose priority cannot be a row index is
-    // dropped from `count` and from the numbering, so it can manifest as a hole
-    // or as a count that is one short. Not an error on its own — an award the
-    // manifest never names and that nothing is counting on is somebody else's
-    // problem, and malformedFields already rejects it the moment art is
-    // supplied for it. But when one of the checks below DOES fail, this is the
-    // likeliest reason, and saying so is the difference between fixing the
-    // broken entry and renumbering a hundred that were fine.
+    // dropped from `count` and from the numbering, so it can surface as a hole
+    // or as a count one short. Appended to whichever check fails rather than
+    // raised on its own, and the asymmetry with the hole check below is
+    // deliberate: a hole or a repeat is contagious, shifting every award
+    // beneath it, whereas an unusable priority costs exactly the one award that
+    // has it — and that award cannot be uploaded anyway, because
+    // malformedFields rejects it the moment art is supplied for it. So it is
+    // not silent where it counts. What it IS good for is explaining a count
+    // that does not add up, which is the difference between fixing one broken
+    // entry and renumbering a hundred that were fine.
+    const asPriorities = (rows) =>
+      rows.map((row) => row + firstPriority).join(", ");
+    const named = unusable
+      .map(({ name, value }) => `"${name}" (${JSON.stringify(value)})`)
+      .join(", ");
     const unusableHint =
       unusable.length > 0
-        ? ` Note the catalog also gives ${unusable.length} ${kind}-sheet award(s) a ` +
-          `${priorityField} that cannot be a row: ${unusable.join(", ")}. Those are not ` +
-          `counted as being on the sheet, which may be the whole of what is wrong here.`
+        ? ` Note the catalog also gives ${unusable.length === 1 ? "an award" : `${unusable.length} awards`} ` +
+          `on the ${kind} sheet ${/^[aeiou]/i.test(priorityField) ? "an" : "a"} ${priorityField} ` +
+          `that cannot be a row: ${named}. ` +
+          `${unusable.length === 1 ? "It is" : "They are"} not counted as being on the sheet, ` +
+          `which may be the whole of what is wrong here.`
         : "";
     // Checked for BOTH sheets, whether or not this run writes to them. Unlike
     // the reconciliation below, a hole or a repeat is a property of the catalog
@@ -864,11 +878,9 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
     // catalog — which is why the message describes the fault rather than
     // blaming them.)
     if (missing.length > 0 || duplicated.length > 0) {
-      // Reported as priorities, not row indices. They differ on the medal sheet
-      // (row 0 is medalPriority 2), and the contributor is going to fix this by
-      // editing priorities.
-      const asPriorities = (rows) =>
-        rows.map((row) => row + firstPriority).join(", ");
+      // Reported as priorities, not row indices, via asPriorities above. They
+      // differ on the medal sheet (row 0 is medalPriority 2), and the
+      // contributor is going to fix this by editing priorities.
       const faults = [];
       if (duplicated.length > 0) {
         faults.push(
@@ -914,25 +926,25 @@ function validateManifest(manifest, catalog, uploadDir, sheetRows) {
     const expected = sheetRows[kind] + inserts;
     if (count === expected) return;
     errors.push(
-      inserts > 0
+      (inserts > 0
         ? `the ${kind} sheet has ${sheetRows[kind]} row(s) and this run inserts ` +
-            `${inserts}, so the catalog must place ${expected} award(s) on it — it places ` +
-            `${count}. An insert pushes every row below it down one tile, so it is only ` +
-            `right for an award that is NEW to the sheet: add it to awardCatalog.js and ` +
-            `renumber the awards below it. To fix the art of an award that already has a ` +
-            `tile, set "replace": true instead. If the catalog looks right as it stands, ` +
-            `suspect the sheet: its row count is its pixel height divided by ${tileHeight} ` +
-            `and rounded UP, so a stray row of leftover pixels reads as a whole extra row. ` +
-            `Do not renumber the catalog to match a sheet you have not checked.`
+          `${inserts}, so the catalog must place ${expected} award(s) on it — it places ` +
+          `${count}. An insert pushes every row below it down one tile, so it is only ` +
+          `right for an award that is NEW to the sheet: add it to awardCatalog.js and ` +
+          `renumber the awards below it. To fix the art of an award that already has a ` +
+          `tile, set "replace": true instead. If the catalog looks right as it stands, ` +
+          `suspect the sheet: its row count is its pixel height divided by ${tileHeight} ` +
+          `and rounded UP, so a stray row of leftover pixels reads as a whole extra row. ` +
+          `Do not renumber the catalog to match a sheet you have not checked.`
         : `the ${kind} sheet has ${sheetRows[kind]} row(s) but the catalog places ${count} ` +
-            `award(s) on it, and a replace overwrites a tile in place without changing that. ` +
-            `If this award is gaining a ${kind} tile it does not have yet while keeping the ` +
-            `one it already has on the other sheet, that is an insert on one sheet and a ` +
-            `replace on the other, which a single manifest entry cannot express and no ` +
-            `sequence of uploads works around — raise it rather than forcing it. Otherwise ` +
-            `the sheet and awardCatalog.js have drifted apart, so restore or regenerate one.`,
+          `award(s) on it, and a replace overwrites a tile in place without changing that. ` +
+          `If this award is gaining a ${kind} tile it does not have yet while keeping the ` +
+          `one it already has on the other sheet, that is an insert on one sheet and a ` +
+          `replace on the other, which a single manifest entry cannot express and no ` +
+          `sequence of uploads works around — raise it rather than forcing it. Otherwise ` +
+          `the sheet and awardCatalog.js have drifted apart, so restore or regenerate one.`) +
+        unusableHint,
     );
-    if (unusableHint) errors.push(unusableHint.trim());
   });
   return { errors };
 }
@@ -1040,28 +1052,38 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   const ribbonPlan = await buildSplicedSheet(paths.ribbonSheet, ribbonInserts);
   const medalPlan = await buildSplicedSheet(paths.medalSheet, medalInserts);
   const pending = [];
-  if (ribbonPlan) pending.push([paths.ribbonSheet, ribbonPlan, ribbonInserts]);
-  if (medalPlan) pending.push([paths.medalSheet, medalPlan, medalInserts]);
+  if (ribbonPlan)
+    pending.push({
+      dest: paths.ribbonSheet,
+      plan: ribbonPlan,
+      inserts: ribbonInserts,
+    });
+  if (medalPlan)
+    pending.push({
+      dest: paths.medalSheet,
+      plan: medalPlan,
+      inserts: medalInserts,
+    });
 
   // Nothing moved. The art supplied is byte-identical to the tiles already in
   // place, so this run would delete the contributor's PNGs, empty the manifest,
   // and open a pull request whose only content is a re-encoded sheet — the
   // upload having achieved nothing, with no way left to tell. Thrown here, ahead
   // of the writes: nothing has been consumed yet, so recovery is to do nothing.
-  pending.forEach(([dest, plan, inserts]) => {
-    if (plan.changed) return;
+  for (const { dest, plan, inserts } of pending) {
+    if (plan.changed) continue;
     throw new Error(
       `${path.basename(dest)} would be unchanged by this run: every tile spliced into it is ` +
         `byte-identical to the art already there (${inserts.map((i) => `"${i.name}"`).join(", ")}). ` +
         `Nothing has been deleted — check you uploaded the files you meant to, and that they ` +
         `are not the same PNGs the sheet was built from.`,
     );
-  });
+  }
 
   const tmpFor = (dest) => dest + ".tmp.png";
   try {
     const renames = [];
-    for (const [dest, plan] of pending) {
+    for (const { dest, plan } of pending) {
       const tmp = tmpFor(dest);
       await writeSheet(tmp, plan);
       renames.push([tmp, dest]);
@@ -1081,17 +1103,18 @@ async function run(paths = DEFAULT_PATHS, log = console) {
   } finally {
     // Best-effort: remove any tmp that didn't get renamed (write failure or a
     // partial-rename crash) so a failed run never litters the repo with orphans.
-    pending.forEach(([dest]) => {
+    pending.forEach(({ dest }) => {
       const tmp = tmpFor(dest);
       if (fs.existsSync(tmp)) {
         try {
           fs.unlinkSync(tmp);
         } catch (e) {
-          // Not "nothing more we can do" — say so. The orphan sits inside
-          // client/public/skunkworks/, which CI both diffs and commits, so an
-          // unremovable one would otherwise ride into the pull request as an
-          // untracked file nobody wrote.
-          log.warn(`WARN: could not remove temp file ${tmp}: ${e.message}`);
+          // Not "nothing more we can do" — say so, through the same helper as
+          // every other warning so it reaches run()'s return value and not just
+          // the log. The orphan sits inside client/public/skunkworks/, which CI
+          // both diffs and commits, so an unremovable one would otherwise ride
+          // into the pull request as an untracked file nobody wrote.
+          warn(`could not remove temp file ${tmp}: ${e.message}`);
         }
       }
     });
@@ -1181,7 +1204,6 @@ module.exports = {
   malformedFields,
   onRibbonSheet,
   onMedalSheet,
-  unusablePriority,
   sheetRowIndex,
   sheetRowCount,
   catalogSheetRows,
