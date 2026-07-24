@@ -22,7 +22,7 @@
     "express": "^5.2.1",
     "mysql2": "^3.22.6",
     "node-cron": "^4.6.0",
-    "node-pg-migrate": "^8.0.4",
+    "node-pg-migrate": "^9.0.0",
     "pg": "^8.22.0"
   }
 }
